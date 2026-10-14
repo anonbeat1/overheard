@@ -5,13 +5,47 @@
 <h1 align="center">Overheard</h1>
 
 <p align="center">
-  <b>A tiny Mac menu bar app that records your meetings, transcribes them, and makes them searchable from Claude.</b><br>
+  <b>Your meetings, turned into text — and answerable from Claude.</b><br>
+  A tiny Mac menu bar app that records your calls, transcribes them and makes them searchable from Claude.<br>
   No bot joins your call. No virtual audio driver. Native Swift.
 </p>
 
-<!-- TODO: demo GIF (click → record → transcript → ask Claude) -->
+<p align="center">
+  <img src="https://img.shields.io/badge/macOS-14.2%2B-111?logo=apple&logoColor=white" alt="macOS 14.2+">
+  <img src="https://img.shields.io/badge/Apple%20Silicon-only-111" alt="Apple Silicon">
+  <img src="https://img.shields.io/badge/Swift-native-FF6A5F?logo=swift&logoColor=white" alt="Swift">
+  <img src="https://img.shields.io/badge/MCP-Claude%20%C2%B7%20Codex-FF6A5F" alt="MCP">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-111" alt="MIT"></a>
+</p>
+
+<p align="center">
+  <a href="docs/overheard.mp4"><img src="docs/demo.gif" width="800" alt="Overheard demo: a call becomes a transcript, a summary with action items, and an answer in Claude Code"></a><br>
+  <sub><a href="docs/overheard.mp4">▶ Watch with sound</a> · <a href="../../releases">Download</a></sub>
+</p>
 
 ---
+
+## How it works
+
+<table>
+  <tr>
+    <td width="50%"><img src="docs/menubar.jpg" alt="The Overheard panel in the menu bar while recording"></td>
+    <td width="50%"><img src="docs/transcript.jpg" alt="A transcript with speakers and timestamps"></td>
+  </tr>
+  <tr>
+    <td><b>1 · Record.</b> It starts when Meet, Teams or Slack grab the mic. Bookmark moments with <b>⌃⌥M</b>.</td>
+    <td><b>2 · Transcribe.</b> Every word, with speakers and timestamps — in the cloud or fully on your Mac.</td>
+  </tr>
+  <tr>
+    <td><img src="docs/summary.jpg" alt="A summary with decisions and checkable action items"></td>
+    <td><img src="docs/claude.jpg" alt="Claude Code answering a question using the Overheard MCP server"></td>
+  </tr>
+  <tr>
+    <td><b>3 · Summarize.</b> Decisions and action items you can tick off.</td>
+    <td><b>4 · Ask Claude.</b> <i>"What did we decide about the Acme launch?"</i> — answered from your meetings, with timestamps.</td>
+  </tr>
+</table>
+
 
 ## Why Overheard
 
