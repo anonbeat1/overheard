@@ -189,6 +189,9 @@ struct TranscriptView: View {
             if lines.isEmpty {
                 Spacer()
                 Text(status).font(.callout).foregroundStyle(.white.opacity(0.6)).frame(maxWidth: .infinity)
+                if FileManager.default.fileExists(atPath: meeting.url.appendingPathComponent("transcript.error").path) {
+                    Button("Riprova") { retry() }.frame(maxWidth: .infinity).padding(.top, 6)
+                }
                 Spacer()
             } else {
                 Picker("", selection: $tab) {
@@ -378,7 +381,7 @@ struct TranscriptView: View {
             status = String(localized: "Trascrizione fallita: \(err.trimmingCharacters(in: .whitespacesAndNewlines))")
         } else if FileManager.default.fileExists(atPath: dir.appendingPathComponent("recording.wav").path) {
             status = String(localized: "Trascrizione in corso…")
-        } else if dir == Recorder.shared.currentDir {
+        } else if Recorder.shared.isRecording(dir) {
             status = String(localized: "Registrazione in corso")
         } else {
             status = String(localized: "Registrazione interrotta: viene recuperata al prossimo avvio dell'app")
@@ -411,6 +414,17 @@ struct TranscriptView: View {
             } else {
                 Button("Inizia sezione audio da qui") { exportStart = line }
             }
+        }
+    }
+
+    /// Trascrizione fallita (chiave mancante, rete…): riprova con il motore attuale
+    private func retry() {
+        let dir = meeting.url, engine = Recorder.shared.engine
+        try? FileManager.default.removeItem(at: dir.appendingPathComponent("transcript.error"))
+        status = String(localized: "Trascrizione in corso…")
+        Task.detached {
+            _ = await Transcriber.run(dir: dir, engine: engine)
+            await MainActor.run { load() }
         }
     }
 
@@ -770,7 +784,7 @@ struct LibraryView: View {
             Button("Mostra nel Finder") { NSWorkspace.shared.activateFileViewerSelecting([m.url]) }
             Divider()
             Button("Sposta nel Cestino…", role: .destructive) { toDelete = m }
-                .disabled(m.url == Recorder.shared.currentDir || FileManager.default.fileExists(atPath: m.url.appendingPathComponent(".transcribing").path))
+                .disabled(Recorder.shared.isRecording(m.url) || FileManager.default.fileExists(atPath: m.url.appendingPathComponent(".transcribing").path))
         }
     }
 

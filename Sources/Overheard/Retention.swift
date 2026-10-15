@@ -19,7 +19,7 @@ enum Retention {
         var cleaned = 0
         for dir in (try? fm.contentsOfDirectory(at: root, includingPropertiesForKeys: nil)) ?? [] {
             let name = dir.lastPathComponent
-            guard name.hasPrefix("20"), dir.standardizedFileURL != active?.standardizedFileURL,
+            guard name.hasPrefix("20"), name != active?.lastPathComponent,
                   !fm.fileExists(atPath: dir.appendingPathComponent(".transcribing").path) else { continue }
             f.dateFormat = name.count > 15 ? "yyyy-MM-dd_HHmmss" : "yyyy-MM-dd_HHmm"
             guard let date = f.date(from: name), date < cutoff else { continue }

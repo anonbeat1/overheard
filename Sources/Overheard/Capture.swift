@@ -456,7 +456,7 @@ enum Recovery {
         let fm = FileManager.default
         let dirs = (try? fm.contentsOfDirectory(at: URL(fileURLWithPath: "\(home)/Meetings"), includingPropertiesForKeys: nil)) ?? []
         return dirs.filter { d in
-            d != current && fm.fileExists(atPath: d.appendingPathComponent("recording.tmp.wav").path)
+            d.lastPathComponent != current?.lastPathComponent && fm.fileExists(atPath: d.appendingPathComponent("recording.tmp.wav").path)
                 && !fm.fileExists(atPath: d.appendingPathComponent("recording.wav").path)
         }
     }
@@ -468,7 +468,7 @@ enum Recovery {
         return dirs.filter { d in
             func has(_ f: String) -> Bool { fm.fileExists(atPath: d.appendingPathComponent(f).path) }
             let date = Meeting.at(d).date ?? .distantPast
-            return d != current && has("recording.wav") && !has("transcript.md") && !has("transcript.error")
+            return d.lastPathComponent != current?.lastPathComponent && has("recording.wav") && !has("transcript.md") && !has("transcript.error")
                 && Date().timeIntervalSince(date) < 2 * 86400
         }
     }

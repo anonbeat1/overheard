@@ -85,6 +85,8 @@ final class Recorder: ObservableObject {
 
     private var capture: MeetingCapture?
     var currentDir: URL? { capture?.dir }
+    /// Cartella in registrazione? Per nome: lo stesso percorso può arrivare con o senza "/" finale
+    func isRecording(_ dir: URL) -> Bool { capture?.dir.lastPathComponent == dir.lastPathComponent }
     var captureForQuit: MeetingCapture? { capture }
     private var handled = false // call già gestita (registrata o scartata): non ripartire finché non lascia il mic
     private var sawMeeting = false // la call è stata vista durante la registrazione

@@ -285,3 +285,4 @@
 "Chiave non salvata: %@" = "Key not saved: %@";
 "Portachiavi errore %d, e file non scrivibile" = "Keychain error %d, and file not writable";
 "Portachiavi errore %d" = "Keychain error %d";
+"Riprova" = "Retry";
