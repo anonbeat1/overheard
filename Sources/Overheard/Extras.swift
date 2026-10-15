@@ -92,6 +92,7 @@ enum HotKey {
 /// scritto da Claude Code o Codex col login dell'utente.
 enum Summarizer {
     static var auto: Bool { UserDefaults.standard.object(forKey: "summary.auto") as? Bool ?? true }
+    static var autoNames: Bool { UserDefaults.standard.object(forKey: "speakers.autoName") as? Bool ?? true }
 
     static func runIfEnabled(_ dir: URL) async {
         guard auto else { return }
@@ -113,8 +114,20 @@ enum Summarizer {
         if !marks.isEmpty { context += "Moments the user bookmarked as important (recording time): \(marks.joined(separator: ", "))\n" }
         // titoli delle sezioni nella lingua dell'interfaccia: sono quelli che si vedono nell'app
         let h = [String(localized: "Riassunto"), String(localized: "Decisioni"), String(localized: "Cose da fare"), String(localized: "Momenti segnati")]
+        let speaker = String(localized: "Parlante")
+        let unnamed = md.contains("] \(speaker) ")
+        let naming = autoNames && unnamed ? """
+        First line of your reply: NAMES: followed by a JSON object mapping each "\(speaker) N" label to the person's real name, \
+        only when the transcript makes it certain (they introduce themselves, or are called by name and answer). \
+        Omit any voice you are not sure about; write NAMES: {} if none. Then the minutes, using those names.
+
+        """ : ""
+        let titling = m.title == nil ? """
+        Line before the minutes: TITLE: a 2-6 word title in \(Prefs.uiLanguageName) naming what the meeting was about (topic, client or project), no date, no app name.
+
+        """ : ""
         let prompt = """
-        Write the minutes of the meeting below in \(Prefs.uiLanguageName), as markdown, with exactly these sections:
+        \(naming)\(titling)Write the minutes of the meeting below in \(Prefs.uiLanguageName), as markdown, with exactly these sections:
         ## \(h[0])
         3-6 sentences on what was discussed and how it ended.
         ## \(h[1])
@@ -129,10 +142,29 @@ enum Summarizer {
         """
         let out = AIChat.complete(prompt, engine: engine)
         guard let text = out, let start = text.range(of: "## ") else { return String(localized: "L'AI non ha risposto") }
+        if !naming.isEmpty { applyNames(text, dir: dir, label: speaker) }
+        if !titling.isEmpty, let line = text.components(separatedBy: .newlines).first(where: { $0.hasPrefix("TITLE:") }) {
+            let title = line.dropFirst(6).trimmingCharacters(in: CharacterSet.whitespaces.union(CharacterSet(charactersIn: "\"*#")))
+            if !title.isEmpty, title.count < 80 { try? (title + "\n").write(to: dir.appendingPathComponent("title"), atomically: true, encoding: .utf8) }
+        }
         try? String(text[start.lowerBound...]).write(to: dir.appendingPathComponent("summary.md"), atomically: true, encoding: .utf8)
         NotesExport.exportIfEnabled(dir)
         DispatchQueue.main.async { NotificationCenter.default.post(name: .meetingsChanged, object: nil) }
         return nil
+    }
+
+    /// "NAMES: {"Parlante 1": "Marco"}" → rinomina nel transcript (non tocca nomi già dati né il tuo)
+    static func applyNames(_ reply: String, dir: URL, label: String) {
+        guard let line = reply.components(separatedBy: .newlines).first(where: { $0.hasPrefix("NAMES:") }),
+              let json = line.dropFirst(6).data(using: .utf8),
+              let map = try? JSONDecoder().decode([String: String].self, from: json) else { return }
+        var md = (try? String(contentsOf: dir.appendingPathComponent("transcript.md"), encoding: .utf8)) ?? ""
+        for (old, new) in map.sorted(by: { $0.key < $1.key }) {
+            let name = new.trimmingCharacters(in: .whitespaces).replacingOccurrences(of: ":", with: "")
+            // due voci con lo stesso nome si fonderebbero: tiene solo la prima
+            guard old.hasPrefix(label + " "), !name.isEmpty, name.count < 40, !md.contains("] \(name):**") else { continue }
+            md = Transcriber.renameSpeaker(in: dir, from: old, to: name) ?? md
+        }
     }
 
     static func stamp(_ t: Double) -> String {

@@ -4,5 +4,11 @@ import PackageDescription
 let package = Package(
     name: "Overheard",
     platforms: [.macOS("14.2")],
-    targets: [.executableTarget(name: "Overheard")]
+    dependencies: [.package(url: "https://github.com/sparkle-project/Sparkle", from: "2.6.0")],
+    targets: [.executableTarget(
+        name: "Overheard",
+        dependencies: [.product(name: "Sparkle", package: "Sparkle")],
+        // Sparkle.framework sta in Contents/Frameworks (lo copia build.sh)
+        linkerSettings: [.unsafeFlags(["-Xlinker", "-rpath", "-Xlinker", "@executable_path/../Frameworks"])]
+    )]
 )

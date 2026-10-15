@@ -20,10 +20,14 @@ struct SettingsView: View {
     @AppStorage("language") private var language = ""
     @AppStorage("calendar.enabled") private var calendarOn = false
     @AppStorage("summary.auto") private var summaryAuto = true
+    @AppStorage("speakers.autoName") private var autoNames = true
+    @AppStorage("dock.visible") private var dockVisible = false
+    @AppStorage("autoStop.seconds") private var autoStop = 30
     @State private var calendarDenied = false
     @AppStorage("mcp.write") private var mcpWrite = false
     @State private var mcpResult: [String] = []
     @State private var mcpBusy = false
+    @State private var mcpConnected = MCPServer.connected()
     @AppStorage("notes.folder") private var notesFolder = ""
     @AppStorage("notes.auto") private var notesAuto = true
     @State private var apiKey = ""
@@ -55,11 +59,33 @@ struct SettingsView: View {
             Card {
                 row("Registra automaticamente", "Parte quando Meet o Teams usano il microfono", $rec.autoDetect)
                 Divider().overlay(Color.white.opacity(0.1))
+                HStack {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Ferma dopo la fine della call")
+                        Text("Attesa dopo che la call lascia il microfono").font(.caption).foregroundStyle(.white.opacity(0.5))
+                    }
+                    Spacer()
+                    Picker("", selection: $autoStop) {
+                        ForEach([10, 20, 30, 60, 120, 300], id: \.self) { s in
+                            Text(s < 60 ? "\(s) s" : "\(s / 60) min").tag(s)
+                        }
+                    }
+                    .labelsHidden().fixedSize()
+                }
+                Divider().overlay(Color.white.opacity(0.1))
                 row("Apri al login", nil, $atLogin)
                     .onChange(of: atLogin) { _, on in
                         try? on ? SMAppService.mainApp.register() : SMAppService.mainApp.unregister()
                         atLogin = SMAppService.mainApp.status == .enabled
                     }
+                Divider().overlay(Color.white.opacity(0.1))
+                HStack {
+                    Button("Rivedi l'introduzione") { Onboarding.showIfNeeded(force: true) }
+                    Spacer()
+                    Text(verbatim: "v\(Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "")")
+                        .font(.caption).foregroundStyle(.white.opacity(0.4))
+                    Button("Controlla aggiornamenti…") { Updates.check() }
+                }
             }
 
             Card {
@@ -122,6 +148,13 @@ struct SettingsView: View {
                 Divider().overlay(Color.white.opacity(0.1))
                 row("Riassunto automatico", "Riassunto, decisioni e cose da fare con Claude Code o Codex dopo ogni trascrizione", $summaryAuto)
                 Divider().overlay(Color.white.opacity(0.1))
+                row("Nomi dei parlanti automatici", "Con il riassunto, l'AI sostituisce \"Parlante N\" col nome quando nel discorso è chiaro (si presenta o viene chiamato per nome)", $autoNames)
+                    .disabled(!summaryAuto)
+                Divider().overlay(Color.white.opacity(0.1))
+                row("Mostra nel Dock", "Icona nel Dock e barra dei menu, oltre all'icona in alto", $dockVisible.onSet { _ in
+                    MainActor.assumeIsolated { AppDelegate.applyDock() }
+                })
+                Divider().overlay(Color.white.opacity(0.1))
                 HStack {
                     Text("Segna un momento importante").foregroundStyle(.white.opacity(0.85))
                     Spacer()
@@ -135,16 +168,21 @@ struct SettingsView: View {
                 Text("Rende i tuoi meeting disponibili in Claude Desktop, Claude Code e Codex: \"prepara la mail di follow-up del meeting di ieri\". Tutto in locale, niente esce dal Mac se non quello che chiedi all'AI.")
                     .font(.caption).foregroundStyle(.white.opacity(0.5)).fixedSize(horizontal: false, vertical: true)
                 HStack {
-                    Button(mcpBusy ? "Collego…" : "Collega a Claude") {
+                    Button(mcpBusy ? "Collego…" : mcpConnected.isEmpty ? "Collega a Claude" : "Ricollega") {
                         mcpBusy = true
                         Task.detached {
                             let r = MCPServer.install()
-                            await MainActor.run { mcpResult = r; mcpBusy = false }
+                            await MainActor.run { mcpResult = r; mcpBusy = false; mcpConnected = MCPServer.connected() }
                         }
                     }
                     .disabled(mcpBusy)
                     Spacer()
-                    Text(mcpResult.joined(separator: "  ")).font(.caption).foregroundStyle(.white.opacity(0.7)).lineLimit(2)
+                    if !mcpResult.isEmpty {
+                        Text(mcpResult.joined(separator: "  ")).font(.caption).foregroundStyle(.white.opacity(0.7)).lineLimit(2)
+                    } else if !mcpConnected.isEmpty {
+                        Label(String(localized: "Collegato: ") + mcpConnected.joined(separator: ", "), systemImage: "checkmark.circle.fill")
+                            .font(.caption).foregroundStyle(.green).lineLimit(2)
+                    }
                 }
                 row("Permetti azioni", "Spuntare cose da fare, avviare/fermare la registrazione, segnare momenti", $mcpWrite)
             }

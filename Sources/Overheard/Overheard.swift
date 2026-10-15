@@ -3,6 +3,7 @@
 import AppKit
 import CoreAudio
 import ServiceManagement
+import Sparkle
 import SwiftUI
 import UserNotifications
 
@@ -68,6 +69,7 @@ final class Recorder: ObservableObject {
     }
 
     private var capture: MeetingCapture?
+    var currentDir: URL? { capture?.dir }
     private var handled = false // call già gestita (registrata o scartata): non ripartire finché non lascia il mic
     private var sawMeeting = false // la call è stata vista durante la registrazione
     private var goneSince: Date?
@@ -88,13 +90,14 @@ final class Recorder: ObservableObject {
         if let capture {
             // Se allo start la call non era ancora partita, aggiorna la sorgente appena la vede
             if let m = meeting, capture.source == "altro" { try? capture.setSource(m); source = m }
-            // Stop automatico quando la call rilascia il microfono per 30s
+            // Stop automatico quando la call rilascia il microfono (attesa nelle Impostazioni, 30s di default)
             if meeting != nil {
                 sawMeeting = true
                 goneSince = nil
             } else if sawMeeting {
                 if goneSince == nil { goneSince = .now }
-                if let g = goneSince, Date().timeIntervalSince(g) > 30, !busy { toggle(reason: "Riunione terminata") }
+                let wait = UserDefaults.standard.object(forKey: "autoStop.seconds") as? Double ?? 30
+                if let g = goneSince, Date().timeIntervalSince(g) >= wait, !busy { toggle(reason: "Riunione terminata") }
             }
         } else if let m = meeting {
             if !handled && autoDetect {
@@ -183,6 +186,29 @@ func notify(_ title: String, _ body: String) {
 
 // MARK: - Notifiche
 
+/// Aggiornamenti automatici (Sparkle): feed e chiave pubblica in Info.plist, pubblicazione con release.sh
+@MainActor
+enum Updates {
+    static let controller = SPUStandardUpdaterController(startingUpdater: true, updaterDelegate: nil, userDriverDelegate: nil)
+    static func check() { NSApp.activate(ignoringOtherApps: true); controller.checkForUpdates(nil) }
+}
+
+/// Voce di menu che esegue una closure
+final class MenuAction: NSObject {
+    private static var all: [MenuAction] = []
+    let run: @MainActor () -> Void
+    init(_ run: @escaping @MainActor () -> Void) { self.run = run }
+    @MainActor @objc func fire() { run() }
+
+    static func item(_ title: String, _ key: String, _ run: @escaping @MainActor () -> Void) -> NSMenuItem {
+        let a = MenuAction(run)
+        all.append(a) // NSMenuItem.target è weak
+        let i = NSMenuItem(title: title, action: #selector(fire), keyEquivalent: key)
+        i.target = a
+        return i
+    }
+}
+
 final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDelegate {
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
         MainActor.assumeIsolated { TranscriptWindow.show(nil) }
@@ -195,23 +221,46 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
         let discard = UNNotificationAction(identifier: "DISCARD", title: String(localized: "Non registrare"), options: [.destructive])
         center.setNotificationCategories([UNNotificationCategory(identifier: "AUTOREC", actions: [discard], intentIdentifiers: [])])
         center.requestAuthorization(options: [.alert, .sound]) { _, _ in }
-        NSApp.mainMenu = Self.editMenu()
+        Self.applyDock()
         HotKey.register()
         _ = Recorder.shared
-        MainActor.assumeIsolated { PanelController.shared.setup() }
+        MainActor.assumeIsolated {
+            PanelController.shared.setup()
+            _ = Updates.controller
+            Onboarding.showIfNeeded()
+        }
+    }
+
+    /// Icona nel Dock (Impostazioni): app normale con il suo menu; altrimenti solo barra dei menu
+    static func applyDock() {
+        let dock = UserDefaults.standard.bool(forKey: "dock.visible")
+        NSApp.setActivationPolicy(dock ? .regular : .accessory)
+        NSApp.mainMenu = editMenu(appMenu: dock)
+        if dock { NSApp.activate(ignoringOtherApps: true) }
     }
 
     /// App solo-barra: senza un menu Modifica, ⌘A/⌘C/⌘V/⌘Z non arrivano ai campi di testo.
     /// Il menu non si vede (niente barra dei menu per le app accessorie) ma le scorciatoie funzionano.
-    static func editMenu() -> NSMenu {
-        let edit = NSMenu(title: "Modifica")
+    static func editMenu(appMenu: Bool = false) -> NSMenu {
+        let main = NSMenu()
+        if appMenu { // con il Dock la barra dei menu si vede: il primo menu è quello dell'app
+            let app = NSMenu(title: "Overheard")
+            app.addItem(MenuAction.item(String(localized: "Riunioni"), "l") { TranscriptWindow.show(nil) })
+            app.addItem(MenuAction.item(String(localized: "Impostazioni…"), ",") { SettingsWindow.show() })
+            app.addItem(MenuAction.item(String(localized: "Controlla aggiornamenti…"), "") { Updates.check() })
+            app.addItem(.separator())
+            app.addItem(withTitle: String(localized: "Esci da Overheard"), action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
+            let item = NSMenuItem()
+            item.submenu = app
+            main.addItem(item)
+        }
+        let edit = NSMenu(title: String(localized: "Modifica"))
         for (title, action, key) in [("Annulla", "undo:", "z"), ("Ripeti", "redo:", "Z"), ("Taglia", "cut:", "x"), ("Copia", "copy:", "c"),
                                      ("Incolla", "paste:", "v"), ("Seleziona tutto", "selectAll:", "a"), ("Chiudi finestra", "performClose:", "w")] {
             edit.addItem(withTitle: title, action: Selector(action), keyEquivalent: key)
         }
         let item = NSMenuItem()
         item.submenu = edit
-        let main = NSMenu()
         main.addItem(item)
         return main
     }
@@ -611,7 +660,8 @@ final class PanelController {
         hide()
         let menu = NSMenu()
         for (title, key, action) in [(String(localized: "Riunioni"), "", #selector(openLibrary)), (String(localized: "Apri cartella Meetings"), "", #selector(openFolder)),
-                                     (String(localized: "Impostazioni…"), ",", #selector(openSettings))] {
+                                     (String(localized: "Impostazioni…"), ",", #selector(openSettings)),
+                                     (String(localized: "Controlla aggiornamenti…"), "", #selector(checkUpdates))] {
             menu.addItem(withTitle: title, action: action, keyEquivalent: key).target = self
         }
         menu.addItem(.separator())
@@ -623,8 +673,9 @@ final class PanelController {
     @objc private func openLibrary() { MainActor.assumeIsolated { TranscriptWindow.show(nil) } }
     @objc private func openFolder() { NSWorkspace.shared.open(URL(fileURLWithPath: "\(home)/Meetings")) }
     @objc private func openSettings() { MainActor.assumeIsolated { SettingsWindow.show() } }
+    @objc private func checkUpdates() { MainActor.assumeIsolated { Updates.check() } }
 
-    private func show() {
+    func show() {
         guard let button = item.button, let win = button.window else { return }
         host.rootView = MenuView() // ricarica ultime riunioni
         let size = host.fittingSize

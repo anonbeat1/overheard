@@ -383,25 +383,14 @@ struct TranscriptView: View {
         }
     }
 
-    /// Riscrive transcript.md con il nuovo nome (righe "] Vecchio:**" e la riga "Partecipanti:")
     private func rename() {
         guard let old = renaming else { return }
         let name = newName.trimmingCharacters(in: .whitespaces).replacingOccurrences(of: ":", with: "")
         renaming = nil
         guard !name.isEmpty, name != old else { return }
-        let url = meeting.url.appendingPathComponent("transcript.md")
-        guard var md = try? String(contentsOf: url, encoding: .utf8) else { return }
-        md = md.replacingOccurrences(of: "] \(old):**", with: "] \(name):**")
-        md = md.components(separatedBy: "\n").map { l in
-            guard let prefix = ["Partecipanti:", "Participants:"].first(where: l.hasPrefix) else { return l }
-            return prefix + " " + l.dropFirst(prefix.count).split(separator: ",")
-                .map { $0.trimmingCharacters(in: .whitespaces) }
-                .map { $0 == old ? name : $0 }.joined(separator: ", ")
-        }.joined(separator: "\n")
-        try? md.write(to: url, atomically: true, encoding: .utf8)
+        guard let md = Transcriber.renameSpeaker(in: meeting.url, from: old, to: name) else { return }
         if onlySpeaker == old { onlySpeaker = name }
         lines = TranscriptLine.parse(md)
-        NotesExport.exportIfEnabled(meeting.url)
     }
 
     @ViewBuilder private func menu(_ line: TranscriptLine) -> some View {
@@ -620,6 +609,7 @@ struct LibraryView: View {
     @State private var link = ""
     @State private var dropping = false
     @AppStorage("ai.visible") private var showChat = false
+    @State private var toDelete: Meeting?
 
     private var filtered: [Meeting] {
         guard !query.isEmpty else { return meetings }
@@ -742,6 +732,11 @@ struct LibraryView: View {
                     .padding(12)
             }
         }
+        .confirmationDialog("Spostare questa riunione nel Cestino?", isPresented: Binding(get: { toDelete != nil }, set: { if !$0 { toDelete = nil } }), presenting: toDelete) { m in
+            Button("Sposta nel Cestino", role: .destructive) { trash(m) }
+        } message: { m in
+            Text("\(m.app) · audio, transcript e riassunto. Puoi recuperarla dal Cestino.")
+        }
         .alert("Importa da link", isPresented: $askLink) {
             TextField("https://…", text: $link)
             Button("Importa") { importer.importLink(link) }
@@ -769,6 +764,18 @@ struct LibraryView: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
+        .contextMenu {
+            Button("Mostra nel Finder") { NSWorkspace.shared.activateFileViewerSelecting([m.url]) }
+            Divider()
+            Button("Sposta nel Cestino…", role: .destructive) { toDelete = m }
+                .disabled(m.url == Recorder.shared.currentDir || FileManager.default.fileExists(atPath: m.url.appendingPathComponent(".transcribing").path))
+        }
+    }
+
+    private func trash(_ m: Meeting) {
+        guard (try? FileManager.default.trashItem(at: m.url, resultingItemURL: nil)) != nil else { return }
+        if selected == m.id { selected = nil }
+        load()
     }
 
     private func load() {

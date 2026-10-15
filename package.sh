@@ -12,7 +12,7 @@ cat > "$STAGE/README.txt" <<'TXT'
 Overheard — install
 
 1. Drag Overheard to Applications.
-2. First launch: right-click the app → Open → Open.
+2. First launch: open it, then System Settings → Privacy & Security → "Open Anyway".
    (If macOS says it is damaged, run in Terminal:
     xattr -dr com.apple.quarantine /Applications/Overheard.app )
 3. Allow Microphone and System Audio Recording when asked.
@@ -28,7 +28,7 @@ https://github.com/anonbeat1/overheard
 Overheard — installazione
 
 1. Trascina Overheard in Applicazioni.
-2. Primo avvio: clic destro sull'app → Apri → Apri.
+2. Primo avvio: aprila, poi Impostazioni di Sistema → Privacy e sicurezza → "Apri comunque".
    (Se macOS dice che è danneggiata: nel Terminale
     xattr -dr com.apple.quarantine /Applications/Overheard.app )
 3. Concedi Microfono e Registrazione audio di sistema quando li chiede.

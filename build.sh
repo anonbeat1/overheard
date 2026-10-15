@@ -6,6 +6,8 @@ swift build -c release
 APP=build/Overheard.app
 rm -rf "$APP" && mkdir -p "$APP/Contents/MacOS"
 cp .build/release/Overheard "$APP/Contents/MacOS/"
+# Aggiornamenti automatici (Sparkle)
+mkdir -p "$APP/Contents/Frameworks" && cp -R .build/release/Sparkle.framework "$APP/Contents/Frameworks/"
 cp Info.plist "$APP/Contents/"
 mkdir -p "$APP/Contents/Resources" && cp -R Resources/* "$APP/Contents/Resources/"
 # Icona app da Resources/AppIcon.png (1024x1024), se presente
@@ -27,8 +29,15 @@ cp "$T/meeting-transcriber" "$T/mlx.metallib" "$TR/" && cp -R "$T"/*.bundle "$TR
 cp "$(xcrun --find swift | sed 's|/bin/swift$||')/lib/swift-6.2/macosx/libswiftCompatibilitySpan.dylib" "$TR/" 2>/dev/null || true
 for f in "$TR"/libswiftCompatibilitySpan.dylib "$TR/meeting-transcriber"; do [[ -f "$f" ]] && codesign --force --sign - "$f"; done
 
-# Con un certificato Apple Development i permessi (mic, registrazione schermo) sopravvivono ai rebuild; ad-hoc no.
+# Con un certificato stabile i permessi (mic, registrazione schermo) e il Portachiavi sopravvivono ai rebuild; ad-hoc no.
+# Va bene anche un certificato locale autofirmato "Overheard Local Signing" (non "trusted", quindi senza -v).
 ID=$(security find-identity -v -p codesigning | awk -F'"' '/Apple Development|Developer ID Application/{print $2; exit}')
+[[ -z "$ID" ]] && security find-identity -p codesigning | grep -q '"Overheard Local Signing"' && ID="Overheard Local Signing"
+# Sparkle prima dell'app, dai componenti interni verso l'esterno
+SP="$APP/Contents/Frameworks/Sparkle.framework/Versions/B"
+for f in "$SP"/XPCServices/*.xpc "$SP/Autoupdate" "$SP/Updater.app" "$APP/Contents/Frameworks/Sparkle.framework"; do
+  [[ -e "$f" ]] && codesign --force --options runtime --sign "${ID:--}" "$f"
+done
 if [[ -n "$ID" ]]; then
   codesign --force --sign "$ID" "$APP"
 else

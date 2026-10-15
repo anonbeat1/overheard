@@ -120,6 +120,23 @@ enum Transcriber {
         }
     }
 
+    /// Riscrive transcript.md con il nuovo nome (righe "] Vecchio:**" e la riga "Partecipanti:"); ritorna il nuovo testo
+    @discardableResult
+    static func renameSpeaker(in dir: URL, from old: String, to name: String) -> String? {
+        let url = dir.appendingPathComponent("transcript.md")
+        guard var md = try? String(contentsOf: url, encoding: .utf8) else { return nil }
+        md = md.replacingOccurrences(of: "] \(old):**", with: "] \(name):**")
+        md = md.components(separatedBy: "\n").map { l in
+            guard let prefix = ["Partecipanti:", "Participants:"].first(where: l.hasPrefix) else { return l }
+            return prefix + " " + l.dropFirst(prefix.count).split(separator: ",")
+                .map { $0.trimmingCharacters(in: .whitespaces) }
+                .map { $0 == old ? name : $0 }.joined(separator: ", ")
+        }.joined(separator: "\n")
+        try? md.write(to: url, atomically: true, encoding: .utf8)
+        NotesExport.exportIfEnabled(dir)
+        return md
+    }
+
     /// "Partecipanti: …" + nota sulle voci non riconosciute, in cima al transcript
     static func participantsHeader(_ speakers: [String]) -> String {
         let present = Set(speakers.filter { !$0.isEmpty }).sorted()

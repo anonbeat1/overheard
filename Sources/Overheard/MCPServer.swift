@@ -240,6 +240,21 @@ enum MCPServer {
 
     // MARK: Installazione nei client
 
+    /// Client in cui Overheard risulta già collegato (legge le loro config, niente shell)
+    static func connected() -> [String] {
+        let home = NSHomeDirectory()
+        func text(_ path: String) -> String { (try? String(contentsOfFile: home + path, encoding: .utf8)) ?? "" }
+        func jsonHas(_ path: String) -> Bool {
+            let json = (try? JSONSerialization.jsonObject(with: Data(contentsOf: URL(fileURLWithPath: home + path)))) as? [String: Any]
+            return (json?["mcpServers"] as? [String: Any])?[name] != nil
+        }
+        var out: [String] = []
+        if jsonHas("/.claude.json") { out.append("Claude Code") }
+        if text("/.codex/config.toml").contains("[mcp_servers.\(name)]") { out.append("Codex") }
+        if jsonHas("/Library/Application Support/Claude/claude_desktop_config.json") { out.append("Claude Desktop") }
+        return out
+    }
+
     /// Collega il server a Claude Code, Codex e Claude Desktop; ritorna l'esito per ogni client
     static func install() -> [String] {
         guard let exe = Bundle.main.executablePath else { return [String(localized: "Eseguibile non trovato")] }

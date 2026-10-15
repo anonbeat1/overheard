@@ -21,6 +21,9 @@
 	</dict></array>
 	<key>NSCalendarsFullAccessUsageDescription</key><string>Gives recorded meetings the title and attendees of the calendar event.</string>
 	<key>NSCalendarsUsageDescription</key><string>Gives recorded meetings the title and attendees of the calendar event.</string>
+	<key>SUFeedURL</key><string>https://raw.githubusercontent.com/anonbeat1/overheard/main/appcast.xml</string>
+	<key>SUPublicEDKey</key><string>Vzcj6EiUZNU4+0OTR8Twhch+1ng9mAgJcjFAeSlG21k=</string>
+	<key>SUEnableAutomaticChecks</key><true/>
 	<key>NSMicrophoneUsageDescription</key><string>Records your voice during meetings.</string>
 </dict>
 </plist>
