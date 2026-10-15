@@ -2,28 +2,55 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>CFBundleDevelopmentRegion</key><string>en</string>
-	<key>CFBundleLocalizations</key><array><string>en</string><string>it</string></array>
-	<key>CFBundleIdentifier</key><string>com.anonbeat.overheard</string>
-	<key>CFBundleName</key><string>Overheard</string>
-	<key>CFBundleExecutable</key><string>Overheard</string>
-	<key>CFBundlePackageType</key><string>APPL</string>
-	<key>CFBundleShortVersionString</key><string>0.1</string>
-	<key>CFBundleVersion</key><string>1</string>
-	<key>LSMinimumSystemVersion</key><string>14.2</string>
-	<key>LSUIElement</key><true/>
-	<key>CFBundleIconFile</key><string>AppIcon</string>
-	<key>NSAudioCaptureUsageDescription</key><string>Records the meeting audio (the other participants).</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>en</string>
+	<key>CFBundleExecutable</key>
+	<string>Overheard</string>
+	<key>CFBundleIconFile</key>
+	<string>AppIcon</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.anonbeat.overheard</string>
+	<key>CFBundleLocalizations</key>
+	<array>
+		<string>en</string>
+		<string>it</string>
+	</array>
+	<key>CFBundleName</key>
+	<string>Overheard</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>0.1</string>
 	<key>CFBundleURLTypes</key>
-	<array><dict>
-		<key>CFBundleURLName</key><string>com.anonbeat.overheard</string>
-		<key>CFBundleURLSchemes</key><array><string>overheard</string></array>
-	</dict></array>
-	<key>NSCalendarsFullAccessUsageDescription</key><string>Gives recorded meetings the title and attendees of the calendar event.</string>
-	<key>NSCalendarsUsageDescription</key><string>Gives recorded meetings the title and attendees of the calendar event.</string>
-	<key>SUFeedURL</key><string>https://raw.githubusercontent.com/anonbeat1/overheard/main/appcast.xml</string>
-	<key>SUPublicEDKey</key><string>Vzcj6EiUZNU4+0OTR8Twhch+1ng9mAgJcjFAeSlG21k=</string>
-	<key>SUEnableAutomaticChecks</key><true/>
-	<key>NSMicrophoneUsageDescription</key><string>Records your voice during meetings.</string>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>com.anonbeat.overheard</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>overheard</string>
+			</array>
+		</dict>
+	</array>
+	<key>CFBundleVersion</key>
+	<string>2</string>
+	<key>LSMinimumSystemVersion</key>
+	<string>14.2</string>
+	<key>LSUIElement</key>
+	<true/>
+	<key>NSAudioCaptureUsageDescription</key>
+	<string>Records the meeting audio (the other participants).</string>
+	<key>NSCalendarsFullAccessUsageDescription</key>
+	<string>Gives recorded meetings the title and attendees of the calendar event.</string>
+	<key>NSCalendarsUsageDescription</key>
+	<string>Gives recorded meetings the title and attendees of the calendar event.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Records your voice during meetings.</string>
+	<key>SUEnableAutomaticChecks</key>
+	<true/>
+	<key>SUFeedURL</key>
+	<string>https://raw.githubusercontent.com/anonbeat1/overheard/main/appcast.xml</string>
+	<key>SUPublicEDKey</key>
+	<string>Vzcj6EiUZNU4+0OTR8Twhch+1ng9mAgJcjFAeSlG21k=</string>
 </dict>
 </plist>
