@@ -3,6 +3,16 @@
     <channel>
         <title>Overheard</title>
         <item>
+            <title>0.2</title>
+            <pubDate>Thu, 15 Oct 2026 17:29:21 +0200</pubDate>
+            <link>https://github.com/anonbeat1/overheard</link>
+            <sparkle:version>3</sparkle:version>
+            <sparkle:shortVersionString>0.2</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>14.2</sparkle:minimumSystemVersion>
+            <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
+            <enclosure url="https://github.com/anonbeat1/overheard/releases/download/v0.2/Overheard-0.2.dmg" length="51203929" type="application/octet-stream" sparkle:edSignature="qsDe8MAl93dlKCqoJSOvooWaRECWTL68ALOhBoM5aNxjfQmnPh1SR1J9HisN+DXLKiZEmQE6a/+hzsreFN6LBg=="/>
+        </item>
+        <item>
             <title>0.1</title>
             <pubDate>Thu, 15 Oct 2026 16:42:47 +0200</pubDate>
             <link>https://github.com/anonbeat1/overheard</link>
