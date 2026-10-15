@@ -116,6 +116,8 @@ final class SystemAudioCapture {
     private var inFormat: AVAudioFormat?
     private var outputUID = ""
     private var listeners: [(AudioObjectID, AudioObjectPropertyAddress, AudioObjectPropertyListenerBlock)] = []
+    private var pending: DispatchWorkItem?
+    private var lastRebuild = Date.distantPast
 
     func start(to url: URL, log: @escaping (String) -> Void) throws {
         // 48 kHz stereo 16 bit (~690 MB/h)
@@ -132,6 +134,8 @@ final class SystemAudioCapture {
         timer?.cancel()
         timer = nil
         queue.sync {
+            pending?.cancel()
+            pending = nil
             teardown()
             ioQueue.sync { writer?.close(); writer = nil }
         }
@@ -180,8 +184,8 @@ final class SystemAudioCapture {
         // Ricostruisci subito se cambia il formato del tap, il sample rate o l'uscita di default
         listen(tapID, kAudioTapPropertyFormat)
         listen(aggregateID, kAudioDevicePropertyNominalSampleRate)
-        listen(AudioObjectID(kAudioObjectSystemObject), kAudioHardwarePropertyDefaultSystemOutputDevice)
-        listen(AudioObjectID(kAudioObjectSystemObject), kAudioHardwarePropertyDefaultOutputDevice)
+        listen(AudioObjectID(kAudioObjectSystemObject), kAudioHardwarePropertyDefaultSystemOutputDevice, onlyIfOutputChanged: true)
+        listen(AudioObjectID(kAudioObjectSystemObject), kAudioHardwarePropertyDefaultOutputDevice, onlyIfOutputChanged: true)
         log("audio di sistema: cattura avviata, uscita \(outputUID)")
     }
 
@@ -203,8 +207,27 @@ final class SystemAudioCapture {
         inFormat = nil
     }
 
+    /// Le cuffie Bluetooth, quando una call accende il loro mic, cambiano profilo e l'uscita di default
+    /// rimbalza tra loro e gli altoparlanti per un attimo. Ricostruire a ogni notifica riapriva le cuffie
+    /// nell'aggregate e provocava un altro cambio: un loop da decine di ricostruzioni al secondo che lasciava
+    /// la call senza audio né microfono. Quindi si aspetta che la configurazione resti ferma per 1,5s.
+    /// `onlyIfOutputChanged`: notifiche sull'uscita di default, inutili se alla fine l'uscita è la stessa e l'audio arriva
+    private func scheduleRebuild(_ why: String, onlyIfOutputChanged: Bool = false) {
+        pending?.cancel()
+        let w = DispatchWorkItem { [weak self] in
+            guard let self else { return }
+            self.pending = nil
+            if onlyIfOutputChanged, self.aggregateID != kAudioObjectUnknown, Date().timeIntervalSince(self.lastCallback) < 1,
+               (try? self.currentOutputUID()) == self.outputUID { return }
+            self.rebuild(why)
+        }
+        pending = w
+        queue.asyncAfter(deadline: .now() + 1.5, execute: w)
+    }
+
     private func rebuild(_ why: String) {
         guard writer != nil else { return }
+        lastRebuild = Date()
         log("audio di sistema: ricostruzione (\(why))")
         teardown()
         ioQueue.sync { writer?.padToNow() }
@@ -212,21 +235,23 @@ final class SystemAudioCapture {
         lastCallback = Date()
     }
 
-    private func listen(_ obj: AudioObjectID, _ sel: AudioObjectPropertySelector) {
+    private func listen(_ obj: AudioObjectID, _ sel: AudioObjectPropertySelector, onlyIfOutputChanged: Bool = false) {
         var addr = AudioObjectPropertyAddress(mSelector: sel, mScope: kAudioObjectPropertyScopeGlobal, mElement: kAudioObjectPropertyElementMain)
-        let block: AudioObjectPropertyListenerBlock = { [weak self] _, _ in self?.rebuild("proprietà \(sel) cambiata") }
+        let block: AudioObjectPropertyListenerBlock = { [weak self] _, _ in self?.scheduleRebuild("proprietà \(sel) cambiata", onlyIfOutputChanged: onlyIfOutputChanged) }
         if AudioObjectAddPropertyListenerBlock(obj, &addr, queue, block) == noErr { listeners.append((obj, addr, block)) }
     }
 
     private func watchdogTick() {
+        defer { ioQueue.sync { writer?.padToNow() } }
+        // mentre i dispositivi si stanno assestando non si tocca niente (vedi scheduleRebuild)
+        guard pending == nil, Date().timeIntervalSince(lastRebuild) > 2 else { return }
         if aggregateID == kAudioObjectUnknown {
             rebuild("cattura non attiva")
         } else if Date().timeIntervalSince(lastCallback) > 2 {
             rebuild("nessun audio da 2s")
         } else if let uid = try? currentOutputUID(), uid != outputUID {
-            rebuild("uscita audio cambiata: \(uid)")
+            scheduleRebuild("uscita audio cambiata: \(uid)")
         }
-        ioQueue.sync { writer?.padToNow() }
     }
 
     private func currentOutputUID() throws -> String {
