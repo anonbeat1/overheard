@@ -45,7 +45,10 @@ enum Keychain {
         kSecAttrAccount as String: "elevenlabs-api-key",
     ]
 
-    static var elevenLabsKey: String? { read(service: query[kSecAttrService as String] as! String) }
+    static var elevenLabsKey: String? {
+        read(service: query[kSecAttrService as String] as! String)
+            ?? (try? String(contentsOf: fileURL, encoding: .utf8))?.trimmingCharacters(in: .whitespacesAndNewlines).nilIfEmpty
+    }
 
     static func read(service: String) -> String? {
         var q = query
@@ -56,17 +59,40 @@ enum Keychain {
         return String(data: data, encoding: .utf8)
     }
 
+    /// Ripiego se il Portachiavi rifiuta (es. voce creata da una build firmata diversamente, che questa app non può toccare)
+    private static let fileURL = URL(fileURLWithPath: NSHomeDirectory() + "/Library/Application Support/Overheard/elevenlabs.key")
+
     /// Se c'è una chiave salvata, senza leggere il Portachiavi (che con una firma ad-hoc chiede il permesso a ogni build).
     static var hasElevenLabsKey: Bool { UserDefaults.standard.bool(forKey: "hasElevenLabsKey") }
 
-    static func setElevenLabsKey(_ key: String?) {
+    /// nil = salvata; altrimenti il motivo
+    @discardableResult
+    static func setElevenLabsKey(_ key: String?) -> String? {
         SecItemDelete(query as CFDictionary)
-        UserDefaults.standard.set(!(key ?? "").isEmpty, forKey: "hasElevenLabsKey")
-        guard let key, !key.isEmpty else { return }
+        try? FileManager.default.removeItem(at: fileURL)
+        UserDefaults.standard.set(false, forKey: "hasElevenLabsKey")
+        guard let key, !key.isEmpty else { return nil }
+        let data = Data(key.utf8)
         var q = query
-        q[kSecValueData as String] = Data(key.utf8)
-        SecItemAdd(q as CFDictionary, nil)
+        q[kSecValueData as String] = data
+        var status = SecItemAdd(q as CFDictionary, nil)
+        if status == errSecDuplicateItem { status = SecItemUpdate(query as CFDictionary, [kSecValueData as String: data] as CFDictionary) }
+        if status != errSecSuccess || elevenLabsKey != key {
+            // file leggibile solo dall'utente
+            let dir = fileURL.deletingLastPathComponent()
+            try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+            guard FileManager.default.createFile(atPath: fileURL.path, contents: data, attributes: [.posixPermissions: 0o600]) else {
+                return String(localized: "Portachiavi errore \(status), e file non scrivibile")
+            }
+        }
+        let ok = elevenLabsKey == key
+        UserDefaults.standard.set(ok, forKey: "hasElevenLabsKey")
+        return ok ? nil : String(localized: "Portachiavi errore \(status)")
     }
+}
+
+extension String {
+    var nilIfEmpty: String? { isEmpty ? nil : self }
 }
 
 // MARK: - Trascrizione

@@ -378,8 +378,10 @@ struct TranscriptView: View {
             status = String(localized: "Trascrizione fallita: \(err.trimmingCharacters(in: .whitespacesAndNewlines))")
         } else if FileManager.default.fileExists(atPath: dir.appendingPathComponent("recording.wav").path) {
             status = String(localized: "Trascrizione in corso…")
-        } else {
+        } else if dir == Recorder.shared.currentDir {
             status = String(localized: "Registrazione in corso")
+        } else {
+            status = String(localized: "Registrazione interrotta: viene recuperata al prossimo avvio dell'app")
         }
     }
 

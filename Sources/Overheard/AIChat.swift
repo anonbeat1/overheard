@@ -55,6 +55,7 @@ final class AIChat: ObservableObject {
         let p = Process()
         p.executableURL = URL(fileURLWithPath: "/bin/zsh")
         p.arguments = ["-lc", "exec \"$0\" \"$@\""] + args // shell di login: stesso PATH del Terminale
+        p.environment = Self.environment
         p.currentDirectoryURL = dir
         let pipe = Pipe(), err = Pipe()
         p.standardOutput = pipe
@@ -103,6 +104,7 @@ final class AIChat: ObservableObject {
         let p = Process()
         p.executableURL = URL(fileURLWithPath: "/bin/zsh")
         p.arguments = ["-lc", "exec \"$0\" \"$@\""] + args
+        p.environment = environment
         p.currentDirectoryURL = FileManager.default.temporaryDirectory
         let pipe = Pipe()
         p.standardOutput = pipe
@@ -116,10 +118,46 @@ final class AIChat: ObservableObject {
         return text?.trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
+    /// La shell di login legge ~/.zprofile ma non ~/.zshrc, dove spesso finisce il PATH di Claude Code o Codex
+    /// (nvm, npm globale, installer nativo): unisce il PATH della shell interattiva e le cartelle d'installazione comuni.
+    nonisolated static let environment: [String: String] = {
+        let home = NSHomeDirectory(), fm = FileManager.default
+        var dirs = interactivePath().split(separator: ":").map(String.init)
+        dirs += ["\(home)/.local/bin", "\(home)/.claude/local", "/opt/homebrew/bin", "/usr/local/bin", "\(home)/.npm-global/bin",
+                 "\(home)/.bun/bin", "\(home)/.volta/bin", "\(home)/.cargo/bin", "\(home)/.deno/bin"]
+        for base in ["\(home)/.nvm/versions/node", "\(home)/Library/Application Support/fnm/node-versions"] {
+            for v in ((try? fm.contentsOfDirectory(atPath: base)) ?? []).sorted().reversed() {
+                dirs += ["\(base)/\(v)/bin", "\(base)/\(v)/installation/bin"]
+            }
+        }
+        dirs += (ProcessInfo.processInfo.environment["PATH"] ?? "/usr/bin:/bin:/usr/sbin:/sbin").split(separator: ":").map(String.init)
+        var seen = Set<String>()
+        var env = ProcessInfo.processInfo.environment
+        env["PATH"] = dirs.filter { fm.fileExists(atPath: $0) && seen.insert($0).inserted }.joined(separator: ":")
+        return env
+    }()
+
+    /// PATH di `zsh -i` (legge ~/.zshrc); al massimo 4s, perché certe configurazioni restano in attesa
+    nonisolated private static func interactivePath() -> String {
+        let p = Process()
+        p.executableURL = URL(fileURLWithPath: "/bin/zsh")
+        p.arguments = ["-ilc", "printf '\\n__PATH__%s\\n' \"$PATH\""]
+        let pipe = Pipe()
+        p.standardOutput = pipe
+        p.standardError = FileHandle.nullDevice
+        p.standardInput = FileHandle.nullDevice
+        guard (try? p.run()) != nil else { return "" }
+        DispatchQueue.global().asyncAfter(deadline: .now() + 4) { if p.isRunning { p.terminate() } }
+        let out = String(data: pipe.fileHandleForReading.readDataToEndOfFile(), encoding: .utf8) ?? ""
+        p.waitUntilExit()
+        return out.components(separatedBy: "\n").first { $0.hasPrefix("__PATH__") }.map { String($0.dropFirst(8)) } ?? ""
+    }
+
     nonisolated static func shell(_ cmd: String) -> (status: Int32, out: String) {
         let p = Process()
         p.executableURL = URL(fileURLWithPath: "/bin/zsh")
         p.arguments = ["-lc", cmd]
+        p.environment = environment
         let pipe = Pipe()
         p.standardOutput = pipe
         p.standardError = FileHandle.nullDevice

@@ -13,6 +13,7 @@ struct OnboardingView: View {
     var done: () -> Void
     @State private var page = 0
     @State private var forward = true
+    @State private var nav = 0 // identità nuova a ogni passaggio: una pagina che rientra mentre esce non sparisce
     private let pages = 5
 
     var body: some View {
@@ -32,7 +33,7 @@ struct OnboardingView: View {
                 default: Ready()
                 }
             }
-            .id(page)
+            .id(nav)
             .transition(.asymmetric(insertion: .move(edge: forward ? .trailing : .leading).combined(with: .opacity),
                                     removal: .move(edge: forward ? .leading : .trailing).combined(with: .opacity)))
             .padding(.horizontal, 48)
@@ -69,7 +70,7 @@ struct OnboardingView: View {
 
     private func go(_ p: Int) {
         forward = p > page
-        withAnimation(.spring(duration: 0.55, bounce: 0.15)) { page = p }
+        withAnimation(.spring(duration: 0.55, bounce: 0.15)) { page = p; nav += 1 }
     }
 }
 
@@ -186,8 +187,6 @@ private struct SetupVoice: View {
     @ObservedObject var rec = Recorder.shared
     @ObservedObject var models = LocalModels.shared
     @AppStorage("myName") private var myName = ""
-    @State private var apiKey = ""
-    @State private var hasKey = Keychain.hasElevenLabsKey
     @State private var mic = AVCaptureDevice.authorizationStatus(for: .audio)
 
     var body: some View {
@@ -224,18 +223,7 @@ private struct SetupVoice: View {
                     }
                 }
                 if rec.engine == "elevenlabs" {
-                    HStack {
-                        SecureField(hasKey ? "•••••••• (salvata nel Portachiavi)" : "Chiave API ElevenLabs (sk_…)", text: $apiKey)
-                            .textFieldStyle(.roundedBorder)
-                        Button("Salva") {
-                            Keychain.setElevenLabsKey(apiKey.trimmingCharacters(in: .whitespacesAndNewlines))
-                            apiKey = ""
-                            hasKey = Keychain.hasElevenLabsKey
-                        }
-                        .disabled(apiKey.trimmingCharacters(in: .whitespaces).isEmpty)
-                    }
-                    Text(hasKey ? "Chiave configurata" : "Creala su elevenlabs.io → API Keys (permesso Speech to Text)")
-                        .font(.caption).foregroundStyle(hasKey ? .green : .white.opacity(0.5))
+                    ElevenLabsKeyField()
                 } else if !LocalModels.supported {
                     Text("Richiede macOS 15 o successivo").font(.caption).foregroundStyle(.orange)
                 } else if let p = models.progress {
@@ -256,7 +244,7 @@ private struct SetupPrefs: View {
     @State private var atLogin = SMAppService.mainApp.status == .enabled
     @State private var mcp: [String] = []
     @State private var mcpBusy = false
-    private let hasAI = ["claude", "codex"].contains { AIChat.shell("command -v \($0)").status == 0 }
+    @State private var hasAI = true
 
     var body: some View {
         VStack(alignment: .leading, spacing: 18) {
@@ -296,6 +284,9 @@ private struct SetupPrefs: View {
                 }
             }
         }
+        .task {
+            hasAI = await Task.detached { ["claude", "codex"].contains { AIChat.shell("command -v \($0)").status == 0 } }.value
+        }
     }
 
     private func toggle(_ icon: String, _ title: LocalizedStringKey, _ text: LocalizedStringKey, _ on: Binding<Bool>) -> some View {
@@ -317,8 +308,10 @@ private struct Ready: View {
     var body: some View {
         VStack(spacing: 20) {
             Spacer(minLength: 0)
-            Image(systemName: "checkmark.circle.fill").font(.system(size: 64)).foregroundStyle(coral)
-                .symbolEffect(.bounce, value: on)
+            Image(systemName: "checkmark").font(.system(size: 30, weight: .bold)).foregroundStyle(.white)
+                .frame(width: 68, height: 68)
+                .background(coral, in: Circle())
+                .shadow(color: coral.opacity(0.5), radius: 16)
                 .scaleEffect(on ? 1 : 0.5).opacity(on ? 1 : 0)
             Text("Tutto pronto").font(.system(size: 34, weight: .bold, design: .rounded))
             Text("Overheard vive nella barra dei menu, in alto a destra. Cliccala per registrare, vedere le ultime riunioni o chiedere all'AI.")

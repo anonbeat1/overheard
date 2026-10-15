@@ -30,8 +30,6 @@ struct SettingsView: View {
     @State private var mcpConnected = MCPServer.connected()
     @AppStorage("notes.folder") private var notesFolder = ""
     @AppStorage("notes.auto") private var notesAuto = true
-    @State private var apiKey = ""
-    @State private var hasKey = Keychain.hasElevenLabsKey
 
     var body: some View {
         ScrollView {
@@ -261,25 +259,7 @@ struct SettingsView: View {
                 if rec.engine == "elevenlabs" {
                     Divider().overlay(Color.white.opacity(0.1))
                     Text("Chiave API ElevenLabs")
-                    HStack {
-                        SecureField(hasKey ? "•••••••• (salvata nel Portachiavi)" : "sk_…", text: $apiKey)
-                            .textFieldStyle(.roundedBorder)
-                        Button("Salva") {
-                            Keychain.setElevenLabsKey(apiKey.trimmingCharacters(in: .whitespacesAndNewlines))
-                            apiKey = ""
-                            hasKey = Keychain.hasElevenLabsKey
-                        }
-                        .disabled(apiKey.trimmingCharacters(in: .whitespaces).isEmpty)
-                        if hasKey {
-                            Button("Rimuovi") { Keychain.setElevenLabsKey(nil); hasKey = false }
-                        }
-                    }
-                    HStack(spacing: 4) {
-                        Image(systemName: hasKey ? "checkmark.circle.fill" : "exclamationmark.triangle.fill")
-                            .foregroundStyle(hasKey ? .green : .orange)
-                        Text(hasKey ? "Chiave configurata" : "Crea una chiave su elevenlabs.io → API Keys (permesso Speech to Text)")
-                    }
-                    .font(.caption).foregroundStyle(.white.opacity(0.6))
+                    ElevenLabsKeyField()
 
                     Divider().overlay(Color.white.opacity(0.1))
                     Text("Parole chiave")
@@ -326,6 +306,41 @@ struct SettingsView: View {
             Spacer()
             Toggle("", isOn: isOn).labelsHidden().toggleStyle(.switch).controlSize(.small)
         }
+    }
+}
+
+/// Chiave ElevenLabs: si salva da sola appena incollata (o con Invio), e mostra l'esito vero del Portachiavi
+struct ElevenLabsKeyField: View {
+    @State private var key = ""
+    @State private var saved = Keychain.hasElevenLabsKey
+    @State private var failed: String?
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack {
+                SecureField(saved ? "•••••••• (salvata nel Portachiavi)" : "Chiave API ElevenLabs (sk_…)", text: $key)
+                    .textFieldStyle(.roundedBorder)
+                    .onSubmit(save)
+                    .onChange(of: key) { _, k in if k.hasPrefix("sk_"), k.count >= 40 { save() } } // incollata
+                Button("Salva", action: save).disabled(key.trimmingCharacters(in: .whitespaces).isEmpty)
+                if saved { Button("Rimuovi") { Keychain.setElevenLabsKey(nil); saved = false } }
+            }
+            HStack(spacing: 4) {
+                Image(systemName: saved ? "checkmark.circle.fill" : "exclamationmark.triangle.fill").foregroundStyle(saved ? .green : .orange)
+                if let failed { Text("Chiave non salvata: \(failed)") }
+                else { Text(saved ? "Chiave configurata" : "Crea una chiave su elevenlabs.io → API Keys (permesso Speech to Text)") }
+            }
+            .font(.caption).foregroundStyle(.white.opacity(0.6))
+        }
+        .onAppear { saved = Keychain.elevenLabsKey != nil }
+    }
+
+    private func save() {
+        let k = key.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !k.isEmpty else { return }
+        failed = Keychain.setElevenLabsKey(k)
+        saved = failed == nil
+        key = ""
     }
 }
 

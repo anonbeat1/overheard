@@ -64,12 +64,28 @@ final class Recorder: ObservableObject {
         if n > 0 { notify(String(localized: "Pulizia meeting"), String(localized: "\(n) meeting più vecchi di \(Retention.days) giorni spostati nel Cestino")) }
     }
 
+    /// Registrazioni interrotte da una chiusura improvvisa: le chiude e le trascrive
+    func recoverInterrupted() {
+        let dirs = Recovery.orphans(skipping: capture?.dir), pending = Recovery.untranscribed(skipping: capture?.dir)
+        guard !dirs.isEmpty || !pending.isEmpty else { return }
+        let engine = engine
+        Task.detached {
+            var todo = pending
+            for dir in dirs where Recovery.finalize(dir) { todo.append(dir) }
+            guard !todo.isEmpty else { return }
+            notify(String(localized: "Registrazione recuperata"), String(localized: "L'app si era chiusa durante la call: la trascrivo ora"))
+            await MainActor.run { NotificationCenter.default.post(name: .meetingsChanged, object: nil) }
+            for dir in todo { _ = await Transcriber.run(dir: dir, engine: engine) }
+        }
+    }
+
     func sourceOf(_ dir: URL) -> String {
         (try? String(contentsOf: dir.appendingPathComponent("source"), encoding: .utf8))?.trimmingCharacters(in: .whitespacesAndNewlines) ?? "altro"
     }
 
     private var capture: MeetingCapture?
     var currentDir: URL? { capture?.dir }
+    var captureForQuit: MeetingCapture? { capture }
     private var handled = false // call già gestita (registrata o scartata): non ripartire finché non lascia il mic
     private var sawMeeting = false // la call è stata vista durante la registrazione
     private var goneSince: Date?
@@ -80,6 +96,7 @@ final class Recorder: ObservableObject {
             Task { @MainActor in Recorder.shared.cleanOld() }
         }
         DispatchQueue.main.async { Recorder.shared.cleanOld() }
+        DispatchQueue.main.async { Recorder.shared.recoverInterrupted() }
         Timer.scheduledTimer(withTimeInterval: 3, repeats: true) { _ in
             Task { @MainActor in Recorder.shared.tick() }
         }
@@ -215,7 +232,25 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
         return false
     }
 
+    /// Esci / aggiornamento Sparkle durante una call: chiude bene i file (poi trascrive al prossimo avvio)
+    func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
+        MainActor.assumeIsolated {
+            guard let capture = Recorder.shared.captureForQuit else { return .terminateNow }
+            capture.stop { NSApp.reply(toApplicationShouldTerminate: true) }
+            return .terminateLater
+        }
+    }
+
+    private var sigterm: DispatchSourceSignal?
+
     func applicationDidFinishLaunching(_ notification: Notification) {
+        // kill / pkill: passa da applicationShouldTerminate invece di troncare la registrazione
+        signal(SIGTERM, SIG_IGN)
+        // terminate dal run loop, non da un blocco della coda principale: lo stop della registrazione
+        // risponde con DispatchQueue.main.async, che resterebbe bloccato dietro al blocco in corso
+        sigterm = DispatchSource.makeSignalSource(signal: SIGTERM, queue: .global())
+        sigterm?.setEventHandler { RunLoop.main.perform { NSApp.terminate(nil) } }
+        sigterm?.resume()
         let center = UNUserNotificationCenter.current()
         center.delegate = self
         let discard = UNNotificationAction(identifier: "DISCARD", title: String(localized: "Non registrare"), options: [.destructive])

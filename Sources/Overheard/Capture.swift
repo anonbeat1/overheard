@@ -450,6 +450,66 @@ final class MeetingCapture {
     }
 }
 
+/// Registrazioni rimaste a metà (app chiusa o crash durante la call): file .tmp.wav senza recording.wav
+enum Recovery {
+    static func orphans(skipping current: URL?) -> [URL] {
+        let fm = FileManager.default
+        let dirs = (try? fm.contentsOfDirectory(at: URL(fileURLWithPath: "\(home)/Meetings"), includingPropertiesForKeys: nil)) ?? []
+        return dirs.filter { d in
+            d != current && fm.fileExists(atPath: d.appendingPathComponent("recording.tmp.wav").path)
+                && !fm.fileExists(atPath: d.appendingPathComponent("recording.wav").path)
+        }
+    }
+
+    /// Audio chiuso ma mai trascritto (app uscita subito dopo lo stop), solo ultimi 2 giorni
+    static func untranscribed(skipping current: URL?) -> [URL] {
+        let fm = FileManager.default
+        let dirs = (try? fm.contentsOfDirectory(at: URL(fileURLWithPath: "\(home)/Meetings"), includingPropertiesForKeys: nil)) ?? []
+        return dirs.filter { d in
+            func has(_ f: String) -> Bool { fm.fileExists(atPath: d.appendingPathComponent(f).path) }
+            let date = Meeting.at(d).date ?? .distantPast
+            return d != current && has("recording.wav") && !has("transcript.md") && !has("transcript.error")
+                && Date().timeIntervalSince(date) < 2 * 86400
+        }
+    }
+
+    /// Ripara le intestazioni e rinomina come farebbe lo stop; false se non c'è audio utile
+    static func finalize(_ dir: URL) -> Bool {
+        let fm = FileManager.default
+        let rec = dir.appendingPathComponent("recording.tmp.wav"), mic = dir.appendingPathComponent("mic.tmp.wav")
+        for f in [rec, mic] where fm.fileExists(atPath: f.path) { repairWAV(f) }
+        guard (try? AVAudioFile(forReading: rec))?.length ?? 0 > 0 else { return false }
+        let micOut = dir.appendingPathComponent("mic.wav")
+        if fm.fileExists(atPath: mic.path) {
+            if (try? MicLevel.normalize(mic, to: micOut)) != nil { try? fm.removeItem(at: mic) } else { try? fm.moveItem(at: mic, to: micOut) }
+        }
+        return (try? fm.moveItem(at: rec, to: dir.appendingPathComponent("recording.wav"))) != nil
+    }
+
+    /// Dopo un crash le dimensioni nell'header WAV (RIFF e chunk "data") restano quelle iniziali: le ricalcola dalla lunghezza del file
+    static func repairWAV(_ url: URL) {
+        guard let h = try? FileHandle(forUpdating: url), let head = try? h.read(upToCount: 1 << 16), head.count >= 12,
+              head.prefix(4) == Data("RIFF".utf8) else { return }
+        defer { try? h.close() }
+        let size = (try? h.seekToEnd()) ?? 0
+        func u32(_ o: Int) -> UInt32 { head[o..<o + 4].enumerated().reduce(0) { $0 | UInt32($1.element) << (8 * $1.offset) } }
+        func put(_ v: UInt64, at o: UInt64) {
+            var le = UInt32(clamping: v).littleEndian
+            try? h.seek(toOffset: o)
+            h.write(Data(bytes: &le, count: 4))
+        }
+        var o = 12
+        while o + 8 <= head.count {
+            if head[o..<o + 4] == Data("data".utf8) {
+                put(size - UInt64(o + 8), at: UInt64(o + 4))
+                put(size - 8, at: 4)
+                return
+            }
+            o += 8 + Int(u32(o + 4)) + Int(u32(o + 4) & 1)
+        }
+    }
+}
+
 /// Il mic del Mac arriva crudo (~-34 dBFS sul parlato) mentre la call è già normalizzata (~-17):
 /// a fine registrazione alza il mic verso -18 dBFS sul parlato, con un limiter morbido sui picchi.
 enum MicLevel {

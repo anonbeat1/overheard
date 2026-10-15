@@ -278,3 +278,10 @@
 "Ricollega" = "Reconnect";
 "Collegato: " = "Connected: ";
 "Controlla aggiornamenti…" = "Check for Updates…";
+"Il Portachiavi non ha salvato la chiave: riprova" = "The Keychain did not save the key: try again";
+"Registrazione recuperata" = "Recording recovered";
+"L'app si era chiusa durante la call: la trascrivo ora" = "The app quit during the call: transcribing it now";
+"Registrazione interrotta: viene recuperata al prossimo avvio dell'app" = "Recording interrupted: it will be recovered the next time the app starts";
+"Chiave non salvata: %@" = "Key not saved: %@";
+"Portachiavi errore %d, e file non scrivibile" = "Keychain error %d, and file not writable";
+"Portachiavi errore %d" = "Keychain error %d";
