@@ -45,5 +45,7 @@ else
   # Un requisito sul solo bundle id resta uguale tra le build.
   codesign --force --sign - -r='designated => identifier "com.anonbeat.overheard"' "$APP"
 fi
+# NO_INSTALL=1: solo build (es. release durante una registrazione: non sostituisce l'app in uso)
+if [[ -n "${NO_INSTALL:-}" ]]; then echo "Build: $APP (firma: ${ID:-ad-hoc})"; exit 0; fi
 mkdir -p ~/Applications && rm -rf ~/Applications/Overheard.app && cp -R "$APP" ~/Applications/
 echo "Installata: ~/Applications/Overheard.app (firma: ${ID:-ad-hoc})"
