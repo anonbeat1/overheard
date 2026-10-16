@@ -22,7 +22,13 @@ fi
 # Trascrizione sul Mac (Cohere): meeting-transcriber + mlx.metallib + risorse SwiftPM dentro l'app.
 # I modelli (~2,5 GB) non sono inclusi: l'app li scarica quando si sceglie "Sul Mac" nelle Impostazioni.
 T=Transcriber/.build/release
-(cd Transcriber && swift build -c release --disable-sandbox && BUILD_DIR="$PWD/.build" .build/checkouts/speech-swift/scripts/build_mlx_metallib.sh release)
+# Se il toolchain Metal di Xcode non c'è (capita dopo un aggiornamento: xcodebuild -downloadComponent MetalToolchain)
+# riusa il trascrittore già compilato, purché i sorgenti non siano più nuovi del binario.
+if ! (cd Transcriber && swift build -c release --disable-sandbox && BUILD_DIR="$PWD/.build" .build/checkouts/speech-swift/scripts/build_mlx_metallib.sh release); then
+  [[ -f "$T/meeting-transcriber" && -f "$T/mlx.metallib" && -z "$(find Transcriber/Sources Transcriber/Package.swift -newer "$T/meeting-transcriber")" ]] \
+    || { echo "Build del trascrittore fallita e nessun binario valido da riusare"; exit 1; }
+  echo "ATTENZIONE: build del trascrittore fallita (toolchain Metal?), riuso quello già compilato"
+fi
 TR="$APP/Contents/Resources/transcriber" && mkdir -p "$TR"
 cp "$T/meeting-transcriber" "$T/mlx.metallib" "$TR/" && cp -R "$T"/*.bundle "$TR/"
 # back-deploy di Swift per macOS < 26 (rpath @loader_path)
