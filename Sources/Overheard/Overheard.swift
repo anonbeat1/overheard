@@ -205,11 +205,35 @@ func notify(_ title: String, _ body: String) {
 
 // MARK: - Notifiche
 
-/// Aggiornamenti automatici (Sparkle): feed e chiave pubblica in Info.plist, pubblicazione con release.sh
+/// Aggiornamenti automatici (Sparkle): feed e chiave pubblica in Info.plist, pubblicazione con release.sh.
+/// "Gentili": durante una call o una trascrizione non apre finestre, mette un pallino sull'icona e una riga nel pannello.
 @MainActor
 enum Updates {
-    static let controller = SPUStandardUpdaterController(startingUpdater: true, updaterDelegate: nil, userDriverDelegate: nil)
+    static let state = UpdateState()
+    static let controller = SPUStandardUpdaterController(startingUpdater: true, updaterDelegate: nil, userDriverDelegate: state)
     static func check() { NSApp.activate(ignoringOtherApps: true); controller.checkForUpdates(nil) }
+}
+
+final class UpdateState: NSObject, ObservableObject, SPUStandardUserDriverDelegate {
+    @MainActor @Published var available: String? // versione trovata e non ancora mostrata
+
+    var supportsGentleScheduledUpdateReminders: Bool { true }
+
+    func standardUserDriverShouldHandleShowingScheduledUpdate(_ update: SUAppcastItem, andInImmediateFocus immediateFocus: Bool) -> Bool {
+        MainActor.assumeIsolated {
+            let busy = Recorder.shared.recording || ((try? FileManager.default.contentsOfDirectory(atPath: "\(home)/Meetings")) ?? [])
+                .contains { FileManager.default.fileExists(atPath: "\(home)/Meetings/\($0)/.transcribing") }
+            return immediateFocus && !busy
+        }
+    }
+
+    func standardUserDriverWillHandleShowingUpdate(_ handleShowingUpdate: Bool, forUpdate update: SUAppcastItem, state: SPUUserUpdateState) {
+        MainActor.assumeIsolated { available = handleShowingUpdate ? nil : update.displayVersionString }
+    }
+
+    func standardUserDriverDidReceiveUserAttention(forUpdate update: SUAppcastItem) {
+        MainActor.assumeIsolated { available = nil }
+    }
 }
 
 /// Voce di menu che esegue una closure
@@ -500,6 +524,7 @@ struct RoundButton: View {
 struct MenuView: View {
     var arrowX: CGFloat?
     @ObservedObject var rec = Recorder.shared
+    @ObservedObject var updates = Updates.state
     @State private var meetings = Meeting.recent()
     @State private var query = ""
 
@@ -510,6 +535,13 @@ struct MenuView: View {
                 Text(rec.recording ? "In registrazione" : "Meeting").font(.system(size: 20, weight: .bold))
                 Spacer()
                 RoundButton(icon: "gearshape") { PanelController.shared.hide(); SettingsWindow.show() }.help("Impostazioni")
+            }
+            if let v = updates.available, !rec.recording {
+                Button { PanelController.shared.hide(); Updates.check() } label: {
+                    Label("Aggiornamento disponibile: \(v) · Novità", systemImage: "arrow.down.circle.fill")
+                        .font(.callout.weight(.semibold)).foregroundStyle(.orange)
+                }
+                .buttonStyle(.plain)
             }
 
             // Registrazione
@@ -664,7 +696,8 @@ final class PanelController {
         item.button?.target = self
         item.button?.action = #selector(togglePanel)
         item.button?.sendAction(on: [.leftMouseUp, .rightMouseUp]) // clic destro: menu con cartella ed Esci
-        sub = Recorder.shared.$recording.sink { [weak self] on in self?.setIcon(on) }
+        sub = Recorder.shared.$recording.combineLatest(Updates.state.$available)
+            .sink { [weak self] on, update in self?.setIcon(on, update: update != nil) }
 
         host = NSHostingView(rootView: MenuView())
         panel = Panel(contentRect: .zero, styleMask: [.borderless, .nonactivatingPanel], backing: .buffered, defer: true)
@@ -676,10 +709,21 @@ final class PanelController {
         panel.contentView = host
     }
 
-    private func setIcon(_ recording: Bool) {
-        // Glifo onda→testo (Resources/MenuIcon.png): template normalmente, rossa mentre registra
+    private func setIcon(_ recording: Bool, update: Bool) {
+        // Glifo onda→testo (Resources/MenuIcon.png): template normalmente, rossa mentre registra, pallino se c'è un aggiornamento
         guard let base = Bundle.main.image(forResource: "MenuIcon") else { return }
         base.size = NSSize(width: 22, height: 22)
+        if update && !recording {
+            base.isTemplate = true
+            let dot = NSImage(size: base.size, flipped: false) { r in
+                base.draw(in: r)
+                NSColor.systemOrange.setFill()
+                NSBezierPath(ovalIn: NSRect(x: r.maxX - 7, y: r.maxY - 7, width: 7, height: 7)).fill()
+                return true
+            }
+            item.button?.image = dot
+            return
+        }
         guard recording else { base.isTemplate = true; item.button?.image = base; return }
         item.button?.image = NSImage(size: base.size, flipped: false) { r in
             base.draw(in: r)

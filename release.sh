@@ -5,7 +5,10 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 VER=${1:?"uso: ./release.sh <versione>, es. 0.2"}
-[[ -z "$(git status --porcelain -- Sources Resources Info.plist Package.swift)" ]] || { echo "Prima fai commit delle modifiche"; exit 1; }
+[[ -z "$(git status --porcelain -- Sources Resources Info.plist Package.swift CHANGELOG.md)" ]] || { echo "Prima fai commit delle modifiche"; exit 1; }
+# note di rilascio: la sezione "## <versione>" di CHANGELOG.md (finestra di Sparkle e release su GitHub)
+NOTES=$(awk -v v="## $VER" '$0 == v {on=1; next} on && /^## / {exit} on' CHANGELOG.md | sed '/./,$!d')
+[[ -n "$NOTES" ]] || { echo "Manca la sezione \"## $VER\" in CHANGELOG.md"; exit 1; }
 
 # versione: CFBundleVersion cresce di 1 a ogni release (Sparkle confronta questo)
 BUILD=$(( $(/usr/libexec/PlistBuddy -c "Print CFBundleVersion" Info.plist) + 1 ))
@@ -18,12 +21,13 @@ DMG="dist/Overheard-$VER.dmg"
 UP=build/updates && rm -rf "$UP" && mkdir -p "$UP"
 cp "$DMG" "$UP/"
 [[ -f appcast.xml ]] && cp appcast.xml "$UP/"
-.build/artifacts/sparkle/Sparkle/bin/generate_appcast \
+printf '%s\n' "$NOTES" > "$UP/Overheard-$VER.md"
+.build/artifacts/sparkle/Sparkle/bin/generate_appcast --embed-release-notes \
   --download-url-prefix "https://github.com/anonbeat1/overheard/releases/download/v$VER/" \
   --link "https://github.com/anonbeat1/overheard" "$UP"
 cp "$UP/appcast.xml" appcast.xml
 
-gh release create "v$VER" "$DMG" --title "Overheard $VER" --generate-notes
+gh release create "v$VER" "$DMG" --title "Overheard $VER" --notes "$NOTES"
 git add Info.plist appcast.xml
 git commit -m "Release $VER"
 git push

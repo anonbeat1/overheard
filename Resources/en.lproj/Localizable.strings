@@ -319,3 +319,6 @@
 "Nessuna trovata: installa Claude Code o Codex, o attiva Apple Intelligence" = "None found: install Claude Code or Codex, or turn on Apple Intelligence";
 "Sul Mac, senza account: riassunti più semplici per le call lunghe" = "On your Mac, no account: simpler summaries for long calls";
 "Usa il login che hai già fatto nel Terminale" = "Uses the sign-in you already did in Terminal";
+"Aggiornamento disponibile: %@ · Novità" = "Update available: %@ · What's new";
+"Installa gli aggiornamenti automaticamente" = "Install updates automatically";
+"Li scarica in background e li installa alla prossima chiusura di Overheard" = "Downloads them in the background and installs them the next time Overheard quits";

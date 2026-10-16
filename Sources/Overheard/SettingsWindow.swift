@@ -20,6 +20,7 @@ struct SettingsView: View {
     @AppStorage("language") private var language = ""
     @AppStorage("calendar.enabled") private var calendarOn = false
     @AppStorage("summary.auto") private var summaryAuto = true
+    @AppStorage("SUAutomaticallyUpdate") private var autoUpdate = false // la chiave che legge Sparkle
     @AppStorage("ai.engine") private var aiEngine = "claude"
     @State private var aiTools: [String]?
     @AppStorage("speakers.autoName") private var autoNames = true
@@ -86,6 +87,7 @@ struct SettingsView: View {
                         .font(.caption).foregroundStyle(.white.opacity(0.4))
                     Button("Controlla aggiornamenti…") { Updates.check() }
                 }
+                row("Installa gli aggiornamenti automaticamente", "Li scarica in background e li installa alla prossima chiusura di Overheard", $autoUpdate)
             }
 
             Card {
