@@ -41,8 +41,12 @@ enum AppleAI {
             var notes: [String] = []
             for chunk in chunks(text, size: budget) {
                 notes.append(try await complete("""
-                Notes on this part of a meeting transcript, as short bullet points in \(Prefs.uiLanguageName): \
-                what was discussed, decisions, who must do what (with deadlines). Keep people's names and [mm:ss] times.
+                Notes on this part of a meeting transcript, in \(Prefs.uiLanguageName), as three short lists:
+                Discussed: topics, facts, numbers.
+                Decided: everything agreed or chosen, even small technical choices.
+                To do: "Name: action (deadline)", only for concrete tasks someone takes on or is asked to do. \
+                Never list people who are only mentioned.
+                Keep people's names and [mm:ss] times. Write "none" for an empty list.
 
                 \(chunk)
                 """))

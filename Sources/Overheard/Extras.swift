@@ -146,7 +146,12 @@ enum Summarizer {
         if apple {
             do {
                 let body = try await AppleAI.condense(md, to: AppleAI.budget - prompt.count)
-                out = try await AppleAI.complete(prompt + body)
+                // il modello piccolo copia "Person:" dal formato e salta la riga TITLE: titolo con una domanda a parte
+                var text = try await AppleAI.complete(prompt + "Only list action items with a concrete action.\n\n" + body).replacingOccurrences(of: "- [ ] Person: ", with: "- [ ] ")
+                if !titling.isEmpty, !text.contains("TITLE:") {
+                    text = "TITLE: " + (try await AppleAI.complete("A 2-6 word title in \(Prefs.uiLanguageName) for the meeting summarized below: topic, client or project, no date. Reply with the title only.\n\n" + text)) + "\n" + text
+                }
+                out = text
             } catch { return error.localizedDescription }
         } else {
             out = AIChat.complete(prompt, engine: engine)

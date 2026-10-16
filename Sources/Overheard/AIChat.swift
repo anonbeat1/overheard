@@ -322,7 +322,7 @@ struct AIChatView: View {
         .padding(.bottom, 16)
         .frame(width: 340)
         .background(Color.white.opacity(0.04))
-        .onAppear { focused = true }
+        .onAppear { focused = true; chat.detect() }
     }
 
     private func send() {

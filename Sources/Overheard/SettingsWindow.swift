@@ -414,11 +414,12 @@ enum SettingsWindow {
             w.appearance = NSAppearance(named: .darkAqua)
             w.isReleasedWhenClosed = false
             w.title = "Impostazioni"
-            w.contentView = NSHostingView(rootView: SettingsView())
             w.center()
             window = w
             return w
         }()
+        // vista nuova a ogni apertura: rilegge cosa è installato (Claude, Codex, Apple Intelligence attivata nel frattempo)
+        if !w.isVisible { w.contentView = NSHostingView(rootView: SettingsView()) }
         NSApp.activate(ignoringOtherApps: true)
         w.makeKeyAndOrderFront(nil)
     }
