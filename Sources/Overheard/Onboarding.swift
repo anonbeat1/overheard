@@ -143,27 +143,33 @@ private struct Unveil: View {
 
 private struct Features: View {
     @State private var shown = 0
-    private let items: [(String, LocalizedStringKey, LocalizedStringKey)] = [
-        ("record.circle", "Registra", "Parte da solo quando Meet, Teams o Slack usano il microfono. Nessun bot entra nella call."),
-        ("text.quote", "Trascrive", "Ogni parola, con chi parla e quando. Nel cloud o tutto sul tuo Mac."),
-        ("checklist", "Riassume", "Decisioni e cose da fare da spuntare, appena finisce la call."),
-        ("sparkles", "Rispondi con Claude", "Chiedi a Claude Code o Codex cosa si è deciso: legge le tue riunioni."),
+    @State private var ai: [String]?
+    private let items: [(String, LocalizedStringKey, LocalizedStringKey, [Permission])] = [
+        ("record.circle", "Registra", "Parte da solo quando Meet, Teams o Slack usano il microfono. Nessun bot entra nella call.",
+         [.microphone, .systemAudio, .notifications]),
+        ("text.quote", "Trascrive", "Ogni parola, con chi parla e quando. Nel cloud o tutto sul tuo Mac.", []),
+        ("checklist", "Riassume", "Decisioni e cose da fare da spuntare, appena finisce la call. Titoli e invitati dal calendario.", [.calendar]),
+        ("sparkles", "Rispondi con Claude", "Chiedi a Claude Code o Codex cosa si è deciso: legge le tue riunioni.", []),
     ]
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 22) {
-            Heading(title: "Cosa fa Overheard", subtitle: "Vive nella barra dei menu e lavora in silenzio.")
-            VStack(spacing: 12) {
+        VStack(alignment: .leading, spacing: 18) {
+            Heading(title: "Cosa fa Overheard", subtitle: "Concedi i permessi di cui ha bisogno, uno alla volta.")
+            VStack(spacing: 10) {
                 ForEach(items.indices, id: \.self) { i in
-                    let (icon, title, text) = items[i]
+                    let (icon, title, text, perms) = items[i]
                     HStack(alignment: .top, spacing: 14) {
                         Image(systemName: icon).font(.system(size: 18, weight: .semibold)).foregroundStyle(coral)
                             .frame(width: 40, height: 40)
                             .background(coral.opacity(0.14), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
                             .symbolEffect(.bounce, value: shown > i)
-                        VStack(alignment: .leading, spacing: 3) {
+                        VStack(alignment: .leading, spacing: 6) {
                             Text(title).font(.headline)
                             Text(text).font(.callout).foregroundStyle(.white.opacity(0.6)).fixedSize(horizontal: false, vertical: true)
+                            if !perms.isEmpty {
+                                HStack(spacing: 8) { ForEach(perms, id: \.self) { PermissionChip(permission: $0) } }
+                            }
+                            if i == 3 { aiStatus }
                         }
                         Spacer(minLength: 0)
                     }
@@ -180,6 +186,61 @@ private struct Features: View {
                 withAnimation(.spring(duration: 0.5, bounce: 0.2)) { shown = i }
             }
         }
+        .task { ai = await Task.detached { AIChat.installed() }.value }
+    }
+
+    @ViewBuilder private var aiStatus: some View {
+        if let ai {
+            if ai.isEmpty {
+                HStack(spacing: 8) {
+                    Label("Non trovato", systemImage: "exclamationmark.circle.fill").foregroundStyle(.orange)
+                    Link("Installa Claude Code", destination: URL(string: "https://claude.com/claude-code")!)
+                    Button("Ricontrolla") { Task { self.ai = nil; self.ai = await Task.detached { AIChat.installed() }.value } }
+                        .buttonStyle(.plain).foregroundStyle(.white.opacity(0.6))
+                }
+                .font(.caption)
+            } else {
+                Label(ai.map { $0 == "claude" ? "Claude Code" : "Codex" }.joined(separator: ", "), systemImage: "checkmark.circle.fill")
+                    .font(.caption).foregroundStyle(.green)
+            }
+        } else {
+            ProgressView().controlSize(.mini)
+        }
+    }
+}
+
+/// Un permesso: "Consenti" → richiesta di macOS → spunta verde (o "Apri Impostazioni" se negato)
+private struct PermissionChip: View {
+    let permission: Permission
+    @State private var state: Permission.State?
+
+    var body: some View {
+        Button {
+            Task {
+                if state == .denied { permission.openSettings() } else { await permission.request() }
+                state = await permission.state()
+            }
+        } label: {
+            HStack(spacing: 5) {
+                Image(systemName: state == .granted ? "checkmark.circle.fill" : permission.icon)
+                Text(permission.title)
+                if state == .denied { Text("· Apri Impostazioni").foregroundStyle(.white.opacity(0.6)) }
+                else if state != .granted { Text("· Consenti").foregroundStyle(coral) }
+            }
+            .font(.caption.weight(.medium))
+            .padding(.horizontal, 9).padding(.vertical, 5)
+            .foregroundStyle(state == .granted ? .green : .white)
+            .background(state == .granted ? Color.green.opacity(0.14) : Color.white.opacity(0.08), in: Capsule())
+            .contentShape(Capsule())
+        }
+        .buttonStyle(.plain)
+        .disabled(state == .granted)
+        .animation(.spring(duration: 0.3), value: state)
+        .task { state = await permission.state() }
+        // rientrando dalle Impostazioni di Sistema
+        .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
+            Task { state = await permission.state() }
+        }
     }
 }
 
@@ -187,7 +248,6 @@ private struct SetupVoice: View {
     @ObservedObject var rec = Recorder.shared
     @ObservedObject var models = LocalModels.shared
     @AppStorage("myName") private var myName = ""
-    @State private var mic = AVCaptureDevice.authorizationStatus(for: .audio)
 
     var body: some View {
         VStack(alignment: .leading, spacing: 18) {
@@ -196,22 +256,6 @@ private struct SetupVoice: View {
                 Text("Come ti chiami?").font(.headline)
                 TextField("Il tuo nome, es. Mario", text: $myName).textFieldStyle(.roundedBorder)
                 Text("Così la tua voce nei transcript ha il tuo nome.").font(.caption).foregroundStyle(.white.opacity(0.5))
-                Divider().overlay(Color.white.opacity(0.1))
-                HStack {
-                    Label("Microfono", systemImage: "mic.fill")
-                    Spacer()
-                    switch mic {
-                    case .authorized: Label("Concesso", systemImage: "checkmark.circle.fill").foregroundStyle(.green).font(.callout)
-                    case .notDetermined: Button("Consenti") {
-                        AVCaptureDevice.requestAccess(for: .audio) { _ in
-                            Task { @MainActor in mic = AVCaptureDevice.authorizationStatus(for: .audio) }
-                        }
-                    }
-                    default: Button("Apri Impostazioni di Sistema") {
-                        NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Microphone")!)
-                    }
-                    }
-                }
             }
             Card {
                 Text("Come trascrivere").font(.headline)
@@ -285,7 +329,7 @@ private struct SetupPrefs: View {
             }
         }
         .task {
-            hasAI = await Task.detached { ["claude", "codex"].contains { AIChat.shell("command -v \($0)").status == 0 } }.value
+            hasAI = await Task.detached { !AIChat.installed().isEmpty }.value
         }
     }
 

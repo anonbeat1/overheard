@@ -116,14 +116,17 @@ enum Transcriber {
         defer { try? FileManager.default.removeItem(at: marker) }
         do {
             let md: String
+            var used = engine == "local" ? "local" : "elevenlabs"
+            try? FileManager.default.removeItem(at: dir.appendingPathComponent("engine"))
             if engine == "local" {
                 md = try local(dir)
             } else if let key = Keychain.elevenLabsKey {
                 do {
                     md = try await elevenLabs(dir, key: key)
                 } catch {
-                    // rete/credito/chiave: ripiega sul Mac se possibile
-                    guard FileManager.default.isExecutableFile(atPath: localTool) else { throw error }
+                    used = "fallback"
+                    // rete/credito/chiave: ripiega sul Mac solo se i modelli ci sono, altrimenti l'errore vero è quello di ElevenLabs
+                    guard UserDefaults.standard.bool(forKey: "localModelsReady"), FileManager.default.isExecutableFile(atPath: localTool) else { throw error }
                     md = String(localized: "_Trascrizione locale (ElevenLabs non disponibile: \(error.localizedDescription))._\n\n") + (try local(dir))
                 }
             } else {
@@ -137,6 +140,7 @@ enum Transcriber {
             if !marks.isEmpty { head.append(String(localized: "Momenti segnati: ") + marks.map { "[\(Summarizer.stamp($0))]" }.joined(separator: ", ")) }
             let top = head.isEmpty ? "" : head.joined(separator: "\n") + "\n\n"
             try "# Transcript — \(dir.lastPathComponent)\n\n\(top)\(md)".write(to: dir.appendingPathComponent("transcript.md"), atomically: true, encoding: .utf8)
+            try? (used + "\n").write(to: dir.appendingPathComponent("engine"), atomically: true, encoding: .utf8) // per il badge
             NotesExport.exportIfEnabled(dir)
             Task.detached { await Summarizer.runIfEnabled(dir) } // riassunto e cose da fare, poi riesporta la nota
             return .success(())
@@ -201,6 +205,48 @@ enum Transcriber {
 
     // MARK: ElevenLabs
 
+    /// Messaggio leggibile per una risposta di ElevenLabs non riuscita (nil se ok)
+    static func apiError(_ data: Data, _ resp: URLResponse?) -> String? {
+        let status = (resp as? HTTPURLResponse)?.statusCode ?? 0
+        guard status != 200 else { return nil }
+        // {"detail": {"status": "missing_permissions", "message": "..."}} oppure {"detail": "..."}
+        let json = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any]
+        let detail = json?["detail"]
+        let code = (detail as? [String: Any])?["status"] as? String ?? ""
+        let message = (detail as? [String: Any])?["message"] as? String ?? detail as? String ?? String(decoding: data.prefix(300), as: UTF8.self)
+        switch (status, code) {
+        case (_, "missing_permissions"): return String(localized: "La chiave ElevenLabs non ha il permesso Speech to Text: abilitalo su elevenlabs.io → API Keys")
+        case (_, "quota_exceeded"): return String(localized: "Credito ElevenLabs esaurito")
+        case (401, _), (_, "invalid_api_key"): return String(localized: "Chiave ElevenLabs non valida: controlla di averla copiata intera")
+        default: return String(localized: "ElevenLabs HTTP \(status): \(message)")
+        }
+    }
+
+    /// Prova la chiave con un secondo di silenzio (costo trascurabile); nil se funziona, altrimenti il motivo
+    static func testElevenLabs(key: String) async -> String? {
+        var wav = Data("RIFF".utf8), rate: UInt32 = 16000, n: UInt32 = 16000 * 2
+        func le<T: FixedWidthInteger>(_ v: T) { withUnsafeBytes(of: v.littleEndian) { wav.append(contentsOf: $0) } }
+        le(UInt32(36 + n)); wav.append(Data("WAVEfmt ".utf8)); le(UInt32(16)); le(UInt16(1)); le(UInt16(1))
+        le(rate); le(rate * 2); le(UInt16(2)); le(UInt16(16)); wav.append(Data("data".utf8)); le(n)
+        wav.append(Data(count: Int(n)))
+        var req = URLRequest(url: URL(string: "https://api.elevenlabs.io/v1/speech-to-text")!)
+        req.httpMethod = "POST"
+        req.timeoutInterval = 60
+        req.setValue(key, forHTTPHeaderField: "xi-api-key")
+        let boundary = "mr-\(UUID().uuidString)"
+        req.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
+        var body = Data("--\(boundary)\r\nContent-Disposition: form-data; name=\"model_id\"\r\n\r\nscribe_v2\r\n".utf8)
+        body.append(Data("--\(boundary)\r\nContent-Disposition: form-data; name=\"file\"; filename=\"test.wav\"\r\nContent-Type: audio/wav\r\n\r\n".utf8))
+        body.append(wav)
+        body.append(Data("\r\n--\(boundary)--\r\n".utf8))
+        do {
+            let (data, resp) = try await URLSession.shared.upload(for: req, from: body)
+            return apiError(data, resp)
+        } catch {
+            return String(localized: "ElevenLabs non raggiungibile: \(error.localizedDescription)")
+        }
+    }
+
     private static func elevenLabs(_ dir: URL, key: String) async throws -> String {
         let tmp = FileManager.default.temporaryDirectory.appendingPathComponent("mr-\(UUID().uuidString).m4a")
         defer { try? FileManager.default.removeItem(at: tmp) }
@@ -228,11 +274,7 @@ enum Transcriber {
         body.append(Data("\r\n--\(boundary)--\r\n".utf8))
 
         let (data, resp) = try await URLSession.shared.upload(for: req, from: body)
-        let status = (resp as? HTTPURLResponse)?.statusCode ?? 0
-        guard status == 200 else {
-            let detail = String(decoding: data.prefix(300), as: UTF8.self)
-            throw TranscriptionError.message(status == 401 ? String(localized: "Chiave ElevenLabs non valida") : String(localized: "ElevenLabs HTTP \(status): \(detail)"))
-        }
+        if let err = apiError(data, resp) { throw TranscriptionError.message(err) }
         struct Word: Decodable { let text: String; let type: String?; let start: Double?; let end: Double?; let speaker_id: String? }
         struct Response: Decodable { let words: [Word] }
         let words = try JSONDecoder().decode(Response.self, from: data).words.filter { $0.type != "audio_event" }

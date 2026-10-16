@@ -18,14 +18,26 @@ final class AIChat: ObservableObject {
     @AppStorage("ai.engine") var engine = "claude"
     private var process: Process?
 
-    init() {
+    @Published var checking = true
+
+    init() { detect() }
+
+    func detect() {
+        checking = true
         Task.detached {
-            let found = ["claude", "codex"].filter { AIChat.shell("command -v \($0)").status == 0 }
+            let found = AIChat.installed()
             await MainActor.run {
                 self.tools = found
+                self.checking = false
                 if !found.contains(self.engine), let first = found.first { self.engine = first }
             }
         }
+    }
+
+    /// CLI che rispondono davvero (`--version`), non solo presenti nel PATH: un link rotto o un'installazione
+    /// a metà farebbe accettare domande che poi non ricevono risposta
+    nonisolated static func installed() -> [String] {
+        ["claude", "codex"].filter { shell("\($0) --version").status == 0 }
     }
 
     private static let instructions = """
@@ -70,7 +82,9 @@ final class AIChat: ObservableObject {
                 var text = (last ?? stdout).trimmingCharacters(in: .whitespacesAndNewlines)
                 if proc.terminationReason == .uncaughtSignal { text = String(localized: "Interrotto.") }
                 else if proc.terminationStatus != 0 || text.isEmpty {
-                    text = String(localized: "Errore: ") + (stderr.split(separator: "\n").suffix(3).joined(separator: "\n").isEmpty ? String(localized: "nessuna risposta") : stderr.split(separator: "\n").suffix(3).joined(separator: "\n"))
+                    let detail = (stderr + "\n" + stdout).split(separator: "\n").suffix(3).joined(separator: "\n")
+                    text = String(localized: "Errore: ") + (detail.isEmpty ? String(localized: "nessuna risposta") : detail)
+                    if proc.terminationStatus == 127 { text = String(localized: "Claude Code o Codex non trovato: installalo e fai il login nel Terminale.") }
                 }
                 self.messages.append(Message(mine: false, text: text))
                 self.busy = false
@@ -199,10 +213,26 @@ struct AIChatView: View {
             .labelsHidden().pickerStyle(.segmented)
             .disabled(meeting == nil)
 
-            if chat.tools.isEmpty {
+            if chat.checking && chat.tools.isEmpty {
                 Spacer()
-                Text("Serve Claude Code o Codex installato e con il login fatto nel Terminale.")
-                    .font(.callout).foregroundStyle(.white.opacity(0.6)).multilineTextAlignment(.center).frame(maxWidth: .infinity)
+                ProgressView().controlSize(.small).frame(maxWidth: .infinity)
+                Spacer()
+            } else if chat.tools.isEmpty {
+                Spacer()
+                VStack(spacing: 12) {
+                    Image(systemName: "terminal").font(.system(size: 28)).foregroundStyle(.orange)
+                    Text("Per chiedere ai tuoi meeting serve Claude Code o Codex").font(.headline).multilineTextAlignment(.center)
+                    Text("Installalo e fai il login una volta nel Terminale (claude oppure codex). Lo usano anche i riassunti automatici.")
+                        .font(.callout).foregroundStyle(.white.opacity(0.6)).multilineTextAlignment(.center)
+                    HStack {
+                        Link("Installa Claude Code", destination: URL(string: "https://claude.com/claude-code")!)
+                        Text(verbatim: "·").foregroundStyle(.white.opacity(0.4))
+                        Link("Codex", destination: URL(string: "https://github.com/openai/codex")!)
+                    }
+                    .font(.callout)
+                    Button("Ricontrolla") { chat.detect() }
+                }
+                .frame(maxWidth: .infinity)
                 Spacer()
             } else {
                 ScrollViewReader { proxy in

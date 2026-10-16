@@ -103,7 +103,7 @@ enum Summarizer {
     static func run(_ dir: URL) async -> String? {
         guard let md = try? String(contentsOf: dir.appendingPathComponent("transcript.md"), encoding: .utf8) else { return String(localized: "Transcript mancante") }
         let preferred = UserDefaults.standard.string(forKey: "ai.engine") ?? "claude"
-        guard let engine = [preferred, "claude", "codex"].first(where: { AIChat.shell("command -v \($0)").status == 0 }) else {
+        guard let engine = [preferred, "claude", "codex"].first(where: AIChat.installed().contains) else {
             return String(localized: "Serve Claude Code o Codex installato (con il login fatto nel Terminale)")
         }
         let m = Meeting.at(dir)

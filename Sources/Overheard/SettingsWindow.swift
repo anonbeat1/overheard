@@ -314,6 +314,8 @@ struct ElevenLabsKeyField: View {
     @State private var key = ""
     @State private var saved = Keychain.hasElevenLabsKey
     @State private var failed: String?
+    @State private var check: Check = .idle
+    enum Check: Equatable { case idle, running, ok, error(String) }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
@@ -323,14 +325,31 @@ struct ElevenLabsKeyField: View {
                     .onSubmit(save)
                     .onChange(of: key) { _, k in if k.hasPrefix("sk_"), k.count >= 40 { save() } } // incollata
                 Button("Salva", action: save).disabled(key.trimmingCharacters(in: .whitespaces).isEmpty)
-                if saved { Button("Rimuovi") { Keychain.setElevenLabsKey(nil); saved = false } }
+                if saved {
+                    Button("Verifica") { verify() }.disabled(check == .running)
+                    Button("Rimuovi") { Keychain.setElevenLabsKey(nil); saved = false; check = .idle }
+                }
             }
-            HStack(spacing: 4) {
-                Image(systemName: saved ? "checkmark.circle.fill" : "exclamationmark.triangle.fill").foregroundStyle(saved ? .green : .orange)
-                if let failed { Text("Chiave non salvata: \(failed)") }
-                else { Text(saved ? "Chiave configurata" : "Crea una chiave su elevenlabs.io → API Keys (permesso Speech to Text)") }
+            HStack(alignment: .top, spacing: 4) {
+                switch (failed, check) {
+                case let (f?, _):
+                    Image(systemName: "exclamationmark.triangle.fill").foregroundStyle(.orange)
+                    Text("Chiave non salvata: \(f)")
+                case (nil, .running):
+                    ProgressView().controlSize(.mini)
+                    Text("Verifico la chiave con ElevenLabs…")
+                case (nil, .ok):
+                    Image(systemName: "checkmark.circle.fill").foregroundStyle(.green)
+                    Text("Chiave funzionante")
+                case let (nil, .error(e)):
+                    Image(systemName: "xmark.octagon.fill").foregroundStyle(.red)
+                    Text(e).fixedSize(horizontal: false, vertical: true)
+                default:
+                    Image(systemName: saved ? "checkmark.circle.fill" : "exclamationmark.triangle.fill").foregroundStyle(saved ? .green : .orange)
+                    Text(saved ? "Chiave configurata" : "Crea una chiave su elevenlabs.io → API Keys (permesso Speech to Text)")
+                }
             }
-            .font(.caption).foregroundStyle(.white.opacity(0.6))
+            .font(.caption).foregroundStyle(.white.opacity(0.7))
         }
         .onAppear { saved = Keychain.elevenLabsKey != nil }
     }
@@ -341,6 +360,16 @@ struct ElevenLabsKeyField: View {
         failed = Keychain.setElevenLabsKey(k)
         saved = failed == nil
         key = ""
+        if saved { verify() }
+    }
+
+    private func verify() {
+        guard let k = Keychain.elevenLabsKey else { saved = false; return }
+        check = .running
+        Task {
+            let err = await Transcriber.testElevenLabs(key: k)
+            check = err.map { .error($0) } ?? .ok
+        }
     }
 }
 

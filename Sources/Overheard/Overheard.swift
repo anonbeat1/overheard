@@ -257,7 +257,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
         center.delegate = self
         let discard = UNNotificationAction(identifier: "DISCARD", title: String(localized: "Non registrare"), options: [.destructive])
         center.setNotificationCategories([UNNotificationCategory(identifier: "AUTOREC", actions: [discard], intentIdentifiers: [])])
-        center.requestAuthorization(options: [.alert, .sound]) { _, _ in }
+        // i nuovi utenti la concedono nell'introduzione, non al primo avvio insieme a tutto il resto
+        if UserDefaults.standard.bool(forKey: "onboarding.done") { center.requestAuthorization(options: [.alert, .sound]) { _, _ in } }
         Self.applyDock()
         HotKey.register()
         _ = Recorder.shared

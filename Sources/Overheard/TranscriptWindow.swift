@@ -165,7 +165,10 @@ struct TranscriptView: View {
                 SourceIcon(source: meeting.source)
                 VStack(alignment: .leading, spacing: 2) {
                     Text(meeting.app).font(.system(size: 18, weight: .bold))
-                    Text(meeting.when).font(.callout).foregroundStyle(.white.opacity(0.5))
+                    HStack(spacing: 8) {
+                        Text(meeting.when).font(.callout).foregroundStyle(.white.opacity(0.5))
+                        EngineBadge(meeting: meeting)
+                    }
                 }
                 Spacer()
                 Menu {
@@ -610,6 +613,40 @@ struct TranscriptView: View {
 }
 
 /// Archivio: tutti i meeting a sinistra (per giorno, con ricerca anche dentro i transcript), transcript a destra.
+/// Con cosa è stato trascritto il meeting e com'è andata (file "engine", transcript.error, .transcribing)
+struct EngineBadge: View {
+    let meeting: Meeting
+
+    private var info: (String, Color)? {
+        let fm = FileManager.default
+        func has(_ f: String) -> Bool { fm.fileExists(atPath: meeting.url.appendingPathComponent(f).path) }
+        if has(".transcribing") { return (String(localized: "In corso"), .gray) }
+        if has("transcript.error") { return (String(localized: "Fallita"), .red) }
+        let engine = (try? String(contentsOf: meeting.url.appendingPathComponent("engine"), encoding: .utf8))?
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        switch engine {
+        case "elevenlabs": return ("ElevenLabs", .green)
+        case "local": return (String(localized: "Sul Mac"), .green)
+        case "fallback": return (String(localized: "Sul Mac · ElevenLabs fallito"), .orange)
+        default: return nil // meeting di prima dei badge
+        }
+    }
+
+    var body: some View {
+        if let (label, color) = info {
+            HStack(spacing: 4) {
+                Circle().fill(color).frame(width: 6, height: 6)
+                Text(label)
+            }
+            .font(.caption2.weight(.semibold))
+            .foregroundStyle(color == .gray ? .white.opacity(0.6) : color)
+            .padding(.horizontal, 7).padding(.vertical, 2)
+            .background(color.opacity(0.15), in: Capsule())
+            .lineLimit(1).fixedSize()
+        }
+    }
+}
+
 struct LibraryView: View {
     @State var selected: String?
     @State var query = ""
