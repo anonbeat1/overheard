@@ -8,7 +8,8 @@ let package = Package(
     targets: [.executableTarget(
         name: "Overheard",
         dependencies: [.product(name: "Sparkle", package: "Sparkle")],
-        // Sparkle.framework sta in Contents/Frameworks (lo copia build.sh)
-        linkerSettings: [.unsafeFlags(["-Xlinker", "-rpath", "-Xlinker", "@executable_path/../Frameworks"])]
+        // Sparkle.framework sta in Contents/Frameworks (lo copia build.sh); FoundationModels c'è solo da macOS 26
+        linkerSettings: [.unsafeFlags(["-Xlinker", "-rpath", "-Xlinker", "@executable_path/../Frameworks",
+                                       "-Xlinker", "-weak_framework", "-Xlinker", "FoundationModels"])]
     )]
 )

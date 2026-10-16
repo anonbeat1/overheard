@@ -103,9 +103,10 @@ enum Summarizer {
     static func run(_ dir: URL) async -> String? {
         guard let md = try? String(contentsOf: dir.appendingPathComponent("transcript.md"), encoding: .utf8) else { return String(localized: "Transcript mancante") }
         let preferred = UserDefaults.standard.string(forKey: "ai.engine") ?? "claude"
-        guard let engine = [preferred, "claude", "codex"].first(where: AIChat.installed().contains) else {
-            return String(localized: "Serve Claude Code o Codex installato (con il login fatto nel Terminale)")
+        guard let engine = [preferred, "claude", "codex", "apple"].first(where: AIChat.installed().contains) else {
+            return String(localized: "Serve Claude Code o Codex installato (con il login fatto nel Terminale), oppure Apple Intelligence attiva")
         }
+        let apple = engine == "apple"
         let m = Meeting.at(dir)
         let marks = Bookmarks.load(dir).map { "[\(stamp($0))]" }
         var context = "Meeting: \(m.app), \(m.date.map { $0.formatted(date: .long, time: .shortened) } ?? m.id)\n"
@@ -116,7 +117,8 @@ enum Summarizer {
         let h = [String(localized: "Riassunto"), String(localized: "Decisioni"), String(localized: "Cose da fare"), String(localized: "Momenti segnati")]
         let speaker = String(localized: "Parlante")
         let unnamed = md.contains("] \(speaker) ")
-        let naming = autoNames && unnamed ? """
+        // il modello di Apple vede solo appunti a pezzi: non può essere sicuro di chi sia chi
+        let naming = autoNames && unnamed && !apple ? """
         First line of your reply: NAMES: followed by a JSON object mapping each "\(speaker) N" label to the person's real name, \
         only when the transcript makes it certain (they introduce themselves, or are called by name and answer). \
         Omit any voice you are not sure about; write NAMES: {} if none. Then the minutes, using those names.
@@ -138,9 +140,17 @@ enum Summarizer {
         Reply with the markdown only, no preamble. "\(Prefs.myName)" is the user; "\(String(localized: "Parlante")) N" are unidentified voices.
 
         \(context)
-        \(md)
+        \(apple ? "" : md)
         """
-        let out = AIChat.complete(prompt, engine: engine)
+        let out: String?
+        if apple {
+            do {
+                let body = try await AppleAI.condense(md, to: AppleAI.budget - prompt.count)
+                out = try await AppleAI.complete(prompt + body)
+            } catch { return error.localizedDescription }
+        } else {
+            out = AIChat.complete(prompt, engine: engine)
+        }
         guard let text = out, let start = text.range(of: "## ") else { return String(localized: "L'AI non ha risposto") }
         if !naming.isEmpty { applyNames(text, dir: dir, label: speaker) }
         if !titling.isEmpty, let line = text.components(separatedBy: .newlines).first(where: { $0.hasPrefix("TITLE:") }) {

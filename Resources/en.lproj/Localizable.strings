@@ -309,3 +309,13 @@
 "In corso" = "In progress";
 "Fallita" = "Failed";
 "Sul Mac · ElevenLabs fallito" = "On Mac · ElevenLabs failed";
+"Apple Intelligence non è disponibile su questo Mac" = "Apple Intelligence is not available on this Mac";
+"Serve Claude Code o Codex installato (con il login fatto nel Terminale), oppure Apple Intelligence attiva" = "Requires Claude Code or Codex installed (and signed in from Terminal), or Apple Intelligence turned on";
+"Per chiedere ai tuoi meeting serve Claude Code, Codex o Apple Intelligence" = "To ask your meetings you need Claude Code, Codex or Apple Intelligence";
+"Installa Claude Code o Codex e fai il login una volta nel Terminale, oppure attiva Apple Intelligence (macOS 26) in Impostazioni di Sistema. Lo usano anche i riassunti automatici." = "Install Claude Code or Codex and sign in once from Terminal, or turn on Apple Intelligence (macOS 26) in System Settings. Automatic summaries use it too.";
+"Riassunto, decisioni e cose da fare dopo ogni trascrizione" = "Summary, decisions and action items after every transcription";
+"AI per riassunti e chat" = "AI for summaries and chat";
+"Cerco Claude Code, Codex e Apple Intelligence…" = "Looking for Claude Code, Codex and Apple Intelligence…";
+"Nessuna trovata: installa Claude Code o Codex, o attiva Apple Intelligence" = "None found: install Claude Code or Codex, or turn on Apple Intelligence";
+"Sul Mac, senza account: riassunti più semplici per le call lunghe" = "On your Mac, no account: simpler summaries for long calls";
+"Usa il login che hai già fatto nel Terminale" = "Uses the sign-in you already did in Terminal";

@@ -17,6 +17,7 @@ final class AIChat: ObservableObject {
     @Published var tools: [String] = [] // "claude", "codex": quelli trovati nel PATH della shell di login
     @AppStorage("ai.engine") var engine = "claude"
     private var process: Process?
+    private var appleTask: Task<Void, Never>?
 
     @Published var checking = true
 
@@ -37,7 +38,15 @@ final class AIChat: ObservableObject {
     /// CLI che rispondono davvero (`--version`), non solo presenti nel PATH: un link rotto o un'installazione
     /// a metà farebbe accettare domande che poi non ricevono risposta
     nonisolated static func installed() -> [String] {
-        ["claude", "codex"].filter { shell("\($0) --version").status == 0 }
+        ["claude", "codex"].filter { shell("\($0) --version").status == 0 } + (AppleAI.available ? ["apple"] : [])
+    }
+
+    nonisolated static func name(_ engine: String) -> String {
+        switch engine {
+        case "codex": "Codex"
+        case "apple": "Apple Intelligence"
+        default: "Claude"
+        }
     }
 
     private static let instructions = """
@@ -58,6 +67,7 @@ final class AIChat: ObservableObject {
         if let m = meeting { prompt += "Answer only about the meeting in folder \(m.id) (\(m.app), \(m.when)).\n\n" }
         if !history.isEmpty { prompt += "Conversation so far:\n\(history)\n\nNew question: " }
         prompt += q
+        if engine == "apple" { return askApple(q, prompt: prompt, meeting: meeting) }
 
         let dir = URL(fileURLWithPath: NSHomeDirectory() + "/Meetings")
         let out = FileManager.default.temporaryDirectory.appendingPathComponent("overheard-ai.txt")
@@ -101,7 +111,38 @@ final class AIChat: ObservableObject {
         }
     }
 
-    func stop() { process?.terminate() }
+    /// Apple Intelligence non legge i file da sola: le si passano riassunti e righe pertinenti
+    private func askApple(_ question: String, prompt: String, meeting: Meeting?) {
+        busy = true
+        started = Date()
+        let meetings = meeting.map { [$0] } ?? Meeting.recent(60)
+        appleTask = Task {
+            let context = AppleAI.context(for: question, meetings: meetings, limit: AppleAI.budget - prompt.count)
+            var text: String
+            do {
+                text = try await AppleAI.complete(prompt, instructions: """
+                You answer questions about the user's recorded meetings, using only the meeting notes below. \
+                Answer concisely in the language of the question, citing the meeting and the minute [mm:ss] when possible. \
+                If the notes do not contain the answer, say so.
+
+                \(context)
+                """)
+            } catch is CancellationError {
+                text = String(localized: "Interrotto.")
+            } catch {
+                text = String(localized: "Errore: ") + error.localizedDescription
+            }
+            if Task.isCancelled { text = String(localized: "Interrotto.") }
+            messages.append(Message(mine: false, text: text))
+            busy = false
+            appleTask = nil
+        }
+    }
+
+    func stop() {
+        process?.terminate()
+        appleTask?.cancel()
+    }
 
     func clear() {
         stop()
@@ -197,9 +238,9 @@ struct AIChatView: View {
                 Spacer()
                 if chat.tools.count > 1 {
                     Picker("", selection: $chat.engine) {
-                        ForEach(chat.tools, id: \.self) { Text($0 == "claude" ? "Claude" : "Codex").tag($0) }
+                        ForEach(chat.tools, id: \.self) { Text($0 == "apple" ? "Apple" : AIChat.name($0)).tag($0) }
                     }
-                    .labelsHidden().pickerStyle(.segmented).frame(width: 130)
+                    .labelsHidden().pickerStyle(.segmented).frame(width: chat.tools.count > 2 ? 190 : 130)
                 }
                 if !chat.messages.isEmpty {
                     Button { chat.clear() } label: { Image(systemName: "trash") }
@@ -221,8 +262,8 @@ struct AIChatView: View {
                 Spacer()
                 VStack(spacing: 12) {
                     Image(systemName: "terminal").font(.system(size: 28)).foregroundStyle(.orange)
-                    Text("Per chiedere ai tuoi meeting serve Claude Code o Codex").font(.headline).multilineTextAlignment(.center)
-                    Text("Installalo e fai il login una volta nel Terminale (claude oppure codex). Lo usano anche i riassunti automatici.")
+                    Text("Per chiedere ai tuoi meeting serve Claude Code, Codex o Apple Intelligence").font(.headline).multilineTextAlignment(.center)
+                    Text("Installa Claude Code o Codex e fai il login una volta nel Terminale, oppure attiva Apple Intelligence (macOS 26) in Impostazioni di Sistema. Lo usano anche i riassunti automatici.")
                         .font(.callout).foregroundStyle(.white.opacity(0.6)).multilineTextAlignment(.center)
                     HStack {
                         Link("Installa Claude Code", destination: URL(string: "https://claude.com/claude-code")!)

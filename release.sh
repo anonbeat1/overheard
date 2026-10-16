@@ -11,7 +11,7 @@ VER=${1:?"uso: ./release.sh <versione>, es. 0.2"}
 BUILD=$(( $(/usr/libexec/PlistBuddy -c "Print CFBundleVersion" Info.plist) + 1 ))
 /usr/libexec/PlistBuddy -c "Set CFBundleShortVersionString $VER" -c "Set CFBundleVersion $BUILD" Info.plist
 
-./package.sh
+NOTARY_PROFILE=${NOTARY_PROFILE:-$(xcrun notarytool history --keychain-profile overheard >/dev/null 2>&1 && echo overheard)} ./package.sh
 DMG="dist/Overheard-$VER.dmg"
 
 # appcast: generate_appcast tiene lo storico se trova l'appcast precedente nella cartella

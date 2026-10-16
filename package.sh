@@ -42,4 +42,10 @@ TXT
 DMG="dist/Overheard-$VER.dmg"
 rm -f "$DMG"
 hdiutil create -volname "Overheard $VER" -srcfolder "$STAGE" -fs HFS+ -format UDZO -ov "$DMG" >/dev/null
+# Notarizzazione (serve un "Developer ID Application" e, una volta sola:
+#   xcrun notarytool store-credentials overheard --apple-id <email> --team-id <TEAM> )
+if [[ -n "${NOTARY_PROFILE:-}" ]]; then
+  xcrun notarytool submit "$DMG" --keychain-profile "$NOTARY_PROFILE" --wait
+  xcrun stapler staple "$DMG"
+fi
 echo "Pronto: $DMG ($(du -h "$DMG" | cut -f1))"

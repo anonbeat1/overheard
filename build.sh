@@ -33,19 +33,24 @@ TR="$APP/Contents/Resources/transcriber" && mkdir -p "$TR"
 cp "$T/meeting-transcriber" "$T/mlx.metallib" "$TR/" && cp -R "$T"/*.bundle "$TR/"
 # back-deploy di Swift per macOS < 26 (rpath @loader_path)
 cp "$(xcrun --find swift | sed 's|/bin/swift$||')/lib/swift-6.2/macosx/libswiftCompatibilitySpan.dylib" "$TR/" 2>/dev/null || true
-for f in "$TR"/libswiftCompatibilitySpan.dylib "$TR/meeting-transcriber"; do [[ -f "$f" ]] && codesign --force --sign - "$f"; done
-
 # Con un certificato stabile i permessi (mic, registrazione schermo) e il Portachiavi sopravvivono ai rebuild; ad-hoc no.
 # Va bene anche un certificato locale autofirmato "Overheard Local Signing" (non "trusted", quindi senza -v).
-ID=$(security find-identity -v -p codesigning | awk -F'"' '/Apple Development|Developer ID Application/{print $2; exit}')
+# Con "Developer ID Application" la firma è quella da notarizzare (hardened runtime + timestamp, vedi package.sh).
+IDS=$(security find-identity -v -p codesigning)
+ID=$(awk -F'"' '/Developer ID Application/{print $2; exit}' <<<"$IDS")
+[[ -z "$ID" ]] && ID=$(awk -F'"' '/Apple Development/{print $2; exit}' <<<"$IDS")
 [[ -z "$ID" ]] && security find-identity -p codesigning | grep -q '"Overheard Local Signing"' && ID="Overheard Local Signing"
+# Developer ID: hardened runtime + timestamp, come vuole la notarizzazione. Con un certificato senza Team ID
+# il runtime resta solo su Sparkle (la validazione delle librerie bloccherebbe il caricamento del framework).
+RT="" TS="" ENT=""; [[ "$ID" == Developer\ ID* ]] && RT="--options=runtime" TS="--timestamp" ENT="--entitlements=Overheard.entitlements"
+for f in "$TR"/libswiftCompatibilitySpan.dylib "$TR/meeting-transcriber"; do [[ -f "$f" ]] && codesign --force $RT $TS --sign "${ID:--}" "$f"; done
 # Sparkle prima dell'app, dai componenti interni verso l'esterno
 SP="$APP/Contents/Frameworks/Sparkle.framework/Versions/B"
 for f in "$SP"/XPCServices/*.xpc "$SP/Autoupdate" "$SP/Updater.app" "$APP/Contents/Frameworks/Sparkle.framework"; do
-  [[ -e "$f" ]] && codesign --force --options runtime --sign "${ID:--}" "$f"
+  [[ -e "$f" ]] && codesign --force --options=runtime $TS --sign "${ID:--}" "$f"
 done
 if [[ -n "$ID" ]]; then
-  codesign --force --sign "$ID" "$APP"
+  codesign --force $RT $TS $ENT --sign "$ID" "$APP"
 else
   # Ad-hoc: il requisito di default è il cdhash, che cambia a ogni build e invalida i permessi (registrazione schermo, mic).
   # Un requisito sul solo bundle id resta uguale tra le build.

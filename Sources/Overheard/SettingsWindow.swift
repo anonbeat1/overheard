@@ -20,6 +20,8 @@ struct SettingsView: View {
     @AppStorage("language") private var language = ""
     @AppStorage("calendar.enabled") private var calendarOn = false
     @AppStorage("summary.auto") private var summaryAuto = true
+    @AppStorage("ai.engine") private var aiEngine = "claude"
+    @State private var aiTools: [String]?
     @AppStorage("speakers.autoName") private var autoNames = true
     @AppStorage("dock.visible") private var dockVisible = false
     @AppStorage("autoStop.seconds") private var autoStop = 30
@@ -144,7 +146,29 @@ struct SettingsView: View {
                         .font(.caption).foregroundStyle(.orange).fixedSize(horizontal: false, vertical: true)
                 }
                 Divider().overlay(Color.white.opacity(0.1))
-                row("Riassunto automatico", "Riassunto, decisioni e cose da fare con Claude Code o Codex dopo ogni trascrizione", $summaryAuto)
+                row("Riassunto automatico", "Riassunto, decisioni e cose da fare dopo ogni trascrizione", $summaryAuto)
+                HStack {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("AI per riassunti e chat")
+                        Text(aiTools == nil ? "Cerco Claude Code, Codex e Apple Intelligence…"
+                             : aiTools!.isEmpty ? "Nessuna trovata: installa Claude Code o Codex, o attiva Apple Intelligence"
+                             : aiEngine == "apple" ? "Sul Mac, senza account: riassunti più semplici per le call lunghe"
+                             : "Usa il login che hai già fatto nel Terminale")
+                            .font(.caption).foregroundStyle(aiTools?.isEmpty == true ? .orange : .white.opacity(0.5))
+                    }
+                    Spacer()
+                    if let tools = aiTools, !tools.isEmpty {
+                        Picker("", selection: $aiEngine) {
+                            ForEach(tools, id: \.self) { Text(verbatim: AIChat.name($0)).tag($0) }
+                        }
+                        .labelsHidden().fixedSize()
+                    }
+                }
+                .task {
+                    let found = await Task.detached { AIChat.installed() }.value
+                    aiTools = found
+                    if !found.contains(aiEngine), let first = found.first { aiEngine = first }
+                }
                 Divider().overlay(Color.white.opacity(0.1))
                 row("Nomi dei parlanti automatici", "Con il riassunto, l'AI sostituisce \"Parlante N\" col nome quando nel discorso è chiaro (si presenta o viene chiamato per nome)", $autoNames)
                     .disabled(!summaryAuto)
