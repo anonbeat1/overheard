@@ -222,6 +222,12 @@
 "Spostare questa riunione nel Cestino?" = "Move this meeting to the Trash?";
 "Sposta nel Cestino" = "Move to Trash";
 "Sposta nel Cestino…" = "Move to Trash…";
+"Spostare %lld riunioni nel Cestino?" = "Move %lld meetings to the Trash?";
+"Sposta %lld riunioni nel Cestino…" = "Move %lld meetings to Trash…";
+"Audio, transcript e riassunti. Puoi recuperarle dal Cestino." = "Audio, transcripts and summaries. You can restore them from the Trash.";
+"Seleziona più riunioni" = "Select multiple meetings";
+"Seleziona tutte" = "Select all";
+"Deseleziona tutte" = "Deselect all";
 "%@ · audio, transcript e riassunto. Puoi recuperarla dal Cestino." = "%@ · audio, transcript and summary. You can restore it from the Trash.";
 "Nomi dei parlanti automatici" = "Automatic speaker names";
 "Con il riassunto, l'AI sostituisce \"Parlante N\" col nome quando nel discorso è chiaro (si presenta o viene chiamato per nome)" = "Along with the summary, the AI replaces \"Speaker N\" with the real name when the conversation makes it clear (they introduce themselves or are called by name)";
