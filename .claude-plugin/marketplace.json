@@ -1,6 +1,9 @@
 {
   "name": "overheard",
-  "owner": { "name": "Gabriele Spilotri Cavaiola" },
+  "owner": {
+    "name": "Gabriele Spilotri Cavaiola"
+  },
+  "description": "Overheard for Claude Code: your recorded meetings, searchable and answerable from Claude.",
   "plugins": [
     {
       "name": "overheard",
