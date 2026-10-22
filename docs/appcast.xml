@@ -1,0 +1,46 @@
+<?xml version="1.0" standalone="yes"?>
+<rss xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" version="2.0">
+    <channel>
+        <title>Overheard</title>
+        <item>
+            <title>0.3.1</title>
+            <pubDate>Thu, 22 Oct 2026 18:03:52 +0200</pubDate>
+            <link>https://github.com/anonbeat1/overheard</link>
+            <sparkle:version>7</sparkle:version>
+            <sparkle:shortVersionString>0.3.1</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>14.2</sparkle:minimumSystemVersion>
+            <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
+            <description sparkle:format="markdown"><![CDATA[- New installs on macOS 15 transcribe **on your Mac** by default: no account and no API key. The models download during the introduction. If you already use ElevenLabs, nothing changes.
+- Summaries with Claude Code run with no tools and no MCP servers, in an empty folder: whatever anyone says in a call stays text and is never run as a command.
+- Updates now come from getoverheard.dev.
+]]></description>
+            <enclosure url="https://github.com/anonbeat1/overheard/releases/download/v0.3.1/Overheard-0.3.1.dmg" length="51355238" type="application/octet-stream" sparkle:edSignature="pwJQL0iGP/rceu+orOomA8gY997rqd+BRPOfsj8e+6AGl/iNAY2WA9V7WMRz9PLebyl+tOoXvxKrp96B3cc9DQ=="/>
+        </item>
+        <item>
+            <title>0.3</title>
+            <pubDate>Thu, 22 Oct 2026 17:17:23 +0200</pubDate>
+            <link>https://github.com/anonbeat1/overheard</link>
+            <sparkle:version>6</sparkle:version>
+            <sparkle:shortVersionString>0.3</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>14.2</sparkle:minimumSystemVersion>
+            <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
+            <description sparkle:format="markdown"><![CDATA[- **Apple Intelligence** for summaries and chat: everything on your Mac, no account and nothing to install (macOS 26, Apple Intelligence turned on).
+- Pick the AI for summaries and chat in **Settings**: Claude Code, Codex or Apple Intelligence.
+- Updates no longer interrupt you: during a call or a transcription Overheard waits, and shows a dot on the menu bar icon instead.
+- New option: **Install updates automatically**.
+- Signed and notarized by Apple: Overheard opens with a double click, no more "Open Anyway". Because the signature changes, macOS asks once more for microphone and system audio access after this update.
+]]></description>
+            <enclosure url="https://github.com/anonbeat1/overheard/releases/download/v0.3/Overheard-0.3.dmg" length="51344957" type="application/octet-stream" sparkle:edSignature="RMz2G4aYNm6TiGPe6eb9mD6j3IQpNjwhECR5T5RuPx5ebAZr4PgxXpv74IFCZVsCcAggwl7mx0LVPlxF6xHYCA=="/>
+        </item>
+        <item>
+            <title>0.2.2</title>
+            <pubDate>Fri, 16 Oct 2026 11:05:50 +0200</pubDate>
+            <link>https://github.com/anonbeat1/overheard</link>
+            <sparkle:version>5</sparkle:version>
+            <sparkle:shortVersionString>0.2.2</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>14.2</sparkle:minimumSystemVersion>
+            <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
+            <enclosure url="https://github.com/anonbeat1/overheard/releases/download/v0.2.2/Overheard-0.2.2.dmg" length="51293668" type="application/octet-stream" sparkle:edSignature="FLmYpe9jFwfHO6AsPlbJyzfHEgFDl/w1OEFIbl7e3SiujVvk7jQRSLjGnqff1JJji6twaZR7D1/qOGvP55+KBg=="/>
+        </item>
+    </channel>
+</rss>
