@@ -322,3 +322,8 @@
 "Aggiornamento disponibile: %@ · Novità" = "Update available: %@ · What's new";
 "Installa gli aggiornamenti automaticamente" = "Install updates automatically";
 "Li scarica in background e li installa alla prossima chiusura di Overheard" = "Downloads them in the background and installs them the next time Overheard quits";
+"Avvisa i partecipanti" = "Tell participants";
+"Copiato: incollalo nella chat della call" = "Copied: paste it in the call chat";
+"Copia un messaggio da incollare nella chat della call per dire che stai registrando" = "Copy a message to paste in the call chat saying you are recording";
+"Sto registrando questa call con Overheard per avere trascrizione e appunti. L'audio resta sul mio Mac. Se preferisci di no, dimmelo e mi fermo." = "I'm recording this call with Overheard to keep a transcript and notes. The audio stays on my Mac. If you'd rather I didn't, just say so and I'll stop.";
+"Sto registrando questa call con Overheard per avere trascrizione e appunti. Se preferisci di no, dimmelo e mi fermo." = "I'm recording this call with Overheard to keep a transcript and notes. If you'd rather I didn't, just say so and I'll stop.";

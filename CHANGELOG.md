@@ -3,6 +3,10 @@
 What's new in each version of Overheard. `release.sh` puts the section of the version it publishes
 in the update window and on the GitHub release, so write it for people who use the app.
 
+## 0.3.2
+
+- **Tell participants** while recording: copies a short message to paste in the call chat, saying you are recording and that they can ask you to stop.
+
 ## 0.3.1
 
 - New installs on macOS 15 transcribe **on your Mac** by default: no account and no API key. The models download during the introduction. If you already use ElevenLabs, nothing changes.

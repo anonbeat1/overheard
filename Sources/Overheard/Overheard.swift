@@ -537,6 +537,18 @@ struct MenuView: View {
     @ObservedObject var updates = Updates.state
     @State private var meetings = Meeting.recent()
     @State private var query = ""
+    @State private var notified = false
+
+    /// Il messaggio per la chat della call: chi registra lo dice, e chi non vuole può chiedere di fermarsi
+    private func notifyParticipants() {
+        let msg = rec.engine == "local"
+            ? String(localized: "Sto registrando questa call con Overheard per avere trascrizione e appunti. L'audio resta sul mio Mac. Se preferisci di no, dimmelo e mi fermo.")
+            : String(localized: "Sto registrando questa call con Overheard per avere trascrizione e appunti. Se preferisci di no, dimmelo e mi fermo.")
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(msg, forType: .string)
+        notified = true
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2) { notified = false }
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -597,6 +609,14 @@ struct MenuView: View {
                                 .foregroundStyle(.white.opacity(0.6))
                                 .disabled(rec.busy)
                         }
+                        Button { notifyParticipants() } label: {
+                            Label(notified ? "Copiato: incollalo nella chat della call" : "Avvisa i partecipanti",
+                                  systemImage: notified ? "checkmark" : "bubble.left")
+                        }
+                        .buttonStyle(.plain)
+                        .font(.caption.weight(.medium))
+                        .foregroundStyle(.white.opacity(notified ? 0.9 : 0.6))
+                        .help("Copia un messaggio da incollare nella chat della call per dire che stai registrando")
                     } else if let m = rec.meeting {
                         Text("Riunione rilevata · \(sourceLabel(m).0)").font(.callout).foregroundStyle(.orange)
                     } else if let next = MeetingCalendar.next() {
