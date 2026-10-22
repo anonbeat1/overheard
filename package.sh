@@ -11,12 +11,9 @@ ln -s /Applications "$STAGE/Applications"
 cat > "$STAGE/README.txt" <<'TXT'
 Overheard — install
 
-1. Drag Overheard to Applications.
-2. First launch: open it, then System Settings → Privacy & Security → "Open Anyway".
-   (If macOS says it is damaged, run in Terminal:
-    xattr -dr com.apple.quarantine /Applications/Overheard.app )
-3. Allow Microphone and System Audio Recording when asked.
-4. Click the menu bar icon → gear → Settings: your name, labels,
+1. Drag Overheard to Applications and open it.
+2. Allow Microphone and System Audio Recording when asked.
+3. Click the menu bar icon → gear → Settings: your name, labels,
    the ElevenLabs key (or "On this Mac"), and optionally "Connect to Claude".
 
 Requirements: Apple Silicon Mac, macOS 14.2+ (15+ for on-device transcription).
@@ -27,12 +24,9 @@ https://github.com/anonbeat1/overheard
 
 Overheard — installazione
 
-1. Trascina Overheard in Applicazioni.
-2. Primo avvio: aprila, poi Impostazioni di Sistema → Privacy e sicurezza → "Apri comunque".
-   (Se macOS dice che è danneggiata: nel Terminale
-    xattr -dr com.apple.quarantine /Applications/Overheard.app )
-3. Concedi Microfono e Registrazione audio di sistema quando li chiede.
-4. Clic sull'icona nella barra in alto → ingranaggio → Impostazioni:
+1. Trascina Overheard in Applicazioni e aprila.
+2. Concedi Microfono e Registrazione audio di sistema quando li chiede.
+3. Clic sull'icona nella barra in alto → ingranaggio → Impostazioni:
    il tuo nome, le etichette, la chiave ElevenLabs (oppure "Sul Mac"),
    e se vuoi "Collega a Claude".
 

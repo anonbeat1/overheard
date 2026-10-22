@@ -9,6 +9,7 @@ in the update window and on the GitHub release, so write it for people who use t
 - Pick the AI for summaries and chat in **Settings**: Claude Code, Codex or Apple Intelligence.
 - Updates no longer interrupt you: during a call or a transcription Overheard waits, and shows a dot on the menu bar icon instead.
 - New option: **Install updates automatically**.
+- Signed and notarized by Apple: Overheard opens with a double click, no more "Open Anyway". Because the signature changes, macOS asks once more for microphone and system audio access after this update.
 
 ## 0.2.2
 
