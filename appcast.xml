@@ -3,6 +3,19 @@
     <channel>
         <title>Overheard</title>
         <item>
+            <title>0.3.2</title>
+            <pubDate>Thu, 22 Oct 2026 18:23:14 +0200</pubDate>
+            <link>https://github.com/anonbeat1/overheard</link>
+            <sparkle:version>8</sparkle:version>
+            <sparkle:shortVersionString>0.3.2</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>14.2</sparkle:minimumSystemVersion>
+            <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
+            <description sparkle:format="markdown"><![CDATA[- Select several meetings in the library (checklist button or ⌘-click) and move them to the Trash with one confirmation. Thanks @VitoSaulle!
+- **Tell participants** while recording: copies a short message to paste in the call chat, saying you are recording and that they can ask you to stop.
+]]></description>
+            <enclosure url="https://github.com/anonbeat1/overheard/releases/download/v0.3.2/Overheard-0.3.2.dmg" length="51372242" type="application/octet-stream" sparkle:edSignature="sLEdo3GfZaIjKY8RuSfvws8Jux2g6NS+VJ98rH6Si5TS3Z+/Kpd9pfru9DbrF8PyzNQjfpOdetQQgXtpNOIqBg=="/>
+        </item>
+        <item>
             <title>0.3.1</title>
             <pubDate>Thu, 22 Oct 2026 18:03:52 +0200</pubDate>
             <link>https://github.com/anonbeat1/overheard</link>
@@ -31,16 +44,6 @@
 - Signed and notarized by Apple: Overheard opens with a double click, no more "Open Anyway". Because the signature changes, macOS asks once more for microphone and system audio access after this update.
 ]]></description>
             <enclosure url="https://github.com/anonbeat1/overheard/releases/download/v0.3/Overheard-0.3.dmg" length="51344957" type="application/octet-stream" sparkle:edSignature="RMz2G4aYNm6TiGPe6eb9mD6j3IQpNjwhECR5T5RuPx5ebAZr4PgxXpv74IFCZVsCcAggwl7mx0LVPlxF6xHYCA=="/>
-        </item>
-        <item>
-            <title>0.2.2</title>
-            <pubDate>Fri, 16 Oct 2026 11:05:50 +0200</pubDate>
-            <link>https://github.com/anonbeat1/overheard</link>
-            <sparkle:version>5</sparkle:version>
-            <sparkle:shortVersionString>0.2.2</sparkle:shortVersionString>
-            <sparkle:minimumSystemVersion>14.2</sparkle:minimumSystemVersion>
-            <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
-            <enclosure url="https://github.com/anonbeat1/overheard/releases/download/v0.2.2/Overheard-0.2.2.dmg" length="51293668" type="application/octet-stream" sparkle:edSignature="FLmYpe9jFwfHO6AsPlbJyzfHEgFDl/w1OEFIbl7e3SiujVvk7jQRSLjGnqff1JJji6twaZR7D1/qOGvP55+KBg=="/>
         </item>
     </channel>
 </rss>
