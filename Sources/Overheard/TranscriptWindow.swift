@@ -662,7 +662,9 @@ struct LibraryView: View {
     @State private var link = ""
     @State private var dropping = false
     @AppStorage("ai.visible") private var showChat = false
-    @State private var toDelete: Meeting?
+    @State private var toDelete: [Meeting] = []
+    @State private var picking = false               // modalità selezione multipla
+    @State private var picked: Set<String> = []
 
     private var filtered: [Meeting] {
         guard !query.isEmpty else { return meetings }
@@ -705,6 +707,12 @@ struct LibraryView: View {
                             .background(showChat ? Color.orange.opacity(0.3) : Color.white.opacity(0.1), in: Circle())
                     }
                     .buttonStyle(.plain).help("Chiedi all'AI sui meeting")
+                    Button { picking.toggle(); picked = [] } label: {
+                        Image(systemName: "checklist").font(.system(size: 13, weight: .semibold))
+                            .frame(width: 30, height: 30)
+                            .background(picking ? Color.orange.opacity(0.3) : Color.white.opacity(0.1), in: Circle())
+                    }
+                    .buttonStyle(.plain).help("Seleziona più riunioni")
                 }
                 HStack {
                     Image(systemName: "magnifyingglass").foregroundStyle(.white.opacity(0.5))
@@ -734,6 +742,25 @@ struct LibraryView: View {
                             Text(query.isEmpty ? "Nessuna riunione" : "Nessun risultato").font(.callout)
                                 .foregroundStyle(.white.opacity(0.5)).padding(.top, 20)
                         }
+                    }
+                }
+
+                if picking {
+                    HStack {
+                        Button(picked.count == filtered.filter { !busy($0) }.count && !picked.isEmpty ? LocalizedStringKey("Deseleziona tutte") : "Seleziona tutte") {
+                            let all = Set(filtered.filter { !busy($0) }.map(\.id))
+                            picked = picked == all ? [] : all
+                        }
+                        .buttonStyle(.plain).font(.caption).foregroundStyle(.white.opacity(0.7))
+                        Spacer()
+                        Button("Annulla") { picking = false; picked = [] }
+                            .buttonStyle(.plain).font(.caption).foregroundStyle(.white.opacity(0.7))
+                        Button { toDelete = meetings.filter { picked.contains($0.id) } } label: {
+                            Label("\(picked.count)", systemImage: "trash").font(.caption.weight(.semibold))
+                                .padding(.horizontal, 10).padding(.vertical, 6)
+                                .background(Color.red.opacity(picked.isEmpty ? 0.1 : 0.3), in: Capsule())
+                        }
+                        .buttonStyle(.plain).disabled(picked.isEmpty).help("Sposta nel Cestino…")
                     }
                 }
             }
@@ -785,10 +812,15 @@ struct LibraryView: View {
                     .padding(12)
             }
         }
-        .confirmationDialog("Spostare questa riunione nel Cestino?", isPresented: Binding(get: { toDelete != nil }, set: { if !$0 { toDelete = nil } }), presenting: toDelete) { m in
-            Button("Sposta nel Cestino", role: .destructive) { trash(m) }
-        } message: { m in
-            Text("\(m.app) · audio, transcript e riassunto. Puoi recuperarla dal Cestino.")
+        .confirmationDialog(toDelete.count == 1 ? Text("Spostare questa riunione nel Cestino?") : Text("Spostare \(toDelete.count) riunioni nel Cestino?"),
+                            isPresented: Binding(get: { !toDelete.isEmpty }, set: { if !$0 { toDelete = [] } }), presenting: toDelete) { ms in
+            Button("Sposta nel Cestino", role: .destructive) { trash(ms) }
+        } message: { ms in
+            if ms.count == 1, let m = ms.first {
+                Text("\(m.app) · audio, transcript e riassunto. Puoi recuperarla dal Cestino.")
+            } else {
+                Text("Audio, transcript e riassunti. Puoi recuperarle dal Cestino.")
+            }
         }
         .alert("Importa da link", isPresented: $askLink) {
             TextField("https://…", text: $link)
@@ -801,10 +833,26 @@ struct LibraryView: View {
 
     private func row(_ m: Meeting) -> some View {
         let isSel = m.id == selected
+        let isPicked = picked.contains(m.id)
         let time = m.date?.formatted(date: .omitted, time: .shortened) ?? m.id
         let missing = texts[m.id] == nil
-        return Button { selected = m.id } label: {
+        return Button {
+            // ⌘-clic entra in selezione multipla partendo dalla riunione aperta
+            if !picking, NSEvent.modifierFlags.contains(.command) {
+                picking = true
+                picked = Set([selected, m.id].compactMap { $0 }.filter { id in meetings.contains { $0.id == id && !busy($0) } })
+            } else if picking {
+                if busy(m) { return }
+                if isPicked { picked.remove(m.id) } else { picked.insert(m.id) }
+            } else {
+                selected = m.id
+            }
+        } label: {
             HStack(spacing: 10) {
+                if picking {
+                    Image(systemName: isPicked ? "checkmark.circle.fill" : "circle")
+                        .foregroundStyle(isPicked ? Color.orange : .white.opacity(busy(m) ? 0.2 : 0.5))
+                }
                 SourceIcon(source: m.source)
                 VStack(alignment: .leading, spacing: 2) {
                     Text(m.app).lineLimit(1)
@@ -813,21 +861,34 @@ struct LibraryView: View {
                 Spacer(minLength: 0)
             }
             .padding(8)
-            .background(isSel ? Color.white.opacity(0.12) : .clear, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+            .background(isPicked ? Color.orange.opacity(0.15) : isSel ? Color.white.opacity(0.12) : .clear, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
         .contextMenu {
             Button("Mostra nel Finder") { NSWorkspace.shared.activateFileViewerSelecting([m.url]) }
             Divider()
-            Button("Sposta nel Cestino…", role: .destructive) { toDelete = m }
-                .disabled(Recorder.shared.isRecording(m.url) || FileManager.default.fileExists(atPath: m.url.appendingPathComponent(".transcribing").path))
+            if isPicked && picked.count > 1 {
+                Button("Sposta \(picked.count) riunioni nel Cestino…", role: .destructive) { toDelete = meetings.filter { picked.contains($0.id) } }
+            } else {
+                Button("Sposta nel Cestino…", role: .destructive) { toDelete = [m] }
+                    .disabled(busy(m))
+            }
         }
     }
 
-    private func trash(_ m: Meeting) {
-        guard (try? FileManager.default.trashItem(at: m.url, resultingItemURL: nil)) != nil else { return }
-        if selected == m.id { selected = nil }
+    /// In registrazione o in trascrizione: non si può cestinare
+    private func busy(_ m: Meeting) -> Bool {
+        Recorder.shared.isRecording(m.url) || FileManager.default.fileExists(atPath: m.url.appendingPathComponent(".transcribing").path)
+    }
+
+    private func trash(_ ms: [Meeting]) {
+        for m in ms where !busy(m) {
+            guard (try? FileManager.default.trashItem(at: m.url, resultingItemURL: nil)) != nil else { continue }
+            picked.remove(m.id)
+            if selected == m.id { selected = nil }
+        }
+        if picked.isEmpty { picking = false }
         load()
     }
 
