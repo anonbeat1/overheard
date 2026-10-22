@@ -5,6 +5,7 @@ in the update window and on the GitHub release, so write it for people who use t
 
 ## 0.3.2
 
+- Select several meetings in the library (checklist button or ⌘-click) and move them to the Trash with one confirmation. Thanks @VitoSaulle!
 - **Tell participants** while recording: copies a short message to paste in the call chat, saying you are recording and that they can ask you to stop.
 
 ## 0.3.1
