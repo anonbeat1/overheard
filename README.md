@@ -88,6 +88,20 @@ Requires an **Apple Silicon** Mac with **macOS 14.2** or later (on-device transc
 3. Transcription runs *On this Mac* by default on macOS 15 (downloads ~2.5 GB of models once, no account). For the best accuracy, switch to ElevenLabs in **Settings → Transcription** and paste an API key with the *Speech to Text* permission.
 4. Optional: install [Claude Code](https://claude.com/claude-code) or Codex for summaries and chat, then click **Connect to Claude** in Settings to enable the MCP server.
 
+### Claude Code plugin
+
+Instead of **Connect to Claude**, Claude Code users can install the plugin: the same MCP server plus three skills.
+
+```
+/plugin install overheard --marketplace anonbeat1/overheard
+```
+
+- `/overheard:recap` — decisions, action items and open questions of a meeting, with the minute of each
+- `/overheard:followup` — a ready-to-send follow-up email
+- `/overheard:todo` — your open action items across meetings
+
+It expects the app in `/Applications`. Use one or the other: with both, Claude sees the tools twice.
+
 ### Build from source
 
 ```bash

@@ -1,0 +1,11 @@
+{
+  "name": "overheard",
+  "owner": { "name": "Gabriele Spilotri Cavaiola" },
+  "plugins": [
+    {
+      "name": "overheard",
+      "source": "./plugin",
+      "description": "Your meetings inside Claude Code: search transcripts, recap a call, draft the follow-up, list your action items. Needs the Overheard Mac app."
+    }
+  ]
+}

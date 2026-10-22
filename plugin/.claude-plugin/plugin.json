@@ -1,0 +1,10 @@
+{
+  "name": "overheard",
+  "version": "0.3.1",
+  "description": "Your meetings inside Claude Code: search transcripts, recap a call, draft the follow-up, list your action items. Needs the Overheard Mac app.",
+  "author": { "name": "Gabriele Spilotri Cavaiola" },
+  "homepage": "https://getoverheard.dev",
+  "repository": "https://github.com/anonbeat1/overheard",
+  "license": "MIT",
+  "keywords": ["meetings", "transcription", "macos", "mcp"]
+}

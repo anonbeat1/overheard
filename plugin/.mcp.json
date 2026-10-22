@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "overheard": {
+      "command": "/Applications/Overheard.app/Contents/MacOS/Overheard",
+      "args": ["--mcp"]
+    }
+  }
+}
