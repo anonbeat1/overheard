@@ -39,6 +39,8 @@ hdiutil create -volname "Overheard $VER" -srcfolder "$STAGE" -fs HFS+ -format UD
 # Notarizzazione (serve un "Developer ID Application" e, una volta sola:
 #   xcrun notarytool store-credentials overheard --apple-id <email> --team-id <TEAM> )
 if [[ -n "${NOTARY_PROFILE:-}" ]]; then
+  ID=$(security find-identity -v -p codesigning | awk -F'"' '/Developer ID Application/{print $2; exit}')
+  codesign --force --timestamp --sign "$ID" "$DMG"
   xcrun notarytool submit "$DMG" --keychain-profile "$NOTARY_PROFILE" --wait
   xcrun stapler staple "$DMG"
 fi

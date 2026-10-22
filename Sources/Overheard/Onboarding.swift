@@ -277,6 +277,8 @@ private struct SetupVoice: View {
                 }
             }
         }
+        // "Sul Mac" è la scelta predefinita: i modelli si scaricano mentre si finisce l'introduzione
+        .onAppear { if rec.engine == "local", !models.ready, LocalModels.supported { models.download() } }
     }
 }
 

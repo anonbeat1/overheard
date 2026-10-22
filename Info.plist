@@ -49,7 +49,7 @@
 	<key>SUEnableAutomaticChecks</key>
 	<true/>
 	<key>SUFeedURL</key>
-	<string>https://raw.githubusercontent.com/anonbeat1/overheard/main/appcast.xml</string>
+	<string>https://getoverheard.dev/appcast.xml</string>
 	<key>SUPublicEDKey</key>
 	<string>Vzcj6EiUZNU4+0OTR8Twhch+1ng9mAgJcjFAeSlG21k=</string>
 </dict>

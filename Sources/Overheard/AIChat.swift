@@ -149,18 +149,22 @@ final class AIChat: ObservableObject {
         messages = []
     }
 
-    /// Domanda secca all'AI (senza strumenti), es. il riassunto: ritorna il testo della risposta
+    /// Domanda secca all'AI (senza strumenti), es. il riassunto: ritorna il testo della risposta.
+    /// Il prompt contiene le parole di chiunque fosse in call: niente strumenti, niente server MCP, cartella vuota.
     nonisolated static func complete(_ prompt: String, engine: String) -> String? {
-        let out = FileManager.default.temporaryDirectory.appendingPathComponent("mr-ai-\(UUID().uuidString).txt")
-        defer { try? FileManager.default.removeItem(at: out) }
+        let fm = FileManager.default
+        let work = fm.temporaryDirectory.appendingPathComponent("mr-ai-\(UUID().uuidString)")
+        try? fm.createDirectory(at: work, withIntermediateDirectories: true)
+        defer { try? fm.removeItem(at: work) }
+        let out = work.appendingPathComponent("out.txt")
         let args = engine == "codex"
             ? ["codex", "exec", "--skip-git-repo-check", "-s", "read-only", "--color", "never", "--output-last-message", out.path, prompt]
-            : ["claude", "-p", "--no-session-persistence", prompt]
+            : ["claude", "-p", "--no-session-persistence", "--tools", "", "--strict-mcp-config", "--permission-mode", "dontAsk", prompt]
         let p = Process()
         p.executableURL = URL(fileURLWithPath: "/bin/zsh")
         p.arguments = ["-lc", "exec \"$0\" \"$@\""] + args
         p.environment = environment
-        p.currentDirectoryURL = FileManager.default.temporaryDirectory
+        p.currentDirectoryURL = work
         let pipe = Pipe()
         p.standardOutput = pipe
         p.standardError = FileHandle.nullDevice

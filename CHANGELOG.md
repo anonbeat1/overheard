@@ -3,6 +3,12 @@
 What's new in each version of Overheard. `release.sh` puts the section of the version it publishes
 in the update window and on the GitHub release, so write it for people who use the app.
 
+## 0.3.1
+
+- New installs on macOS 15 transcribe **on your Mac** by default: no account and no API key. The models download during the introduction. If you already use ElevenLabs, nothing changes.
+- Summaries with Claude Code run with no tools and no MCP servers, in an empty folder: whatever anyone says in a call stays text and is never run as a command.
+- Updates now come from getoverheard.dev.
+
 ## 0.3
 
 - **Apple Intelligence** for summaries and chat: everything on your Mac, no account and nothing to install (macOS 26, Apple Intelligence turned on).

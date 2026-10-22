@@ -55,8 +55,18 @@ final class Recorder: ObservableObject {
         didSet { UserDefaults.standard.set(autoDetect, forKey: "autoDetect") }
     }
     /// Motore di trascrizione: "elevenlabs" o "local"
-    @Published var engine = UserDefaults.standard.string(forKey: "engine") ?? "elevenlabs" {
+    @Published var engine = Recorder.defaultEngine {
         didSet { UserDefaults.standard.set(engine, forKey: "engine") }
+    }
+
+    /// Nuove installazioni su macOS 15+: sul Mac, senza chiavi. Chi aveva già l'app resta su ElevenLabs.
+    /// Si salva subito, così dopo l'onboarding non cambia.
+    private static var defaultEngine: String {
+        let d = UserDefaults.standard
+        if let e = d.string(forKey: "engine") { return e }
+        let e = !d.bool(forKey: "onboarding.done") && LocalModels.supported ? "local" : "elevenlabs"
+        d.set(e, forKey: "engine")
+        return e
     }
 
     func cleanOld() {

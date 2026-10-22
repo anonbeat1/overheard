@@ -26,9 +26,11 @@ printf '%s\n' "$NOTES" > "$UP/Overheard-$VER.md"
   --download-url-prefix "https://github.com/anonbeat1/overheard/releases/download/v$VER/" \
   --link "https://github.com/anonbeat1/overheard" "$UP"
 cp "$UP/appcast.xml" appcast.xml
+# le app dalla 0.3.1 leggono getoverheard.dev/appcast.xml (docs/, GitHub Pages); quella alla radice resta per le versioni precedenti
+cp appcast.xml docs/appcast.xml
 
 gh release create "v$VER" "$DMG" --title "Overheard $VER" --notes "$NOTES"
-git add Info.plist appcast.xml
+git add Info.plist appcast.xml docs/appcast.xml
 git commit -m "Release $VER"
 git push
 echo "Pubblicata $VER: chi ha l'app la riceve al prossimo controllo (o da Controlla aggiornamenti…)"
