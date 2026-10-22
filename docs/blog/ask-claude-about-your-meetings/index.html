@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ask Claude about your meetings: an MCP server for call transcripts — Overheard</title>
+<meta name="description" content="Connect your meeting transcripts to Claude Code, Claude Desktop or Codex with an MCP server, and ask what was decided, what you owe, or draft the follow-up — with the minute it was said.">
+<meta name="author" content="Gabriele Spilotri Cavaiola">
+<link rel="canonical" href="https://getoverheard.dev/blog/ask-claude-about-your-meetings/">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Ask Claude about your meetings">
+<meta property="og:description" content="An MCP server that lets Claude Code, Claude Desktop and Codex search your call transcripts and cite the minute.">
+<meta property="og:image" content="https://getoverheard.dev/assets/poster.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#0B0B0C">
+<link rel="icon" href="../../assets/icon-tile.svg" type="image/svg+xml">
+<link rel="alternate" type="application/rss+xml" title="Overheard blog" href="../feed.xml">
+<link rel="stylesheet" href="../blog.css">
+</head>
+<body>
+
+<header class="nav">
+  <a class="brand" href="../../"><img src="../../assets/icon-tile.svg" alt="">Overheard</a>
+  <nav>
+    <a href="../" aria-current="page">Blog</a>
+    <a href="../../compare/">Compare</a>
+    <a class="hide-s" href="https://github.com/anonbeat1/overheard">GitHub</a>
+  </nav>
+  <a class="dl" href="https://github.com/anonbeat1/overheard/releases/latest">Download</a>
+</header>
+
+<main class="wrap">
+<article>
+  <span class="eyebrow">Guide · Claude &amp; MCP</span>
+  <h1>Ask Claude about your meetings</h1>
+  <p class="meta">Gabriele Spilotri Cavaiola · October 2026 · 5 min read</p>
+
+  <p class="lead">You already ask Claude about your code, your docs and your tickets. The one thing it can't see is what was said in last Tuesday's call. Here's how to give Claude Code, Claude Desktop or Codex your meeting transcripts — and get answers with the date and the minute.</p>
+
+  <h2>What it looks like</h2>
+<pre><code><span class="k">&gt;</span> what did we decide about the Acme launch?
+
+<span class="s">●</span> overheard · search_meetings("Acme launch")
+  └ 4 lines in 1 meeting
+
+<span class="s">●</span> On Tue 14 Oct (11:30, Teams) you agreed to move the launch to Friday
+  <span class="k">[02:14]</span>. Marco will send the new timeline tonight <span class="k">[02:31]</span>.</code></pre>
+  <p>Claude doesn't guess or summarize from memory: it calls a tool that searches your transcripts, reads the matching lines, and cites where they came from. The <code>[02:14]</code> is the minute in the recording, so you can go back and listen.</p>
+
+  <h2>How it works</h2>
+  <p>The piece in the middle is an <strong>MCP server</strong>. The Model Context Protocol is how Claude Code, Claude Desktop and Codex talk to local tools: the client starts a small program, and they exchange JSON-RPC messages over stdin and stdout. Nothing listens on the network.</p>
+  <p><a href="https://getoverheard.dev">Overheard</a> records your calls from the Mac menu bar and saves each one as plain files in <code>~/Meetings</code> — <code>transcript.md</code>, <code>summary.md</code>, the audio. The same app, started with <code>--mcp</code>, is the server: it reads those files and answers Claude's tool calls.</p>
+
+  <h3>The tools Claude gets</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>Tool</th><th>What it does</th></tr></thead>
+    <tbody>
+      <tr><th><code>list_meetings</code></th><td>Meetings newest first, with date, title, length and participants; filter by date range or text.</td></tr>
+      <tr><th><code>search_meetings</code></th><td>A word or phrase across every transcript; returns the matching lines with meeting and minute.</td></tr>
+      <tr><th><code>get_meeting</code></th><td>Summary, decisions, action items, bookmarks and (optionally) the full transcript of one meeting, or <code>latest</code>.</td></tr>
+      <tr><th><code>list_action_items</code></th><td>Action items from the summaries: open, done or all, from a date, for a person.</td></tr>
+      <tr><th><code>complete_action_item</code></th><td>Tick an item off. <em>Off until you allow it.</em></td></tr>
+      <tr><th><code>start_recording</code>, <code>stop_recording</code>, <code>bookmark</code></th><td>Control the recording from Claude. <em>Off until you allow it.</em></td></tr>
+    </tbody>
+  </table></div>
+  <p>The read-only tools are always there. The ones that change something only appear after you turn them on in <strong>Settings → Claude &amp; other AIs (MCP)</strong>.</p>
+
+  <h2>Set it up</h2>
+  <p>Install Overheard (from <a href="https://github.com/anonbeat1/overheard/releases/latest">GitHub Releases</a> or <code>brew install --cask anonbeat1/tap/overheard</code>), record a meeting, then pick one of these.</p>
+
+  <h3>One click</h3>
+  <p>In Overheard, open <strong>Settings → Claude &amp; other AIs</strong> and click <strong>Connect to Claude</strong>. It registers the server with every client it finds: Claude Code, Codex and Claude Desktop.</p>
+
+  <h3>The Claude Code plugin</h3>
+  <p>If you live in Claude Code, the plugin adds the same server plus three commands:</p>
+<pre><code>/plugin install overheard --marketplace anonbeat1/overheard</code></pre>
+  <ul>
+    <li><code>/overheard:recap</code> — decisions, action items and open questions of a meeting, each with its minute</li>
+    <li><code>/overheard:followup</code> — a ready-to-send follow-up email (a draft; it never sends anything)</li>
+    <li><code>/overheard:todo</code> — your open action items across meetings, grouped by call</li>
+  </ul>
+  <p>Use the plugin <em>or</em> Connect to Claude, not both, or Claude will see every tool twice.</p>
+
+  <h3>By hand</h3>
+  <p>It's a normal stdio server, so you can add it yourself:</p>
+<pre><code><span class="c"># Claude Code</span>
+claude mcp add --scope user overheard -- /Applications/Overheard.app/Contents/MacOS/Overheard --mcp
+
+<span class="c"># Codex</span>
+codex mcp add overheard -- /Applications/Overheard.app/Contents/MacOS/Overheard --mcp</code></pre>
+  <p>For Claude Desktop, add it to <code>claude_desktop_config.json</code>:</p>
+<pre><code>{
+  <span class="s">"mcpServers"</span>: {
+    <span class="s">"overheard"</span>: {
+      <span class="s">"command"</span>: <span class="s">"/Applications/Overheard.app/Contents/MacOS/Overheard"</span>,
+      <span class="s">"args"</span>: [<span class="s">"--mcp"</span>]
+    }
+  }
+}</code></pre>
+
+  <h2>Things worth asking</h2>
+  <ul>
+    <li><strong>"What was I asked to do this week?"</strong> — Claude calls <code>list_action_items</code> and groups what's yours by meeting.</li>
+    <li><strong>"Draft the follow-up email for the Acme call."</strong> — it reads the meeting with <code>get_meeting</code> and writes the recap, decisions and next steps.</li>
+    <li><strong>"Which meetings talked about the budget?"</strong> — a <code>search_meetings</code> across every transcript, with the minute of each mention.</li>
+    <li><strong>"Turn the decisions from today's design review into GitHub issues."</strong> — this is where it gets interesting: in Claude Code, your meetings and your repository are in the same conversation.</li>
+    <li><strong>"Start recording."</strong> — if you've allowed actions, Claude can start and stop the recording or bookmark a moment.</li>
+  </ul>
+
+  <h2>A note on safety</h2>
+  <p>A transcript is words spoken by everyone on the call, and anything in your context can steer a model. Overheard is built with that in mind:</p>
+  <ul>
+    <li>The tools that change anything are <strong>off by default</strong>; reading is all Claude can do until you say otherwise.</li>
+    <li>The plugin's skills tell Claude to treat transcript text as <strong>content, never instructions</strong>.</li>
+    <li>When Overheard itself asks Claude Code for a summary, it runs it with <strong>no tools, no MCP servers and an empty working folder</strong> — so whatever someone says in a call stays text.</li>
+    <li>The server only speaks over stdio to the client that started it, and only reads <code>~/Meetings</code>.</li>
+  </ul>
+
+  <h2>Under the hood</h2>
+  <p>The whole server is one Swift file, <a href="https://github.com/anonbeat1/overheard/blob/main/Sources/Overheard/MCPServer.swift">MCPServer.swift</a>, under 300 lines. The transport, simplified, is a loop over stdin:</p>
+<pre><code><span class="k">while let</span> line = readLine(strippingNewline: <span class="k">true</span>) {
+    <span class="k">guard let</span> msg = try? JSONSerialization.jsonObject(with: Data(line.utf8)) <span class="k">as</span>? [String: Any] <span class="k">else</span> { <span class="k">continue</span> }
+    <span class="k">guard let</span> id = msg[<span class="s">"id"</span>] <span class="k">else</span> { <span class="k">continue</span> }   <span class="c">// notifications get no reply</span>
+    <span class="k">switch</span> msg[<span class="s">"method"</span>] <span class="k">as</span>? String {
+    <span class="k">case</span> <span class="s">"initialize"</span>: reply(id, result: [<span class="s">"capabilities"</span>: [<span class="s">"tools"</span>: [:]], ...])
+    <span class="k">case</span> <span class="s">"tools/list"</span>: reply(id, result: [<span class="s">"tools"</span>: tools.filter { writeEnabled || !$0.write }.map(\.json)])
+    <span class="k">case</span> <span class="s">"tools/call"</span>: reply(id, result: [<span class="s">"content"</span>: [[<span class="s">"type"</span>: <span class="s">"text"</span>, <span class="s">"text"</span>: try call(name, args)]]])
+    ...
+    }
+}</code></pre>
+  <p>No SDK, no dependencies: MCP over stdio is newline-delimited JSON-RPC, and for a handful of tools that reply with text, a <code>switch</code> is enough. The tools read the Markdown files directly; the ones that control the recording go through the running app with an <code>overheard://</code> URL.</p>
+
+  <div class="cta">
+    <img src="../../assets/icon-tile.svg" alt="">
+    <div>
+      <h3>Overheard</h3>
+      <p>Records your calls from the menu bar, transcribes them on your Mac, and makes them answerable from Claude. Free and open source.</p>
+    </div>
+    <a class="dl" href="https://getoverheard.dev">Get Overheard</a>
+  </div>
+</article>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 Gabriele Spilotri Cavaiola · MIT</span>
+    <span><a href="../feed.xml">RSS</a> · <a href="https://github.com/anonbeat1/overheard">GitHub</a></span>
+  </div>
+</footer>
+</body>
+</html>

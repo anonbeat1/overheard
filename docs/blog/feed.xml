@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Overheard blog</title>
+    <link>https://getoverheard.dev/blog/</link>
+    <atom:link href="https://getoverheard.dev/blog/feed.xml" rel="self" type="application/rss+xml"/>
+    <description>Notes from building Overheard, an open-source Mac meeting recorder you can query from Claude.</description>
+    <language>en</language>
+    <item>
+      <title>Ask Claude about your meetings</title>
+      <link>https://getoverheard.dev/blog/ask-claude-about-your-meetings/</link>
+      <guid>https://getoverheard.dev/blog/ask-claude-about-your-meetings/</guid>
+      <pubDate>Thu, 22 Oct 2026 12:00:00 +0200</pubDate>
+      <description>Give Claude Code, Claude Desktop or Codex your call transcripts with an MCP server — and get answers with the date and the minute.</description>
+    </item>
+    <item>
+      <title>How to record a Google Meet call on your Mac (without a bot)</title>
+      <link>https://getoverheard.dev/blog/record-google-meet-on-mac/</link>
+      <guid>https://getoverheard.dev/blog/record-google-meet-on-mac/</guid>
+      <pubDate>Thu, 22 Oct 2026 12:00:00 +0200</pubDate>
+      <description>Meet's built-in recording, notetaker bots, or recording your Mac's audio: what each one needs, and how to get a transcript.</description>
+    </item>
+    <item>
+      <title>Recording system audio on macOS without a virtual driver</title>
+      <link>https://getoverheard.dev/blog/system-audio-without-a-virtual-driver/</link>
+      <guid>https://getoverheard.dev/blog/system-audio-without-a-virtual-driver/</guid>
+      <pubDate>Thu, 22 Oct 2026 12:00:00 +0200</pubDate>
+      <description>Core Audio process taps in practice: the tap, the private aggregate device, and three bugs that only show up in real calls.</description>
+    </item>
+  </channel>
+</rss>

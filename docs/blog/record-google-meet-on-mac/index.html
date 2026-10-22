@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How to record a Google Meet call on Mac (without a bot) — Overheard</title>
+<meta name="description" content="Three ways to record and transcribe a Google Meet call on your Mac: Meet's built-in recording, a notetaker bot, or a menu bar app that records your Mac's audio — with no bot and no paid Workspace plan.">
+<meta name="author" content="Gabriele Spilotri Cavaiola">
+<link rel="canonical" href="https://getoverheard.dev/blog/record-google-meet-on-mac/">
+<meta property="og:type" content="article">
+<meta property="og:title" content="How to record a Google Meet call on Mac (without a bot)">
+<meta property="og:description" content="Meet's built-in recording, notetaker bots, or recording your Mac's audio — what each one needs, and how to get a transcript.">
+<meta property="og:image" content="https://getoverheard.dev/assets/poster.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#0B0B0C">
+<link rel="icon" href="../../assets/icon-tile.svg" type="image/svg+xml">
+<link rel="alternate" type="application/rss+xml" title="Overheard blog" href="../feed.xml">
+<link rel="stylesheet" href="../blog.css">
+</head>
+<body>
+
+<header class="nav">
+  <a class="brand" href="../../"><img src="../../assets/icon-tile.svg" alt="">Overheard</a>
+  <nav>
+    <a href="../" aria-current="page">Blog</a>
+    <a href="../../compare/">Compare</a>
+    <a class="hide-s" href="https://github.com/anonbeat1/overheard">GitHub</a>
+  </nav>
+  <a class="dl" href="https://github.com/anonbeat1/overheard/releases/latest">Download</a>
+</header>
+
+<main class="wrap">
+<article>
+  <span class="eyebrow">Guide · Google Meet</span>
+  <h1>How to record a Google Meet call on your Mac (without a bot)</h1>
+  <p class="meta">Gabriele Spilotri Cavaiola · October 2026 · 5 min read</p>
+
+  <p class="lead">There are three ways to record a Google Meet call on a Mac: Meet's own recording button, a notetaker bot that joins the call, or an app that records what your Mac plays. Which one you can use depends on your Google plan, whether you're the host, and whether you want a bot in the participant list.</p>
+
+  <div class="tbl"><table>
+    <thead><tr><th></th><th>Meet's recording</th><th>Notetaker bot</th><th class="us">Record your Mac</th></tr></thead>
+    <tbody>
+      <tr><th>Needs</th><td>An eligible paid Google plan, and the host's permission</td><td>A service account; the bot must be let into the call</td><td class="us">An app on your Mac</td></tr>
+      <tr><th>Visible to others</th><td>Yes, everyone is notified</td><td>Yes, it's a participant</td><td class="us">No — tell them yourself</td></tr>
+      <tr><th>Saved to</th><td>The organizer's Google Drive</td><td>The bot's service</td><td class="us">Your Mac</td></tr>
+      <tr><th>Transcript</th><td>Separate feature</td><td>Usually included</td><td class="us">Depends on the app</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2>1. Meet's built-in recording</h2>
+  <p>If your plan includes it, this is the official option: you start it from the call's own controls. The catch is who gets it. According to Google, recording is available on Business Standard and Plus, Essentials, Enterprise plans, some Education plans, Workspace Individual and Google One plans with 2 TB or more — and a Workspace administrator has to allow it. On a free Gmail account, there is no record button.</p>
+  <p>Even on an eligible plan, the recording belongs to the meeting: it's saved to <strong>the organizer's Google Drive</strong>, in a "Google Meet" folder, and everyone in the call is notified when it starts and stops. If you're a guest in someone else's meeting, you'll usually depend on them to start it and share it.</p>
+
+  <h2>2. A notetaker bot</h2>
+  <p>Services like Otter or Fireflies send a bot that joins the call as an extra participant, records it and emails you the notes. It works on any plan and from any computer. The trade-offs are the ones everyone has seen: the host has to admit it, everybody sees "Notetaker" in the grid, some organizations block them, and the recording and transcript live on the service's servers.</p>
+
+  <h2>3. Record your Mac's audio</h2>
+  <p>The third option skips Meet entirely: record what your Mac plays and what your microphone hears. It works in any browser, on any plan, as a guest or a host — and no one's grid changes.</p>
+  <p>Until recently that meant installing a virtual audio driver like BlackHole and rerouting your sound through it. Since macOS 14.2, apps can record system audio directly with Core Audio process taps, with no driver and no setup. (We wrote up <a href="../system-audio-without-a-virtual-driver/">how that works</a>, for the curious.)</p>
+
+  <h3>With Overheard</h3>
+  <p><a href="https://getoverheard.dev">Overheard</a> is a free, open-source menu bar app that does exactly this and also transcribes the call.</p>
+  <ol>
+    <li><strong>Install it</strong> from <a href="https://github.com/anonbeat1/overheard/releases/latest">GitHub Releases</a> or with <code>brew install --cask anonbeat1/tap/overheard</code>. You need an Apple Silicon Mac with macOS 14.2 or later.</li>
+    <li><strong>Join your Meet call</strong> in Chrome, Safari, Arc or any other browser. When the call takes the microphone, Overheard starts recording on its own; you can also click the menu bar icon.</li>
+    <li><strong>Tell the others.</strong> Click <em>Tell participants</em> in the panel: it copies a short message to paste in the Meet chat.</li>
+    <li><strong>Hang up.</strong> Overheard stops, transcribes the call — on your Mac on macOS 15, or with ElevenLabs if you add a key — and writes a summary with decisions and action items.</li>
+  </ol>
+  <p>Everything ends up in <code>~/Meetings</code>, one folder per call: the audio as WAV, the transcript and summary as Markdown, with speakers and timestamps. If you use Claude Code or Claude Desktop, you can also <a href="../ask-claude-about-your-meetings/">ask Claude about the meeting</a>.</p>
+
+  <div class="note"><b>Before you record</b><p>Recording people may require their consent, depending on where you and they are. With no bot and no Meet banner, nobody is told automatically — so say it at the start, or paste the message from <em>Tell participants</em>.</p></div>
+
+  <h2>Which one should you use?</h2>
+  <ul>
+    <li><strong>You're the host on a paid Workspace plan and want the video</strong> → Meet's built-in recording.</li>
+    <li><strong>You're on Windows or a Chromebook</strong> → a notetaker bot, or another desktop recorder.</li>
+    <li><strong>You're on a Mac, on any plan, and want an audio recording and transcript that stay on your computer</strong> → record your Mac's audio with Overheard.</li>
+  </ul>
+  <p>Overheard records audio, not video. If you need the slides or the screen, use Meet's recording or macOS's screen recording (⌘⇧5) alongside it.</p>
+
+  <p class="sources">Source for Meet's recording rules: <a href="https://support.google.com/meet/answer/9308681?hl=en">Google Meet Help — Record a video meeting</a>, opened on 22 October 2026.</p>
+
+  <div class="cta">
+    <img src="../../assets/icon-tile.svg" alt="">
+    <div>
+      <h3>Overheard</h3>
+      <p>Records Meet, Teams and Slack calls from your menu bar — no bot, no driver — and transcribes them on your Mac. Free and open source.</p>
+    </div>
+    <a class="dl" href="https://getoverheard.dev">Get Overheard</a>
+  </div>
+</article>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 Gabriele Spilotri Cavaiola · MIT</span>
+    <span><a href="../feed.xml">RSS</a> · <a href="https://github.com/anonbeat1/overheard">GitHub</a></span>
+  </div>
+</footer>
+</body>
+</html>

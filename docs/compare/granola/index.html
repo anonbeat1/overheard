@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Overheard vs Granola: a free, local Granola alternative for Mac</title>
+<meta name="description" content="Overheard vs Granola, compared honestly: price, where your notes live, Claude and MCP, platforms. Overheard is a free, open-source Granola alternative for Mac that keeps your meetings on your machine.">
+<link rel="canonical" href="https://getoverheard.dev/compare/granola/">
+<meta property="og:title" content="Overheard vs Granola">
+<meta property="og:description" content="A free, open-source Granola alternative for Mac — and when Granola is still the better pick.">
+<meta property="og:image" content="https://getoverheard.dev/assets/poster.jpg">
+<meta name="theme-color" content="#0B0B0C">
+<link rel="icon" href="../../assets/icon-tile.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../../blog/blog.css">
+</head>
+<body>
+
+<header class="nav">
+  <a class="brand" href="../../"><img src="../../assets/icon-tile.svg" alt="">Overheard</a>
+  <nav>
+    <a href="../../blog/">Blog</a>
+    <a href="../" aria-current="page">Compare</a>
+    <a class="hide-s" href="https://github.com/anonbeat1/overheard">GitHub</a>
+  </nav>
+  <a class="dl" href="https://github.com/anonbeat1/overheard/releases/latest">Download</a>
+</header>
+
+<main class="wrap">
+<article>
+  <span class="eyebrow">Compare</span>
+  <h1>Overheard vs Granola</h1>
+  <p class="meta">Checked against Granola's own pages on 22 October 2026</p>
+
+  <p class="lead">Granola and Overheard both take meeting notes without a bot joining your call. The difference is where everything lives: Granola is a cloud service with apps on every platform; Overheard is a free, open-source Mac app that keeps your recordings as files on your machine and lets Claude read them.</p>
+
+  <div class="verdict">
+    <div><b>Pick Granola if…</b><p>you need Windows, iPhone or Android, in-person notes on your phone, or a shared team workspace — and you're fine with your notes in the cloud.</p></div>
+    <div class="us"><b>Pick Overheard if…</b><p>you're on a Mac, want your meetings to stay on it, don't want another subscription, and use Claude Code, Claude Desktop or Codex.</p></div>
+  </div>
+
+  <h2>Side by side</h2>
+  <div class="tbl"><table>
+    <thead><tr><th></th><th class="us">Overheard</th><th>Granola</th></tr></thead>
+    <tbody>
+      <tr><th>Price</th><td class="us">Free, MIT licensed</td><td>Basic free; Business $14 and Enterprise $35 per user per month</td></tr>
+      <tr><th>History</th><td class="us">Everything you've recorded</td><td>30 days on Basic, unlimited on paid plans</td></tr>
+      <tr><th>Bot in the call</th><td class="us">No — records your Mac's audio</td><td>No — records your device's audio</td></tr>
+      <tr><th>Account</th><td class="us">None</td><td>Google Workspace or Microsoft login</td></tr>
+      <tr><th>Where notes live</th><td class="us">Plain Markdown and WAV files in <code>~/Meetings</code></td><td>Granola's US-hosted AWS cloud</td></tr>
+      <tr><th>Audio</th><td class="us">Kept, so you can replay any line</td><td>Deleted after transcription</td></tr>
+      <tr><th>Transcription</th><td class="us">On your Mac, or ElevenLabs with your own key</td><td>Cloud providers such as Deepgram and AssemblyAI</td></tr>
+      <tr><th>Summaries &amp; chat</th><td class="us">Your Claude Code or Codex subscription, or Apple Intelligence on-device</td><td>Built in, using providers such as OpenAI and Anthropic</td></tr>
+      <tr><th>MCP for Claude</th><td class="us">Built in, all meetings, plus actions (start recording, tick off tasks) you can turn on</td><td>Official connector; last 30 days on Basic</td></tr>
+      <tr><th>Platforms</th><td class="us">Mac with Apple Silicon, macOS 14.2+</td><td>macOS, Windows, iOS, Android, Apple Watch</td></tr>
+      <tr><th>Team workspace</th><td class="us">No</td><td>Yes, on paid plans</td></tr>
+      <tr><th>Source code</th><td class="us">Open, on GitHub</td><td>Closed</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2>Where Granola is better</h2>
+  <p><strong>Everywhere you are.</strong> Granola runs on Windows, iPhone, Android and Apple Watch, and its mobile apps cover in-person meetings. Overheard is a Mac menu bar app and nothing else — on purpose, but it's a real limit.</p>
+  <p><strong>Teams.</strong> Shared workspaces, admin controls and SSO are what Granola's paid plans are for. Overheard has no accounts, so there's nothing to share notes through except the files themselves.</p>
+  <p><strong>Polish around the meeting.</strong> Granola prepares a brief before external meetings and drafts follow-ups inside the app. Overheard gives you a summary, decisions and action items, and leaves the rest to Claude.</p>
+
+  <h2>Where Overheard is better</h2>
+  <p><strong>Your meetings stay yours.</strong> Every meeting is a folder in <code>~/Meetings</code> with the audio, the transcript and the summary as plain files. You can open them in any editor, sync them however you like, or point Obsidian at them. With on-device transcription and Apple Intelligence, nothing leaves the Mac at all.</p>
+  <p><strong>No subscription, no history limit.</strong> Overheard is free and open source. Granola's free plan only shows the last 30 days; seeing older notes means $14 per user per month.</p>
+  <p><strong>Built for Claude.</strong> Overheard ships an MCP server: Claude Code, Claude Desktop and Codex can search every meeting you've recorded and quote the minute something was said. There's also a <a href="https://github.com/anonbeat1/overheard#claude-code-plugin">Claude Code plugin</a> with <code>/overheard:recap</code>, <code>/overheard:followup</code> and <code>/overheard:todo</code>. Read <a href="../../blog/ask-claude-about-your-meetings/">how it works</a>.</p>
+  <p><strong>The audio is still there.</strong> Granola deletes the recording after transcribing it. Overheard keeps it, so you can click any line to hear it again or export a section as an audio clip.</p>
+
+  <h2>Switching</h2>
+  <p>There's nothing to migrate into: Overheard starts from the next call. Install it, pick on-device transcription or paste an ElevenLabs key, and click <strong>Connect to Claude</strong> in Settings if you use Claude Code or Codex. You can run both apps side by side while you decide — they both just listen to your Mac's audio.</p>
+
+  <p class="sources">Sources: <a href="https://www.granola.ai/pricing">Granola pricing</a>, <a href="https://www.granola.ai/">Granola home page</a>, <a href="https://www.granola.ai/security">Granola security</a>, all opened on 22 October 2026. Prices and plans change — check Granola's site for the current ones. Overheard is not affiliated with Granola.</p>
+
+  <div class="cta">
+    <img src="../../assets/icon-tile.svg" alt="">
+    <div>
+      <h3>Try Overheard</h3>
+      <p>Free and open source for Mac. No account, no bot, your files.</p>
+    </div>
+    <a class="dl" href="https://getoverheard.dev">Get Overheard</a>
+  </div>
+</article>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 Gabriele Spilotri Cavaiola · MIT</span>
+    <span><a href="../">Compare</a> · <a href="../../blog/">Blog</a> · <a href="https://github.com/anonbeat1/overheard">GitHub</a></span>
+  </div>
+</footer>
+</body>
+</html>

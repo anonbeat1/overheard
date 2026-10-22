@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Overheard vs Meetily: two open-source meeting recorders compared</title>
+<meta name="description" content="Overheard vs Meetily: both are open-source, bot-free meeting recorders. Compare platforms, speaker labels, meeting detection, MCP for Claude and what's free versus Pro.">
+<link rel="canonical" href="https://getoverheard.dev/compare/meetily/">
+<meta property="og:title" content="Overheard vs Meetily">
+<meta property="og:description" content="Two open-source, bot-free meeting recorders — what's free, what's Pro, and which one fits.">
+<meta property="og:image" content="https://getoverheard.dev/assets/poster.jpg">
+<meta name="theme-color" content="#0B0B0C">
+<link rel="icon" href="../../assets/icon-tile.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../../blog/blog.css">
+</head>
+<body>
+
+<header class="nav">
+  <a class="brand" href="../../"><img src="../../assets/icon-tile.svg" alt="">Overheard</a>
+  <nav>
+    <a href="../../blog/">Blog</a>
+    <a href="../" aria-current="page">Compare</a>
+    <a class="hide-s" href="https://github.com/anonbeat1/overheard">GitHub</a>
+  </nav>
+  <a class="dl" href="https://github.com/anonbeat1/overheard/releases/latest">Download</a>
+</header>
+
+<main class="wrap">
+<article>
+  <span class="eyebrow">Compare</span>
+  <h1>Overheard vs Meetily</h1>
+  <p class="meta">Checked against Meetily's GitHub and pricing page on 22 October 2026</p>
+
+  <p class="lead">Meetily and Overheard are both MIT-licensed, record your computer's audio instead of sending a bot, and can transcribe entirely on your machine. Meetily runs on Windows, Mac and Linux and keeps its advanced features in a paid Pro edition. Overheard is Mac-only, and everything it does is in the free app.</p>
+
+  <div class="verdict">
+    <div><b>Pick Meetily if…</b><p>you're on Windows or Linux, want summaries from a local model through Ollama, or want a project with a large community.</p></div>
+    <div class="us"><b>Pick Overheard if…</b><p>you're on a Mac and want speaker labels, automatic meeting detection and Claude integration without paying for Pro.</p></div>
+  </div>
+
+  <h2>Side by side</h2>
+  <div class="tbl"><table>
+    <thead><tr><th></th><th class="us">Overheard</th><th>Meetily</th></tr></thead>
+    <tbody>
+      <tr><th>License &amp; price</th><td class="us">MIT, everything free</td><td>Community edition MIT and free; Pro $10 per user per month, billed yearly ($120)</td></tr>
+      <tr><th>Platforms</th><td class="us">Mac with Apple Silicon, macOS 14.2+</td><td>Mac with Apple Silicon, Windows x64, Linux from source</td></tr>
+      <tr><th>Bot in the call</th><td class="us">No — Core Audio process taps</td><td>No — captures microphone and system audio</td></tr>
+      <tr><th>Local transcription</th><td class="us">Cohere Transcribe on your Mac's GPU (macOS 15+)</td><td>Whisper or Parakeet</td></tr>
+      <tr><th>Cloud transcription</th><td class="us">Optional: ElevenLabs with your own key</td><td>—</td></tr>
+      <tr><th>Who said what</th><td class="us">Speaker labels, free; your own voice on a separate track</td><td>Speaker diarization in Pro</td></tr>
+      <tr><th>Starts by itself</th><td class="us">When Meet, Teams or Slack use the mic, free</td><td>Auto-detect meetings in Pro</td></tr>
+      <tr><th>Summaries</th><td class="us">Your Claude Code or Codex subscription, or Apple Intelligence on-device</td><td>Ollama locally, or Claude, Groq, OpenRouter, OpenAI</td></tr>
+      <tr><th>Chat with meetings</th><td class="us">Yes, across all meetings or one</td><td>Listed as "Soon" for Pro</td></tr>
+      <tr><th>MCP for Claude</th><td class="us">Built in, free</td><td>In Pro ("MCP, webhooks, CLI")</td></tr>
+      <tr><th>Export</th><td class="us">PDF, Markdown with frontmatter, audio clips</td><td>PDF, DOCX, Markdown in Pro</td></tr>
+      <tr><th>Custom templates</th><td class="us">No</td><td>In Pro</td></tr>
+      <tr><th>GitHub stars</th><td class="us">A new project</td><td>About 32,000</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2>Where Meetily is better</h2>
+  <p><strong>Windows and Linux.</strong> If you're not on a Mac, this is the end of the comparison: Overheard is built on macOS-only APIs and won't follow you there.</p>
+  <p><strong>Fully local summaries with any model.</strong> Meetily talks to Ollama out of the box, so you can pick any local model for summaries. Overheard's local option is Apple Intelligence (macOS 26 with Apple Intelligence on); otherwise it uses the Claude Code or Codex CLI you already have.</p>
+  <p><strong>Community and templates.</strong> Meetily has a large, active community and offers custom summary templates in Pro. Overheard is younger and smaller.</p>
+
+  <h2>Where Overheard is better</h2>
+  <p><strong>The good parts are free.</strong> Speaker labels, starting on its own when a call begins, chat across your meetings and the MCP server for Claude are all in the free, open-source app. In Meetily, diarization, auto-detect and MCP are Pro features.</p>
+  <p><strong>Made for the Mac.</strong> Overheard is a native Swift menu bar app. It records system audio with Core Audio process taps — no virtual driver — survives AirPods connecting mid-call, and is signed and notarized by Apple. (We wrote up <a href="../../blog/system-audio-without-a-virtual-driver/">how the recording works</a>.)</p>
+  <p><strong>Answerable from Claude.</strong> Claude Code, Claude Desktop and Codex can search every meeting and quote the minute something was said; a <a href="https://github.com/anonbeat1/overheard#claude-code-plugin">Claude Code plugin</a> adds recap, follow-up and to-do commands. See <a href="../../blog/ask-claude-about-your-meetings/">Ask Claude about your meetings</a>.</p>
+
+  <p class="sources">Sources: <a href="https://github.com/Zackriya-Solutions/meetily">Meetily on GitHub</a>, <a href="https://meetily.ai/pricing">Meetily pricing</a>, both opened on 22 October 2026. Features and prices change — check Meetily's site for the current ones. Overheard is not affiliated with Meetily or Zackriya Solutions.</p>
+
+  <div class="cta">
+    <img src="../../assets/icon-tile.svg" alt="">
+    <div>
+      <h3>Try Overheard</h3>
+      <p>Free and open source for Mac. No account, no bot, your files.</p>
+    </div>
+    <a class="dl" href="https://getoverheard.dev">Get Overheard</a>
+  </div>
+</article>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 Gabriele Spilotri Cavaiola · MIT</span>
+    <span><a href="../">Compare</a> · <a href="../../blog/">Blog</a> · <a href="https://github.com/anonbeat1/overheard">GitHub</a></span>
+  </div>
+</footer>
+</body>
+</html>

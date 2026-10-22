@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Recording system audio on macOS without a virtual driver — Overheard</title>
+<meta name="description" content="How Overheard records calls with Core Audio process taps on macOS 14.2+: no BlackHole, no bot — and the three bugs we hit on the way (AirPods at 24 kHz, a deadlock in AudioDeviceStop, a Bluetooth rebuild loop).">
+<meta name="author" content="Gabriele Spilotri Cavaiola">
+<link rel="canonical" href="https://getoverheard.dev/blog/system-audio-without-a-virtual-driver/">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Recording system audio on macOS without a virtual driver">
+<meta property="og:description" content="Core Audio process taps in practice: the tap, the private aggregate device, and three bugs that only show up in real calls.">
+<meta property="og:image" content="https://getoverheard.dev/assets/poster.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#0B0B0C">
+<link rel="icon" href="../../assets/icon-tile.svg" type="image/svg+xml">
+<link rel="alternate" type="application/rss+xml" title="Overheard blog" href="../feed.xml">
+<link rel="stylesheet" href="../blog.css">
+</head>
+<body>
+
+<header class="nav">
+  <a class="brand" href="../../"><img src="../../assets/icon-tile.svg" alt="">Overheard</a>
+  <nav>
+    <a href="../" aria-current="page">Blog</a>
+    <a href="../../compare/">Compare</a>
+    <a class="hide-s" href="https://github.com/anonbeat1/overheard">GitHub</a>
+  </nav>
+  <a class="dl" href="https://github.com/anonbeat1/overheard/releases/latest">Download</a>
+</header>
+
+<main class="wrap">
+<article>
+  <span class="eyebrow">Engineering · Core Audio</span>
+  <h1>Recording system audio on macOS without a virtual driver</h1>
+  <p class="meta">Gabriele Spilotri Cavaiola · October 2026 · 8 min read</p>
+
+  <p class="lead">For years, recording what your Mac plays meant installing a virtual audio driver and rerouting your output through it. Since macOS 14.2 there is a better way: Core Audio process taps. Here is how Overheard uses them to record calls with no driver and no bot in the meeting — and the three bugs that only showed up in real calls.</p>
+
+  <h2>The old way, and why it hurts</h2>
+  <p>The classic recipe is BlackHole or Loopback: install a virtual audio driver, build a Multi-Output Device in Audio MIDI Setup, make it your default output, then record from the virtual device. It works, but it asks a lot of the user. Your volume keys stop working on a Multi-Output Device, every new pair of headphones needs the setup redone, and "install this audio driver" is a hard sell for a meeting notes app.</p>
+  <p>The other common answer is a bot: a "notetaker" that joins the call as a participant. Nobody needs to install anything, but everyone sees it, and the recording lives on someone else's server.</p>
+  <p>Overheard does neither. It is a menu bar app that asks macOS for the audio of the call directly.</p>
+
+  <h2>Process taps in 30 seconds</h2>
+  <p>macOS 14.2 added <code>AudioHardwareCreateProcessTap</code>. A tap is a Core Audio object that copies the output of one process, several processes, or all of them. You describe it with a <code>CATapDescription</code>; it never changes what the user hears unless you ask it to mute.</p>
+  <p>A tap is not something you can read from directly. You wrap it in an <strong>aggregate device</strong> — the same kind of object Audio MIDI Setup creates — and then read that device like any input, with an IOProc. Here is the whole setup, lightly trimmed from <a href="https://github.com/anonbeat1/overheard/blob/main/Sources/Overheard/Capture.swift">Capture.swift</a>:</p>
+
+<pre><code><span class="c">// Everything the Mac plays, from every process</span>
+<span class="k">let</span> desc = CATapDescription(stereoGlobalTapButExcludeProcesses: [])
+desc.uuid = UUID()
+desc.muteBehavior = .unmuted   <span class="c">// the user keeps hearing the call</span>
+desc.isPrivate = <span class="k">true</span>           <span class="c">// invisible to other apps</span>
+try check(<span class="s">"Create tap"</span>, AudioHardwareCreateProcessTap(desc, &amp;tapID))
+
+<span class="c">// A private aggregate device clocked by the current output device</span>
+outputUID = try currentOutputUID()
+<span class="k">let</span> agg: [String: Any] = [
+    kAudioAggregateDeviceNameKey: <span class="s">"Overheard-Tap"</span>,
+    kAudioAggregateDeviceUIDKey: UUID().uuidString,
+    kAudioAggregateDeviceMainSubDeviceKey: outputUID,
+    kAudioAggregateDeviceIsPrivateKey: <span class="k">true</span>,
+    kAudioAggregateDeviceTapAutoStartKey: <span class="k">true</span>,
+    kAudioAggregateDeviceSubDeviceListKey: [[kAudioSubDeviceUIDKey: outputUID]],
+    kAudioAggregateDeviceTapListKey: [[kAudioSubTapDriftCompensationKey: <span class="k">true</span>,
+                                       kAudioSubTapUIDKey: desc.uuid.uuidString]],
+]
+try check(<span class="s">"Create aggregate"</span>, AudioHardwareCreateAggregateDevice(agg <span class="k">as</span> CFDictionary, &amp;aggregateID))
+
+<span class="c">// Read it like any input device</span>
+try check(<span class="s">"IOProc"</span>, AudioDeviceCreateIOProcIDWithBlock(&amp;procID, aggregateID, ioQueue) { _, input, _, _, _ <span class="k">in</span>
+    <span class="k">if let</span> buf = AVAudioPCMBuffer(pcmFormat: format, bufferListNoCopy: input, deallocator: <span class="k">nil</span>) {
+        writer.write(buf)
+    }
+})
+try check(<span class="s">"Start"</span>, AudioDeviceStart(aggregateID, procID))</code></pre>
+
+  <p>Three details matter. The aggregate device is <strong>private</strong>, so it never shows up in the user's sound settings. Its clock comes from the <strong>current output device</strong>, with drift compensation on the tap. And the tap is <strong>global</strong>: Overheard records whatever the Mac plays during a call — Meet in a browser tab, Teams, a Slack huddle — instead of guessing which process is the meeting.</p>
+
+  <figure>
+    <svg viewBox="0 0 680 250" role="img" aria-label="Pipeline: apps go through a process tap into a private aggregate device, then an IOProc writes recording.wav; the microphone goes through AVCaptureSession into mic.wav">
+      <defs><linearGradient id="gr" x1="0" x2="1"><stop offset="0" stop-color="#FF9A5B"/><stop offset="1" stop-color="#FF4F6D"/></linearGradient>
+      <marker id="ar" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L8 4L0 8z" fill="rgba(244,244,242,.45)"/></marker></defs>
+      <g font-family="Geist, system-ui, sans-serif" font-size="13" fill="#F4F4F2">
+        <g fill="#151517" stroke="rgba(255,255,255,.14)">
+          <rect x="4" y="30" width="118" height="56" rx="12"/><rect x="152" y="30" width="118" height="56" rx="12"/>
+          <rect x="300" y="30" width="150" height="56" rx="12"/><rect x="480" y="30" width="80" height="56" rx="12"/>
+          <rect x="4" y="160" width="118" height="56" rx="12"/><rect x="152" y="160" width="298" height="56" rx="12"/>
+          <rect x="480" y="160" width="80" height="56" rx="12"/>
+        </g>
+        <rect x="590" y="30" width="86" height="56" rx="12" fill="rgba(255,106,95,.1)" stroke="url(#gr)"/>
+        <rect x="590" y="160" width="86" height="56" rx="12" fill="rgba(255,106,95,.1)" stroke="url(#gr)"/>
+        <text x="63" y="55" text-anchor="middle">Meet, Teams,</text><text x="63" y="72" text-anchor="middle">Slack, …</text>
+        <text x="211" y="63" text-anchor="middle">Process tap</text>
+        <text x="375" y="55" text-anchor="middle">Private aggregate</text><text x="375" y="72" text-anchor="middle" fill="rgba(244,244,242,.55)">clock: output device</text>
+        <text x="520" y="63" text-anchor="middle">IOProc</text>
+        <text x="633" y="55" text-anchor="middle" font-family="Geist Mono, monospace" font-size="11.5">recording</text><text x="633" y="71" text-anchor="middle" font-family="Geist Mono, monospace" font-size="11.5">.wav</text>
+        <text x="63" y="193" text-anchor="middle">Microphone</text>
+        <text x="301" y="193" text-anchor="middle">AVCaptureSession</text>
+        <text x="520" y="193" text-anchor="middle">Level</text>
+        <text x="633" y="185" text-anchor="middle" font-family="Geist Mono, monospace" font-size="11.5">mic</text><text x="633" y="201" text-anchor="middle" font-family="Geist Mono, monospace" font-size="11.5">.wav</text>
+        <g stroke="rgba(244,244,242,.45)" stroke-width="1.5" marker-end="url(#ar)">
+          <path d="M122 58H150"/><path d="M270 58H298"/><path d="M450 58H478"/><path d="M560 58H588"/>
+          <path d="M122 188H150"/><path d="M450 188H478"/><path d="M560 188H588"/>
+        </g>
+        <text x="340" y="128" text-anchor="middle" fill="rgba(244,244,242,.45)" font-size="12">both files are padded with silence to stay the same length as the recording</text>
+      </g>
+    </svg>
+    <figcaption>Two tracks, two pipelines: the call through a process tap, your voice through the microphone.</figcaption>
+  </figure>
+
+  <h3>The permission</h3>
+  <p>Taps need the <code>NSAudioCaptureUsageDescription</code> key in Info.plist, and macOS shows its own "System Audio Recording" prompt the first time you start one. What there isn't is a public API to <em>check</em> that permission or ask for it ahead of time — which you want for an onboarding screen. Overheard does what <a href="https://github.com/insidegui/AudioCap">AudioCap</a> does: it looks up <code>TCCAccessPreflight</code> and <code>TCCAccessRequest</code> in the private TCC framework at runtime, for the <code>kTCCServiceAudioCapture</code> service. If those symbols ever disappear, it falls back to "unknown" and lets macOS ask on the first recording.</p>
+
+  <h2>Bug 1: the format lies</h2>
+  <p>The first real call with AirPods produced a recording at chipmunk speed, half as long as the meeting.</p>
+  <p>The tap reports its format through <code>kAudioTapPropertyFormat</code>, and that format said 48 kHz. But when a call turns on the AirPods' microphone, Bluetooth switches to the hands-free profile and the output device drops to <strong>24 kHz</strong>. The buffers arriving in the IOProc were 24 kHz audio labelled as 48 kHz, so everything played back twice as fast.</p>
+  <p>The fix is to trust the device, not the tap: read the aggregate device's nominal sample rate and use it for the input format.</p>
+
+<pre><code><span class="k">var</span> asbd = AudioStreamBasicDescription()
+try getProp(tapID, kAudioTapPropertyFormat, &amp;asbd)
+<span class="c">// The tap says 48 kHz, but data arrives at the device's real rate
+// (24 kHz with AirPods in a call): without this, audio was 2x fast.</span>
+<span class="k">var</span> deviceRate = Float64(0)
+try getProp(aggregateID, kAudioDevicePropertyNominalSampleRate, &amp;deviceRate)
+<span class="k">if</span> deviceRate &gt; 0 { asbd.mSampleRate = deviceRate }</code></pre>
+
+  <p>Everything after that goes through an <code>AVAudioConverter</code> into one fixed format on disk — 48 kHz stereo, 16-bit, about 690 MB an hour — so the rest of the app never has to care what the hardware was doing.</p>
+
+  <h2>Bug 2: a deadlock in AudioDeviceStop</h2>
+  <p>Sometimes, pressing Stop left the app frozen on "Saving…" forever.</p>
+  <p>The IOProc block ran on the same serial queue as the rest of the capture code. Stop ran on that queue too and called <code>AudioDeviceStop</code>, which <strong>waits for the in-flight IOProc callback to finish</strong>. That callback was waiting for the queue Stop was holding. Classic deadlock, and only when Stop landed while a buffer was being delivered.</p>
+
+  <div class="note"><b>Rule</b><p>Give the IOProc its own queue. Never call <code>AudioDeviceStop</code> from the queue your IOProc runs on.</p></div>
+
+  <p>In Overheard the IOProc runs on <code>ioQueue</code>, everything else on <code>queue</code>, and the file writer is only ever touched from <code>ioQueue</code>.</p>
+
+  <h2>Bug 3: Bluetooth headphones and the rebuild loop</h2>
+  <p>A tap is tied to the output device that clocks its aggregate device. When the output changes — AirPods connect mid-call, the user picks other speakers — the tap has to be torn down and rebuilt. So Overheard listens for changes to the default output device, the tap format and the sample rate, and rebuilds on each.</p>
+  <p>With Bluetooth headphones that was a disaster. When a call opens their microphone, they switch profile, and for a moment the default output bounces between the headphones and the built-in speakers. Every notification triggered a rebuild; every rebuild reopened the headphones in a new aggregate device; that caused another profile change and another notification. Dozens of rebuilds a second, and the call itself lost both audio and microphone.</p>
+  <p>The fix is a debounce: wait until the configuration has been still for 1.5 seconds, and for output-device notifications, skip the rebuild entirely if the output ended up the same and audio is still flowing.</p>
+
+<pre><code><span class="k">private func</span> scheduleRebuild(_ why: String, onlyIfOutputChanged: Bool = <span class="k">false</span>) {
+    pending?.cancel()
+    <span class="k">let</span> work = DispatchWorkItem { [<span class="k">weak self</span>] <span class="k">in</span>
+        <span class="k">guard let self else</span> { <span class="k">return</span> }
+        pending = <span class="k">nil</span>
+        <span class="k">if</span> onlyIfOutputChanged, aggregateID != kAudioObjectUnknown,
+           Date().timeIntervalSince(lastCallback) &lt; 1,
+           (try? currentOutputUID()) == outputUID { <span class="k">return</span> }   <span class="c">// bounced back: nothing to do</span>
+        rebuild(why)
+    }
+    pending = work
+    queue.asyncAfter(deadline: .now() + 1.5, execute: work)
+}</code></pre>
+
+  <h2>Keeping two files in sync</h2>
+  <p>Rebuilds mean gaps: half a second here, two seconds there. For a transcript with timestamps, gaps are worse than silence, because they shift every line after them. So both tracks go through a small writer that knows when the recording started and how many frames it has written. Once a second a watchdog checks how far behind real time the file is, and if it is more than half a second, it writes silence until it catches up.</p>
+  <p>The same watchdog is the safety net for everything else: no audio for two seconds, or a capture that isn't running, means rebuild. The result is that <code>recording.wav</code> and <code>mic.wav</code> are always exactly as long as the meeting, and a timestamp in one is the same moment in the other.</p>
+
+  <h2>Your voice, on its own track</h2>
+  <p>The tap only hears what the Mac plays, so your own voice comes from the microphone, through a plain <code>AVCaptureSession</code>, into a separate 16 kHz mono file. Two tracks make speaker separation much easier later: everything on <code>mic.wav</code> is you.</p>
+  <p>Two details from real use. Overheard defaults to the <strong>built-in microphone</strong> even when AirPods are connected, because recording from a Bluetooth headset's mic switches it to the low-quality hands-free profile. And the raw Mac mic comes in around −34 dBFS on speech while the call audio is already normalized near −17, so at the end of a recording the mic track is measured and raised towards −18 dBFS, with a soft <code>tanh</code> limiter above 0.7 so peaks never clip.</p>
+
+  <h2>Surviving a crash</h2>
+  <p>While recording, the files are called <code>recording.tmp.wav</code> and <code>mic.tmp.wav</code>, so anything reading <code>~/Meetings</code> knows they aren't finished. If the app quits mid-call, the WAV headers still hold the sizes from when the file was opened. On the next launch Overheard walks the RIFF chunks, rewrites the <code>data</code> and <code>RIFF</code> sizes from the real file length, renames the files and transcribes them as if nothing happened.</p>
+
+  <h2>What I'd tell you before you start</h2>
+  <ul>
+    <li><strong>Test with Bluetooth headphones in a real call</strong>, not with music. Profile switches and 24 kHz output only happen when a call opens the mic.</li>
+    <li><strong>Trust the device's sample rate</strong> over the tap's declared format.</li>
+    <li><strong>Separate the IOProc's queue</strong> from the one that starts and stops capture.</li>
+    <li><strong>Debounce device changes</strong>, and check whether anything actually changed before rebuilding.</li>
+    <li><strong>Log every rebuild.</strong> Overheard writes a <code>capture.log</code> next to each recording; every bug above was found by reading one.</li>
+  </ul>
+  <p>The whole capture side — both tracks, the watchdogs, crash recovery and mic leveling — is one Swift file, <a href="https://github.com/anonbeat1/overheard/blob/main/Sources/Overheard/Capture.swift">Capture.swift</a>, about 550 lines, MIT licensed. If you're building something with process taps, take what's useful.</p>
+
+  <div class="cta">
+    <img src="../../assets/icon-tile.svg" alt="">
+    <div>
+      <h3>Overheard</h3>
+      <p>Records your calls from the menu bar, transcribes them on your Mac, and makes them answerable from Claude. Free and open source.</p>
+    </div>
+    <a class="dl" href="https://getoverheard.dev">Get Overheard</a>
+  </div>
+</article>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 Gabriele Spilotri Cavaiola · MIT</span>
+    <span><a href="../feed.xml">RSS</a> · <a href="https://github.com/anonbeat1/overheard">GitHub</a></span>
+  </div>
+</footer>
+</body>
+</html>
