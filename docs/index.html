@@ -736,7 +736,10 @@ footer nav { display: flex; gap: 22px; }
     </div>
     <div class="code rv d2">
       <button class="copy" id="copy" type="button">Copy</button>
-<div id="src"><span class="c"># or build from source (Xcode 16+)</span>
+<div id="src"><span class="c"># with Homebrew</span>
+<span class="pr">$ </span>brew install --cask anonbeat1/tap/overheard
+
+<span class="c"># or build from source (Xcode 16+)</span>
 <span class="pr">$ </span>git clone https://github.com/anonbeat1/overheard.git
 <span class="pr">$ </span>cd overheard &amp;&amp; ./build.sh</div>
     </div>
@@ -833,7 +836,7 @@ footer nav { display: flex; gap: 22px; }
 
   const copy = document.getElementById('copy');
   copy.addEventListener('click', () => {
-    const cmd = 'git clone https://github.com/anonbeat1/overheard.git\ncd overheard && ./build.sh';
+    const cmd = 'brew install --cask anonbeat1/tap/overheard';
     navigator.clipboard?.writeText(cmd).then(() => { copy.textContent = 'Copied'; setTimeout(() => copy.textContent = 'Copy', 1600); });
   });
 

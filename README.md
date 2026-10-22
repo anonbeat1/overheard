@@ -83,7 +83,7 @@ The interface is in English and Italian.
 
 Requires an **Apple Silicon** Mac with **macOS 14.2** or later (on-device transcription needs **macOS 15**).
 
-1. Download the latest `.dmg` from [Releases](../../releases/latest) and drag **Overheard** to Applications. It is signed and notarized by Apple, so it opens with a double click.
+1. Download the latest `.dmg` from [Releases](../../releases/latest) and drag **Overheard** to Applications — or `brew install --cask anonbeat1/tap/overheard`. It is signed and notarized by Apple, so it opens with a double click.
 2. Open it: the icon appears in the menu bar. Grant microphone and audio recording access on the first recording.
 3. Transcription runs *On this Mac* by default on macOS 15 (downloads ~2.5 GB of models once, no account). For the best accuracy, switch to ElevenLabs in **Settings → Transcription** and paste an API key with the *Speech to Text* permission.
 4. Optional: install [Claude Code](https://claude.com/claude-code) or Codex for summaries and chat, then click **Connect to Claude** in Settings to enable the MCP server.

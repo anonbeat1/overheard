@@ -30,6 +30,14 @@ cp "$UP/appcast.xml" appcast.xml
 cp appcast.xml docs/appcast.xml
 
 gh release create "v$VER" "$DMG" --title "Overheard $VER" --notes "$NOTES"
+
+# Homebrew (brew install --cask anonbeat1/tap/overheard): versione e sha256 del cask nel tap
+TAP=build/homebrew-tap
+[[ -d "$TAP/.git" ]] || gh repo clone anonbeat1/homebrew-tap "$TAP" -- -q
+git -C "$TAP" pull -q
+SHA=$(shasum -a 256 "$DMG" | cut -d' ' -f1)
+sed -i '' -e "s/^  version \".*\"/  version \"$VER\"/" -e "s/^  sha256 \".*\"/  sha256 \"$SHA\"/" "$TAP/Casks/overheard.rb"
+git -C "$TAP" commit -qam "overheard $VER" && git -C "$TAP" push -q
 git add Info.plist appcast.xml docs/appcast.xml
 git commit -m "Release $VER"
 git push
