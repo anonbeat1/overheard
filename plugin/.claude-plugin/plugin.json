@@ -1,6 +1,6 @@
 {
   "name": "overheard",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Your meetings inside Claude Code: search transcripts, recap a call, draft the follow-up, list your action items. Needs the Overheard Mac app.",
   "author": { "name": "Gabriele Spilotri Cavaiola" },
   "homepage": "https://getoverheard.dev",
