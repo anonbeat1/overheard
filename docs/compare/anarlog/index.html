@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Overheard vs Anarlog (formerly Hyprnote): open-source meeting notes for Mac</title>
+<meta name="description" content="Overheard vs Anarlog, the app formerly called Hyprnote: two open-source, bot-free meeting recorders for Mac. Compare storage, local transcription, Claude and MCP, team features and what's free versus Pro.">
+<link rel="canonical" href="https://getoverheard.dev/compare/anarlog/">
+<meta property="og:title" content="Overheard vs Anarlog (formerly Hyprnote)">
+<meta property="og:description" content="Two open-source, bot-free meeting recorders for Mac, compared honestly.">
+<meta property="og:image" content="https://getoverheard.dev/assets/poster.jpg">
+<meta name="theme-color" content="#0B0B0C">
+<link rel="icon" href="../../assets/icon-tile.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../../blog/blog.css">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"Overheard vs Anarlog (formerly Hyprnote): open-source meeting notes for Mac","url":"https://getoverheard.dev/compare/anarlog/","datePublished":"2026-10-31","dateModified":"2026-10-31","image":"https://getoverheard.dev/assets/poster.jpg","author":{"@type":"Person","name":"Gabriele Spilotri Cavaiola","url":"https://github.com/anonbeat1"},"publisher":{"@type":"Organization","name":"Overheard","url":"https://getoverheard.dev/"}}</script>
+</head>
+<body>
+
+<header class="nav">
+  <a class="brand" href="../../"><img src="../../assets/icon-tile.svg" alt="">Overheard</a>
+  <nav>
+    <a href="../../blog/">Blog</a>
+    <a href="../" aria-current="page">Compare</a>
+    <a class="hide-s" href="https://github.com/anonbeat1/overheard">GitHub</a>
+  </nav>
+  <a class="dl" href="https://github.com/anonbeat1/overheard/releases/latest">Download</a>
+</header>
+
+<main class="wrap">
+<article>
+  <span class="eyebrow">Compare</span>
+  <h1>Overheard vs Anarlog (formerly Hyprnote)</h1>
+  <p class="meta">Checked against Anarlog's site and GitHub repository on 31 October 2026</p>
+
+  <p class="lead">Anarlog, the open-source app that used to be called Hyprnote, and Overheard are closer than any other pair here: both record your calls without a bot, both can transcribe on your Mac, both are MIT licensed and both speak MCP. The difference is shape. Anarlog is a full AI notepad with an optional cloud and team plan; Overheard is a small menu bar recorder that keeps each meeting as plain files and leaves the thinking to Claude.</p>
+
+  <div class="verdict">
+    <div><b>Pick Anarlog if…</b><p>you want a notepad you type into during the meeting, local models through Ollama or LM Studio, encrypted sync between machines, or shared team workspaces.</p></div>
+    <div class="us"><b>Pick Overheard if…</b><p>you want a recorder that stays out of the way, meetings as plain Markdown folders any tool can read, and Claude Code, Claude Desktop or Codex as the place you ask questions.</p></div>
+  </div>
+
+  <h2>Side by side</h2>
+  <div class="tbl"><table>
+    <thead><tr><th></th><th class="us">Overheard</th><th>Anarlog</th></tr></thead>
+    <tbody>
+      <tr><th>Price</th><td class="us">Free, everything included</td><td>Free; Pro $14 per person per month or $140 a year</td></tr>
+      <tr><th>License</th><td class="us">MIT</td><td>MIT community app; enterprise parts commercially licensed</td></tr>
+      <tr><th>Bot in the call</th><td class="us">No</td><td>No</td></tr>
+      <tr><th>Where notes live</th><td class="us">One folder per meeting in <code>~/Meetings</code>: Markdown and WAV</td><td>A local SQLite database plus local files; Markdown export</td></tr>
+      <tr><th>Local transcription</th><td class="us">Cohere Transcribe on your GPU, with speaker labels</td><td>On-device models, unlimited on Free; manual speaker labels on Free</td></tr>
+      <tr><th>Cloud transcription</th><td class="us">ElevenLabs with your own key</td><td>Your own key, or Anarlog's cloud on Pro</td></tr>
+      <tr><th>Summaries &amp; chat</th><td class="us">Your Claude Code or Codex subscription, or Apple Intelligence</td><td>Local models, your own key, or Anarlog's AI on Pro</td></tr>
+      <tr><th>MCP</th><td class="us">Built in, all meetings, plus actions you can turn on; Claude Code plugin</td><td>Local API, CLI, MCP and webhooks on Free</td></tr>
+      <tr><th>Sync &amp; teams</th><td class="us">None — sync the folder yourself</td><td>Encrypted CloudSync and team workspaces on Pro</td></tr>
+      <tr><th>Platforms</th><td class="us">Mac with Apple Silicon, macOS 14.2+</td><td>Mac with Apple Silicon</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2>Where Anarlog is better</h2>
+  <p><strong>A real notepad.</strong> Anarlog is built around notes you write during the meeting, which AI then fills in. Overheard has no editor for live notes: it records, then summarizes.</p>
+  <p><strong>Any model you like.</strong> Anarlog can use an OpenAI-compatible local server such as Ollama or LM Studio, or several hosted providers. Overheard's summaries go through Claude Code, Codex or Apple Intelligence only.</p>
+  <p><strong>Sync and teams.</strong> Pro adds encrypted sync, shared folders, roles and SSO for companies. Overheard has no accounts and no server.</p>
+  <p><strong>A bigger project.</strong> Anarlog has a funded team and a large community behind it. Overheard is built by one person.</p>
+
+  <h2>Where Overheard is better</h2>
+  <p><strong>Plain files, not a database.</strong> Every Overheard meeting is a folder with the audio, a Markdown transcript and a Markdown summary. Obsidian, grep, Spotlight, git or a sync tool can read them as they are, with no export step.</p>
+  <p><strong>Everything free, no Pro.</strong> There's no paid tier: speaker labels on-device, MCP actions and unlimited history are all in the free app.</p>
+  <p><strong>Claude-first.</strong> Overheard ships a <a href="https://github.com/anonbeat1/overheard#claude-code-plugin">Claude Code plugin</a> with <code>/overheard:recap</code>, <code>/overheard:followup</code> and <code>/overheard:todo</code>, and uses the Claude subscription you already pay for — no extra API keys. Read <a href="../../blog/ask-claude-about-your-meetings/">how it works</a>.</p>
+  <p><strong>Starts on its own.</strong> Overheard lives in the menu bar and starts recording when Meet, Teams or Slack take the microphone, with a global shortcut to bookmark a moment. Native Swift, small and quiet.</p>
+
+  <h2>Switching</h2>
+  <p>Both apps just listen to your Mac's audio, so you can run them side by side. Export old meetings from Anarlog as Markdown for your archive, or drop their audio files into Overheard's Import to make them searchable from Claude.</p>
+
+  <p class="sources">Sources: <a href="https://anarlog.so">Anarlog home page and pricing</a>, <a href="https://github.com/fastrepl/anarlog">fastrepl/anarlog on GitHub</a>, both opened on 31 October 2026. Hyprnote's team now also builds a separate product, Char. Prices and plans change — check Anarlog's site for the current ones. Overheard is not affiliated with Anarlog or Fastrepl.</p>
+
+  <div class="cta">
+    <img src="../../assets/icon-tile.svg" alt="">
+    <div>
+      <h3>Try Overheard</h3>
+      <p>Free and open source for Mac. No account, no bot, your files.</p>
+    </div>
+    <a class="dl" href="https://getoverheard.dev">Get Overheard</a>
+  </div>
+</article>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 Gabriele Spilotri Cavaiola · MIT</span>
+    <span><a href="../">Compare</a> · <a href="../../blog/">Blog</a> · <a href="https://github.com/anonbeat1/overheard">GitHub</a></span>
+  </div>
+</footer>
+</body>
+</html>
