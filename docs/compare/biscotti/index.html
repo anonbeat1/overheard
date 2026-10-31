@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Overheard vs Biscotti: two free, private meeting recorders for Mac</title>
+<meta name="description" content="Overheard vs Biscotti, compared honestly: both are free, bot-free Mac meeting recorders. Compare fully local AI, speaker identification, license, Claude and MCP, and macOS requirements.">
+<link rel="canonical" href="https://getoverheard.dev/compare/biscotti/">
+<meta property="og:title" content="Overheard vs Biscotti">
+<meta property="og:description" content="Two free, bot-free meeting recorders for Mac, compared honestly.">
+<meta property="og:image" content="https://getoverheard.dev/assets/poster.jpg">
+<meta name="theme-color" content="#0B0B0C">
+<link rel="icon" href="../../assets/icon-tile.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../../blog/blog.css">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"Overheard vs Biscotti: two free, private meeting recorders for Mac","url":"https://getoverheard.dev/compare/biscotti/","datePublished":"2026-10-31","dateModified":"2026-10-31","image":"https://getoverheard.dev/assets/poster.jpg","author":{"@type":"Person","name":"Gabriele Spilotri Cavaiola","url":"https://github.com/anonbeat1"},"publisher":{"@type":"Organization","name":"Overheard","url":"https://getoverheard.dev/"}}</script>
+</head>
+<body>
+
+<header class="nav">
+  <a class="brand" href="../../"><img src="../../assets/icon-tile.svg" alt="">Overheard</a>
+  <nav>
+    <a href="../../blog/">Blog</a>
+    <a href="../" aria-current="page">Compare</a>
+    <a class="hide-s" href="https://github.com/anonbeat1/overheard">GitHub</a>
+  </nav>
+  <a class="dl" href="https://github.com/anonbeat1/overheard/releases/latest">Download</a>
+</header>
+
+<main class="wrap">
+<article>
+  <span class="eyebrow">Compare</span>
+  <h1>Overheard vs Biscotti</h1>
+  <p class="meta">Checked against Biscotti's GitHub repository on 31 October 2026</p>
+
+  <p class="lead">Biscotti and Overheard are both free, native Mac apps that record your calls without a bot, keep the audio, and label speakers. Biscotti runs every step — transcription, speaker identification and summaries — with local models on your Mac. Overheard can transcribe locally too, but hands summaries and questions to Claude, and is built so Claude Code, Claude Desktop and Codex can work with your meetings.</p>
+
+  <div class="verdict">
+    <div><b>Pick Biscotti if…</b><p>nothing may ever leave your Mac, including summaries; you want speakers recognized by voice across meetings, calendar-aware prompts, and you have macOS 15 and 16 GB of RAM.</p></div>
+    <div class="us"><b>Pick Overheard if…</b><p>you live in Claude Code, Claude Desktop or Codex, want an open-source MIT license, the option of cloud transcription for the best accuracy, or you're still on macOS 14.</p></div>
+  </div>
+
+  <h2>Side by side</h2>
+  <div class="tbl"><table>
+    <thead><tr><th></th><th class="us">Overheard</th><th>Biscotti</th></tr></thead>
+    <tbody>
+      <tr><th>Price</th><td class="us">Free</td><td>Free</td></tr>
+      <tr><th>License</th><td class="us">MIT (open source)</td><td>PolyForm Perimeter 1.0.1 (source-available)</td></tr>
+      <tr><th>Bot in the call</th><td class="us">No</td><td>No</td></tr>
+      <tr><th>Transcription</th><td class="us">Cohere Transcribe on your Mac, or ElevenLabs with your own key</td><td>Whisper V3 Turbo on your Mac</td></tr>
+      <tr><th>Speaker labels</th><td class="us">On-device diarization</td><td>Diarization plus voiceprints matched across past meetings and your calendar</td></tr>
+      <tr><th>Summaries</th><td class="us">Claude Code or Codex subscription, or Apple Intelligence on-device</td><td>Gemma 4 running locally</td></tr>
+      <tr><th>MCP for Claude</th><td class="us">Built in, plus actions (start recording, tick off tasks) and a Claude Code plugin</td><td>Yes, for Claude Desktop or LM Studio</td></tr>
+      <tr><th>Starting a recording</th><td class="us">Automatic when Meet, Teams or Slack take the mic</td><td>Suggests recording from your calendar and active audio apps; stops when the call ends</td></tr>
+      <tr><th>Where files live</th><td class="us">One folder per meeting in <code>~/Meetings</code>: Markdown and WAV</td><td>On your Mac</td></tr>
+      <tr><th>Requirements</th><td class="us">Apple Silicon, macOS 14.2+ (15 for local transcription)</td><td>Apple Silicon, macOS 15+, 16 GB RAM recommended</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2>Where Biscotti is better</h2>
+  <p><strong>Fully local, summaries included.</strong> Biscotti runs its language model on your Mac too, so it works offline end to end. Overheard's on-device path covers transcription; for summaries you choose Apple Intelligence or a Claude or Codex subscription.</p>
+  <p><strong>Knows who's talking.</strong> Biscotti matches voiceprints against past meetings and uses calendar attendees to put real names on speakers. Overheard labels speakers per meeting; naming them is up to you.</p>
+  <p><strong>Calendar and auto-stop.</strong> Biscotti reads your calendar to offer recording when a meeting starts, and stops when the call ends. It also supports custom vocabulary for names and jargon.</p>
+
+  <h2>Where Overheard is better</h2>
+  <p><strong>Built around Claude.</strong> Overheard's MCP server can also act — start or stop a recording, add a bookmark, tick off an action item — and the <a href="https://github.com/anonbeat1/overheard#claude-code-plugin">Claude Code plugin</a> adds <code>/overheard:recap</code>, <code>/overheard:followup</code> and <code>/overheard:todo</code>. Read <a href="../../blog/ask-claude-about-your-meetings/">how it works</a>.</p>
+  <p><strong>Open source, MIT.</strong> Biscotti's source is public under the PolyForm Perimeter license, which limits using it to build a competing product. Overheard is MIT: fork it, change it, ship it.</p>
+  <p><strong>Cloud when accuracy matters.</strong> For hard audio, accents or many languages, Overheard can send a meeting to ElevenLabs Scribe with your own key. Local stays the default if you want it.</p>
+  <p><strong>Runs on more Macs.</strong> Recording works from macOS 14.2, with no RAM recommendation, because the heavy language model isn't on your machine.</p>
+
+  <h2>Using both</h2>
+  <p>Both just listen to your Mac's audio, so you can try them side by side on the same call and keep the one whose transcripts you prefer.</p>
+
+  <p class="sources">Sources: <a href="https://github.com/scosman/Biscotti">scosman/Biscotti on GitHub</a> (README and license), opened on 31 October 2026. Overheard is not affiliated with Biscotti.</p>
+
+  <div class="cta">
+    <img src="../../assets/icon-tile.svg" alt="">
+    <div>
+      <h3>Try Overheard</h3>
+      <p>Free and open source for Mac. No account, no bot, your files.</p>
+    </div>
+    <a class="dl" href="https://getoverheard.dev">Get Overheard</a>
+  </div>
+</article>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 Gabriele Spilotri Cavaiola · MIT</span>
+    <span><a href="../">Compare</a> · <a href="../../blog/">Blog</a> · <a href="https://github.com/anonbeat1/overheard">GitHub</a></span>
+  </div>
+</footer>
+</body>
+</html>

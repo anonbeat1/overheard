@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Overheard vs MacWhisper: meeting recorder or transcription app?</title>
+<meta name="description" content="Overheard vs MacWhisper, compared honestly: file and dictation transcription versus a menu bar meeting recorder, price, local models, speaker labels, Claude and MCP. Which one fits your Mac?">
+<link rel="canonical" href="https://getoverheard.dev/compare/macwhisper/">
+<meta property="og:title" content="Overheard vs MacWhisper">
+<meta property="og:description" content="A transcription Swiss army knife versus a meeting recorder built for Claude.">
+<meta property="og:image" content="https://getoverheard.dev/assets/poster.jpg">
+<meta name="theme-color" content="#0B0B0C">
+<link rel="icon" href="../../assets/icon-tile.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../../blog/blog.css">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"Overheard vs MacWhisper: meeting recorder or transcription app?","url":"https://getoverheard.dev/compare/macwhisper/","datePublished":"2026-10-31","dateModified":"2026-10-31","image":"https://getoverheard.dev/assets/poster.jpg","author":{"@type":"Person","name":"Gabriele Spilotri Cavaiola","url":"https://github.com/anonbeat1"},"publisher":{"@type":"Organization","name":"Overheard","url":"https://getoverheard.dev/"}}</script>
+</head>
+<body>
+
+<header class="nav">
+  <a class="brand" href="../../"><img src="../../assets/icon-tile.svg" alt="">Overheard</a>
+  <nav>
+    <a href="../../blog/">Blog</a>
+    <a href="../" aria-current="page">Compare</a>
+    <a class="hide-s" href="https://github.com/anonbeat1/overheard">GitHub</a>
+  </nav>
+  <a class="dl" href="https://github.com/anonbeat1/overheard/releases/latest">Download</a>
+</header>
+
+<main class="wrap">
+<article>
+  <span class="eyebrow">Compare</span>
+  <h1>Overheard vs MacWhisper</h1>
+  <p class="meta">Checked against MacWhisper's own site on 31 October 2026</p>
+
+  <p class="lead">MacWhisper is a popular Mac transcription app: drop in any audio or video file, dictate, or record meetings, and it transcribes with Whisper models on your Mac. Overheard does one job — recording and transcribing your calls — and adds what comes after: summaries, action items, a meeting library and an MCP server so Claude can answer questions from every meeting.</p>
+
+  <div class="verdict">
+    <div><b>Pick MacWhisper if…</b><p>you mostly transcribe files — interviews, podcasts, lectures, videos — want subtitles and exports, dictation, many model choices, or an iPhone app too.</p></div>
+    <div class="us"><b>Pick Overheard if…</b><p>you want your calls recorded automatically, a searchable library of meetings with summaries and action items, and Claude Code, Claude Desktop or Codex answering from them.</p></div>
+  </div>
+
+  <h2>Side by side</h2>
+  <div class="tbl"><table>
+    <thead><tr><th></th><th class="us">Overheard</th><th>MacWhisper</th></tr></thead>
+    <tbody>
+      <tr><th>Price</th><td class="us">Free, MIT licensed</td><td>Free version; Pro €64 one-time with lifetime updates</td></tr>
+      <tr><th>Main job</th><td class="us">Recording and understanding your calls</td><td>Transcribing files, dictation and meetings</td></tr>
+      <tr><th>Meeting recording</th><td class="us">Starts when Meet, Teams or Slack take the mic</td><td>Detects Zoom, Teams, Webex, Skype, Chime, Discord and more</td></tr>
+      <tr><th>Bot in the call</th><td class="us">No</td><td>No</td></tr>
+      <tr><th>Transcription</th><td class="us">Cohere Transcribe on your Mac, or ElevenLabs with your own key</td><td>Whisper models on your Mac, or cloud providers with your own keys</td></tr>
+      <tr><th>Speaker labels</th><td class="us">Yes</td><td>Yes</td></tr>
+      <tr><th>Summaries &amp; action items</th><td class="us">Decisions and checkable action items per meeting</td><td>Summarize with the AI provider you choose</td></tr>
+      <tr><th>MCP for Claude</th><td class="us">Built in, all meetings, plus a Claude Code plugin</td><td>Not listed; a CLI for scripting</td></tr>
+      <tr><th>Where files live</th><td class="us">One folder per meeting in <code>~/Meetings</code>: Markdown and WAV</td><td>In the app, with many export formats</td></tr>
+      <tr><th>Platforms</th><td class="us">Mac with Apple Silicon, macOS 14.2+</td><td>Mac, plus an iPhone and iPad version</td></tr>
+      <tr><th>Source code</th><td class="us">Open, on GitHub</td><td>Closed</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2>Where MacWhisper is better</h2>
+  <p><strong>Any file, any format.</strong> MacWhisper is built for transcribing recordings of every kind, with subtitle export, batch processing and translation. Overheard can import files, but it treats them as meetings, not as media to subtitle.</p>
+  <p><strong>More models and more knobs.</strong> MacWhisper lets you choose between many local Whisper models and several cloud providers. Overheard offers two engines and keeps the settings short.</p>
+  <p><strong>Dictation and iPhone.</strong> MacWhisper also does dictation and has an iOS and iPad version. Overheard is a Mac menu bar recorder only.</p>
+  <p><strong>A mature, well-known app.</strong> MacWhisper by Good Snooze has been around for years and has a large user base.</p>
+
+  <h2>Where Overheard is better</h2>
+  <p><strong>Made for meetings, start to finish.</strong> Overheard lives in the menu bar, starts when the call starts, records your voice and the other side on separate tracks, and turns each call into a transcript, a summary, decisions and action items you can tick off. <a href="../../blog/record-google-meet-on-mac/">Recording a Google Meet call</a> needs no setup.</p>
+  <p><strong>Your meetings, answerable from Claude.</strong> Overheard ships an MCP server and a <a href="https://github.com/anonbeat1/overheard#claude-code-plugin">Claude Code plugin</a>: ask "what did I promise the client last week?" and Claude answers from your transcripts with the minute it was said. Read <a href="../../blog/ask-claude-about-your-meetings/">how it works</a>.</p>
+  <p><strong>Free, all of it.</strong> There's no Pro tier. Summaries use the Claude Code or Codex subscription you already have, or Apple Intelligence on-device.</p>
+  <p><strong>Plain files.</strong> Every meeting is a folder of Markdown and WAV in <code>~/Meetings</code>, ready for Obsidian, Spotlight or git.</p>
+
+  <h2>Using both</h2>
+  <p>They don't compete for much. Many people will keep MacWhisper for files and dictation and let Overheard handle calls; both read your Mac's audio, so they run side by side.</p>
+
+  <p class="sources">Sources: <a href="https://macwhisper.com">MacWhisper home page and pricing</a>, opened on 31 October 2026. MacWhisper's site doesn't list which features are in the free version versus Pro. Prices change — check the site for current ones. Overheard is not affiliated with MacWhisper or Good Snooze.</p>
+
+  <div class="cta">
+    <img src="../../assets/icon-tile.svg" alt="">
+    <div>
+      <h3>Try Overheard</h3>
+      <p>Free and open source for Mac. No account, no bot, your files.</p>
+    </div>
+    <a class="dl" href="https://getoverheard.dev">Get Overheard</a>
+  </div>
+</article>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 Gabriele Spilotri Cavaiola · MIT</span>
+    <span><a href="../">Compare</a> · <a href="../../blog/">Blog</a> · <a href="https://github.com/anonbeat1/overheard">GitHub</a></span>
+  </div>
+</footer>
+</body>
+</html>

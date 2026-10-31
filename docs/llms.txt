@@ -19,12 +19,14 @@
 
 ## Comparisons
 
-- [Meeting recorders for Mac, compared](https://getoverheard.dev/compare/): Overheard, Granola, Otter, Fireflies, Anarlog and Meetily
+- [Meeting recorders for Mac, compared](https://getoverheard.dev/compare/): Overheard, Granola, Otter, Fireflies, Anarlog, Biscotti, MacWhisper and Meetily
 - [Overheard vs Granola](https://getoverheard.dev/compare/granola/)
 - [Overheard vs Meetily](https://getoverheard.dev/compare/meetily/)
 - [Overheard vs Otter.ai](https://getoverheard.dev/compare/otter/)
 - [Overheard vs Fireflies.ai](https://getoverheard.dev/compare/fireflies/)
 - [Overheard vs Anarlog (formerly Hyprnote)](https://getoverheard.dev/compare/anarlog/)
+- [Overheard vs Biscotti](https://getoverheard.dev/compare/biscotti/)
+- [Overheard vs MacWhisper](https://getoverheard.dev/compare/macwhisper/)
 
 ## Blog
 
