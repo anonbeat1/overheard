@@ -3,11 +3,36 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Overheard — your meetings, answerable from Claude</title>
-<meta name="description" content="A tiny Mac menu bar app that records your calls, transcribes them and makes them searchable from Claude. No bot joins your call. Free and open source.">
-<meta property="og:title" content="Overheard">
+<title>Overheard — bot-free meeting recorder for Mac, answerable from Claude</title>
+<meta name="description" content="Overheard is a free, open-source Mac menu bar app that records Google Meet, Teams and Slack calls without a bot, transcribes them on your Mac or in the cloud, and makes them searchable from Claude via MCP.">
+<link rel="canonical" href="https://getoverheard.dev/">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://getoverheard.dev/">
+<meta property="og:site_name" content="Overheard">
+<meta property="og:title" content="Overheard — bot-free meeting recorder for Mac">
 <meta property="og:description" content="Your meetings, turned into text — and answerable from Claude.">
 <meta property="og:image" content="https://getoverheard.dev/assets/poster.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:creator" content="@Gabbosc">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@graph":[
+{"@type":"SoftwareApplication","name":"Overheard","url":"https://getoverheard.dev/",
+"description":"A free, open-source Mac menu bar app that records calls without a bot, transcribes them with speakers and timestamps (on-device or in the cloud), summarizes decisions and action items, and makes meetings searchable from Claude Code, Claude Desktop or Codex through an MCP server.",
+"applicationCategory":"BusinessApplication","operatingSystem":"macOS 14.2 or later (Apple Silicon)",
+"softwareVersion":"0.3.2","license":"https://opensource.org/licenses/MIT","isAccessibleForFree":true,
+"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},
+"downloadUrl":"https://github.com/anonbeat1/overheard/releases/latest",
+"codeRepository":"https://github.com/anonbeat1/overheard","image":"https://getoverheard.dev/assets/poster.jpg",
+"author":{"@type":"Person","name":"Gabriele Spilotri Cavaiola","url":"https://github.com/anonbeat1","sameAs":["https://x.com/Gabbosc","https://github.com/anonbeat1"]}},
+{"@type":"FAQPage","mainEntity":[
+{"@type":"Question","name":"Is Overheard really free?","acceptedAnswer":{"@type":"Answer","text":"Yes. Overheard is MIT licensed with no account and no subscription. ElevenLabs bills you for cloud transcription if you choose it; summaries and chat use the Claude Code or Codex subscription you already have. On-device transcription costs nothing."}},
+{"@type":"Question","name":"Do I need Claude to use Overheard?","acceptedAnswer":{"@type":"Answer","text":"No. Recording and transcription work on their own. Summaries and chat need Claude Code, Codex or Apple Intelligence; the MCP server is for asking from Claude Code, Claude Desktop or Codex."}},
+{"@type":"Question","name":"Does Overheard work with Zoom, Webex or other apps?","acceptedAnswer":{"@type":"Answer","text":"It records anything that plays audio on your Mac. It starts automatically for Google Meet, Microsoft Teams and Slack; for other apps, start it with one click or overheard://toggle."}},
+{"@type":"Question","name":"Does Overheard run on Intel Macs?","acceptedAnswer":{"@type":"Answer","text":"No. Overheard needs an Apple Silicon Mac with macOS 14.2 or later. On-device transcription needs macOS 15."}},
+{"@type":"Question","name":"Does a bot join the meeting?","acceptedAnswer":{"@type":"Answer","text":"No. Overheard records the call from your Mac using Core Audio process taps, with your microphone on a separate track, so nothing joins the meeting. Recording people may require their consent, so tell participants."}},
+{"@type":"Question","name":"Where does Overheard store my meetings?","acceptedAnswer":{"@type":"Answer","text":"Everything lives in ~/Meetings, one folder per meeting, as plain WAV and Markdown files. Delete a folder and it's gone; old meetings can also move to the Trash automatically after 7–365 days."}}]}
+]}
+</script>
 <meta name="theme-color" content="#0B0B0C">
 <link rel="icon" href="assets/icon-tile.svg" type="image/svg+xml">
 <link rel="alternate" type="application/rss+xml" title="Overheard blog" href="blog/feed.xml">
@@ -757,7 +782,7 @@ footer nav { display: flex; gap: 22px; }
       <h2 class="d" style="margin-top:16px">Questions, <span class="dim">answered.</span></h2>
     </div>
     <div class="rv d1">
-      <details open><summary>Is it really free?</summary><p>Yes — Overheard is MIT licensed with no account and no subscription. ElevenLabs bills you for cloud transcription if you choose it; summaries and chat use the Claude Code or Codex subscription you already have. On-device transcription with Apple Intelligence costs nothing at all.</p></details>
+      <details open><summary>Is it really free?</summary><p>Yes — Overheard is MIT licensed with no account and no subscription. ElevenLabs bills you for cloud transcription if you choose it; summaries and chat use the Claude Code or Codex subscription you already have. On-device transcription costs nothing at all.</p></details>
       <details><summary>Do I need Claude?</summary><p>No. Recording and transcription work on their own. Summaries and chat need Claude Code, Codex or Apple Intelligence; the MCP server is for asking from Claude Code, Claude Desktop or Codex.</p></details>
       <details><summary>Does it work with Zoom, Webex or other apps?</summary><p>It records anything that plays audio on your Mac. It starts automatically for Meet, Teams and Slack; for other apps, start it with one click or <code>overheard://toggle</code>.</p></details>
       <details><summary>Does it run on Intel Macs?</summary><p>No — Overheard needs an Apple Silicon Mac with macOS 14.2 or later. On-device transcription needs macOS 15.</p></details>

@@ -25,6 +25,8 @@
 
 ---
 
+**Overheard** is a free, open-source meeting recorder for Mac. It lives in the menu bar, records Google Meet, Microsoft Teams and Slack calls without a bot joining the meeting, transcribes them with speakers and timestamps (on your Mac or in the cloud), and lets Claude Code, Claude Desktop or Codex answer questions about your meetings through an MCP server. A free, local alternative to Granola, Otter and Fireflies.
+
 ## How it works
 
 <table>
@@ -140,6 +142,18 @@ Plain files, so other tools can read them. Audio is sent to ElevenLabs only if y
 ```bash
 open -g overheard://toggle
 ```
+
+## FAQ
+
+**Is Overheard free?** Yes. MIT licensed, no account, no subscription. ElevenLabs bills you for cloud transcription only if you choose it; on-device transcription costs nothing.
+
+**Does a bot join the meeting?** No. Overheard records the call from your Mac with Core Audio process taps, so nothing appears in the participant list.
+
+**Does it work with Zoom or Webex?** Yes, it records anything that plays audio on your Mac. It starts automatically for Meet, Teams and Slack; for other apps, start it with one click.
+
+**Does it run on Intel Macs or Windows?** No. It needs an Apple Silicon Mac with macOS 14.2 or later (macOS 15 for on-device transcription).
+
+**Do I need Claude?** No. Recording and transcription work on their own; summaries and chat use Claude Code, Codex or Apple Intelligence, and the MCP server is for asking from Claude.
 
 ## Please record responsibly
 

@@ -1,0 +1,30 @@
+# Overheard
+
+> Overheard is a free, open-source (MIT) Mac menu bar app that records calls without a bot joining the meeting, transcribes them with speakers and timestamps (on-device or with ElevenLabs in the cloud), summarizes decisions and action items, and makes meetings searchable from Claude Code, Claude Desktop or Codex through an MCP server.
+
+- Platform: Apple Silicon Mac, macOS 14.2 or later (on-device transcription needs macOS 15). No Intel, Windows or Linux.
+- Price: free. No account, no subscription. Cloud transcription is billed by ElevenLabs only if you choose it; summaries use the Claude Code or Codex subscription you already have.
+- Recording: system audio via Core Audio process taps (no virtual audio driver such as BlackHole), microphone on a separate track. Starts automatically when Google Meet, Microsoft Teams or Slack use the microphone; any other app with one click.
+- Transcription: ElevenLabs Scribe (cloud) or Cohere Transcribe running locally on the Mac's GPU with on-device speaker diarization.
+- Storage: plain WAV and Markdown files in ~/Meetings, one folder per meeting.
+- MCP tools: search_meetings, get_meeting, list_meetings, list_action_items, complete_action_item, bookmark, start_recording, stop_recording.
+- Author: Gabriele Spilotri Cavaiola (https://github.com/anonbeat1, https://x.com/Gabbosc). Version 0.3.2, October 2026.
+
+## Docs
+
+- [Home](https://getoverheard.dev/): features, setup and FAQ
+- [GitHub repository and README](https://github.com/anonbeat1/overheard): install, build from source, MCP setup
+- [Download the latest release](https://github.com/anonbeat1/overheard/releases/latest)
+- [Changelog](https://github.com/anonbeat1/overheard/blob/main/CHANGELOG.md)
+
+## Comparisons
+
+- [Granola alternatives for Mac](https://getoverheard.dev/compare/): Overheard, Granola and Meetily compared
+- [Overheard vs Granola](https://getoverheard.dev/compare/granola/)
+- [Overheard vs Meetily](https://getoverheard.dev/compare/meetily/)
+
+## Blog
+
+- [How to record a Google Meet call on Mac without a bot](https://getoverheard.dev/blog/record-google-meet-on-mac/)
+- [Ask Claude about your meetings: an MCP server for call transcripts](https://getoverheard.dev/blog/ask-claude-about-your-meetings/)
+- [Recording system audio on macOS without a virtual driver](https://getoverheard.dev/blog/system-audio-without-a-virtual-driver/)
