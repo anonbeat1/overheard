@@ -114,7 +114,7 @@ private struct Unveil: View {
             VStack(spacing: 10) {
                 Text(verbatim: "Overheard").font(.system(size: 46, weight: .bold, design: .rounded))
                     .tracking(words ? 0 : 8)
-                Text("Le tue riunioni, diventate testo — e interrogabili da Claude.")
+                Text("Trascrivi le tue riunioni e fai domande a Claude sul contenuto.")
                     .font(.title3).foregroundStyle(.white.opacity(0.65))
             }
             .opacity(words ? 1 : 0)

@@ -239,7 +239,7 @@
 "Indietro" = "戻る";
 "Avanti" = "次へ";
 "Inizia a usarlo" = "使い始める";
-"Le tue riunioni, diventate testo — e interrogabili da Claude." = "ミーティングを文字に起こし、内容について Claude に質問できます。";
+"Trascrivi le tue riunioni e fai domande a Claude sul contenuto." = "ミーティングを文字に起こし、内容について Claude に質問できます。";
 "Scopri come funziona" = "仕組みを見る";
 "Registra" = "録音";
 "Parte da solo quando Meet, Teams o Slack usano il microfono. Nessun bot entra nella call." = "Meet、Teams、または Slack がマイクを使用すると自動的に起動します。ボットはあなたの通話に参加しません。";

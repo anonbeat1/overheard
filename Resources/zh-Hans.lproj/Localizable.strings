@@ -239,7 +239,7 @@
 "Indietro" = "返回";
 "Avanti" = "下一步";
 "Inizia a usarlo" = "开始使用";
-"Le tue riunioni, diventate testo — e interrogabili da Claude." = "将会议转成文字，随时向 Claude 提问。";
+"Trascrivi le tue riunioni e fai domande a Claude sul contenuto." = "将会议转成文字，随时向 Claude 提问。";
 "Scopri come funziona" = "看看它是如何工作的";
 "Registra" = "录制";
 "Parte da solo quando Meet, Teams o Slack usano il microfono. Nessun bot entra nella call." = "当 Meet、Teams 或 Slack 使用麦克风时自行启动。没有机器人加入您的通话。";

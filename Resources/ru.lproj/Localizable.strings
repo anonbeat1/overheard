@@ -239,7 +239,7 @@
 "Indietro" = "Назад";
 "Avanti" = "Далее";
 "Inizia a usarlo" = "Начать";
-"Le tue riunioni, diventate testo — e interrogabili da Claude." = "Ваши встречи в текстовом виде. Задавайте Claude вопросы о них.";
+"Trascrivi le tue riunioni e fai domande a Claude sul contenuto." = "Ваши встречи в текстовом виде. Задавайте Claude вопросы о них.";
 "Scopri come funziona" = "Посмотрите, как это работает";
 "Registra" = "Записать";
 "Parte da solo quando Meet, Teams o Slack usano il microfono. Nessun bot entra nella call." = "Запускается самостоятельно, когда Meet, Teams или Slack используют микрофон. Ни один бот не присоединится к вашему звонку.";
