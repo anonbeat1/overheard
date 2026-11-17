@@ -337,3 +337,6 @@
 "Meeting" = "ミーティング";
 "%lld min" = "%lld 分";
 "%lld s" = "%lld 秒";
+"Lingua dell'app" = "アプリの言語";
+"Lingua di sistema" = "システムの言語";
+"La modifica si applica alla prossima apertura dell'app." = "変更は次回アプリを開いたときに適用されます。";

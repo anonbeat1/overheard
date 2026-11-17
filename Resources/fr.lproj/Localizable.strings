@@ -337,3 +337,6 @@
 "Meeting" = "Réunion";
 "%lld min" = "%lld min";
 "%lld s" = "%lld s";
+"Lingua dell'app" = "Langue de l’app";
+"Lingua di sistema" = "Langue du système";
+"La modifica si applica alla prossima apertura dell'app." = "Le changement prendra effet à la prochaine ouverture de l’app.";

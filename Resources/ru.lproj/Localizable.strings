@@ -337,3 +337,6 @@
 "Meeting" = "Встреча";
 "%lld min" = "%lld мин";
 "%lld s" = "%lld с";
+"Lingua dell'app" = "Язык приложения";
+"Lingua di sistema" = "Язык системы";
+"La modifica si applica alla prossima apertura dell'app." = "Изменение вступит в силу при следующем запуске приложения.";

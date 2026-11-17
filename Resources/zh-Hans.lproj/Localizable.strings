@@ -337,3 +337,6 @@
 "Meeting" = "会议";
 "%lld min" = "%lld 分钟";
 "%lld s" = "%lld 秒";
+"Lingua dell'app" = "应用语言";
+"Lingua di sistema" = "系统语言";
+"La modifica si applica alla prossima apertura dell'app." = "下次打开应用时生效。";

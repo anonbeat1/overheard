@@ -337,3 +337,6 @@
 "Meeting" = "বৈঠক";
 "%lld min" = "%lld মিনিট";
 "%lld s" = "%lld সেকেন্ড";
+"Lingua dell'app" = "অ্যাপের ভাষা";
+"Lingua di sistema" = "সিস্টেমের ভাষা";
+"La modifica si applica alla prossima apertura dell'app." = "পরের বার অ্যাপ খুললে পরিবর্তনটি কার্যকর হবে।";

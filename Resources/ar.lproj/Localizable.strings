@@ -337,3 +337,6 @@
 "Meeting" = "اجتماع";
 "%lld min" = "%lld دقيقة";
 "%lld s" = "%lld ثانية";
+"Lingua dell'app" = "لغة التطبيق";
+"Lingua di sistema" = "لغة النظام";
+"La modifica si applica alla prossima apertura dell'app." = "يسري التغيير عند فتح التطبيق في المرة القادمة.";

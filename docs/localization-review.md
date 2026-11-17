@@ -37,6 +37,8 @@ The validator checks syntax and selected invariants. Native-speaker review and v
 
 ## Visual preview
 
+Settings includes an app-language picker with native language names and a System language option. The choice applies after quitting and reopening the app, and is independent of the meeting transcription language. The three picker-related strings bring each reference and added interface table to 341 keys.
+
 Run `bash scripts/preview-localization.sh es` to build and open **Overheard Local** in Spanish. Quit that preview with Command-Q before running the command again with another language code: `fr`, `de`, `pt`, `zh-Hans`, `hi`, `ar`, `ja`, `ru`, `bn`, `en`, or `it`.
 
 The preview uses a separate bundle identifier and preferences, shows the introduction on each launch, and disables automatic recording, retention cleanup, and automatic update checks for that session. It does not replace the installed app. It includes the interface and Sparkle framework, but does not build or bundle the on-device transcriber. It can still display the existing meeting library, so use disposable samples if testing edits or deletion.
