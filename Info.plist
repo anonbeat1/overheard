@@ -14,6 +14,16 @@
 	<array>
 		<string>en</string>
 		<string>it</string>
+		<string>es</string>
+		<string>fr</string>
+		<string>de</string>
+		<string>pt</string>
+		<string>zh-Hans</string>
+		<string>hi</string>
+		<string>ar</string>
+		<string>ja</string>
+		<string>ru</string>
+		<string>bn</string>
 	</array>
 	<key>CFBundleName</key>
 	<string>Overheard</string>

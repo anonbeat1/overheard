@@ -1,0 +1,5 @@
+/* Overheard (de). Machine-assisted draft; see docs/localization-review.md. */
+"NSAudioCaptureUsageDescription" = "Zeichnet das Audio der anderen Besprechungsteilnehmer auf.";
+"NSCalendarsFullAccessUsageDescription" = "Übernimmt Titel und Teilnehmer des Kalenderereignisses für aufgezeichnete Besprechungen.";
+"NSCalendarsUsageDescription" = "Übernimmt Titel und Teilnehmer des Kalenderereignisses für aufgezeichnete Besprechungen.";
+"NSMicrophoneUsageDescription" = "Zeichnet Ihre Stimme während Besprechungen auf.";

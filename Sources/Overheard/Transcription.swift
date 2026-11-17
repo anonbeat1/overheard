@@ -25,7 +25,7 @@ enum Prefs {
     /// Lingua delle riunioni ("it", "en"…); vuota = automatica (ElevenLabs la riconosce, sul Mac si usa quella dell'interfaccia)
     static var language: String { UserDefaults.standard.string(forKey: "language") ?? "" }
 
-    /// Lingua dell'interfaccia ("it" o "en") e il suo nome in inglese, per dire all'AI in che lingua scrivere
+    /// Lingua dell'interfaccia e il suo nome in inglese, per dire all'AI in che lingua scrivere
     static var uiLanguage: String { Bundle.main.preferredLocalizations.first ?? "en" }
     static var uiLanguageName: String { Locale(identifier: "en").localizedString(forLanguageCode: uiLanguage) ?? "English" }
 

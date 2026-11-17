@@ -1,0 +1,5 @@
+/* Overheard (ru). Machine-assisted draft; see docs/localization-review.md. */
+"NSAudioCaptureUsageDescription" = "Записывает голоса других участников встречи.";
+"NSCalendarsFullAccessUsageDescription" = "Добавляет к записанным встречам название и участников события из календаря.";
+"NSCalendarsUsageDescription" = "Добавляет к записанным встречам название и участников события из календаря.";
+"NSMicrophoneUsageDescription" = "Записывает Ваш голос во время встреч.";

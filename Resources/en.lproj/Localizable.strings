@@ -333,3 +333,8 @@
 "Copia un messaggio da incollare nella chat della call per dire che stai registrando" = "Copy a message to paste in the call chat saying you are recording";
 "Sto registrando questa call con Overheard per avere trascrizione e appunti. L'audio resta sul mio Mac. Se preferisci di no, dimmelo e mi fermo." = "I'm recording this call with Overheard to keep a transcript and notes. The audio stays on my Mac. If you'd rather I didn't, just say so and I'll stop.";
 "Sto registrando questa call con Overheard per avere trascrizione e appunti. Se preferisci di no, dimmelo e mi fermo." = "I'm recording this call with Overheard to keep a transcript and notes. If you'd rather I didn't, just say so and I'll stop.";
+"Stop" = "Stop";
+"Transcript" = "Transcript";
+"Meeting" = "Meeting";
+"%lld min" = "%lld min";
+"%lld s" = "%lld s";
