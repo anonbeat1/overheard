@@ -1,0 +1,5 @@
+/* Overheard (bn). Machine-assisted draft; see docs/localization-review.md. */
+"NSAudioCaptureUsageDescription" = "বৈঠকের অন্য অংশগ্রহণকারীদের অডিও রেকর্ড করে।";
+"NSCalendarsFullAccessUsageDescription" = "রেকর্ড করা বৈঠকের জন্য ক্যালেন্ডার ইভেন্ট থেকে শিরোনাম ও আমন্ত্রিতদের নাম নেয়।";
+"NSCalendarsUsageDescription" = "রেকর্ড করা বৈঠকের জন্য ক্যালেন্ডার ইভেন্ট থেকে শিরোনাম ও আমন্ত্রিতদের নাম নেয়।";
+"NSMicrophoneUsageDescription" = "বৈঠকের সময় আপনার কণ্ঠ রেকর্ড করে।";

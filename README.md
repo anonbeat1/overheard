@@ -79,7 +79,11 @@
 **Sharing**
 - PDF export, copy summary/transcript, markdown notes with frontmatter for Obsidian, Logseq or Notion
 
-The interface is in English and Italian.
+The interface is available in English, Italian, Spanish, French, German, Portuguese, Simplified Chinese, Hindi, Arabic, Japanese, Russian, and Bengali.
+
+Choose the app language in Settings, then quit and reopen Overheard to apply it. Select System language to follow macOS. This setting is separate from the meeting transcription language.
+
+The additional translations are machine-assisted drafts with an editorial review. They still need native-speaker review; see [translation sources and review scope](docs/localization-review.md). Run `python3 scripts/check-localizations.py` on macOS to check the localization files.
 
 ## Install
 

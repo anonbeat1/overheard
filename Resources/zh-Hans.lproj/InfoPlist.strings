@@ -1,0 +1,5 @@
+/* Overheard (zh-Hans). Machine-assisted draft; see docs/localization-review.md. */
+"NSAudioCaptureUsageDescription" = "录制会议中其他参与者的声音。";
+"NSCalendarsFullAccessUsageDescription" = "为录制的会议获取日历日程的标题和受邀者。";
+"NSCalendarsUsageDescription" = "为录制的会议获取日历日程的标题和受邀者。";
+"NSMicrophoneUsageDescription" = "在会议期间录制你的声音。";

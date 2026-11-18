@@ -18,6 +18,7 @@ struct SettingsView: View {
     @AppStorage("retentionMode") private var retentionMode = "audio"
     @AppStorage("echoReduction") private var echoReduction = true
     @AppStorage("language") private var language = ""
+    @State private var appLanguage = AppLanguage.selected
     @AppStorage("calendar.enabled") private var calendarOn = false
     @AppStorage("summary.auto") private var summaryAuto = true
     @AppStorage("SUAutomaticallyUpdate") private var autoUpdate = false // la chiave che legge Sparkle
@@ -58,6 +59,17 @@ struct SettingsView: View {
             }
 
             Card {
+                Picker("Lingua dell'app", selection: $appLanguage) {
+                    Text("Lingua di sistema").tag("")
+                    ForEach(AppLanguage.choices, id: \.0) {
+                        Text(verbatim: $0.1).tag($0.0)
+                    }
+                }
+                .onChange(of: appLanguage) { _, value in AppLanguage.save(value) }
+                Text("La modifica si applica alla prossima apertura dell'app.")
+                    .font(.caption).foregroundStyle(.white.opacity(0.5))
+                    .fixedSize(horizontal: false, vertical: true)
+                Divider().overlay(Color.white.opacity(0.1))
                 row("Registra automaticamente", "Parte quando Meet o Teams usano il microfono", $rec.autoDetect)
                 Divider().overlay(Color.white.opacity(0.1))
                 HStack {

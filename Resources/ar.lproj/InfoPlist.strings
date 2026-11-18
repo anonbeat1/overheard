@@ -1,0 +1,5 @@
+/* Overheard (ar). Machine-assisted draft; see docs/localization-review.md. */
+"NSAudioCaptureUsageDescription" = "يسجل صوت المشاركين الآخرين في الاجتماع.";
+"NSCalendarsFullAccessUsageDescription" = "يستخدم عنوان حدث التقويم والمدعوين إليه للاجتماعات المسجلة.";
+"NSCalendarsUsageDescription" = "يستخدم عنوان حدث التقويم والمدعوين إليه للاجتماعات المسجلة.";
+"NSMicrophoneUsageDescription" = "يسجل صوتك أثناء الاجتماعات.";

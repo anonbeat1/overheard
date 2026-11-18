@@ -2,6 +2,7 @@
 # Controlla che ogni stringa dell'interfaccia (chiave italiana nel codice) abbia la traduzione in Resources/en.lproj.
 set -euo pipefail
 cd "$(dirname "$0")/.."
+python3 scripts/check-localizations.py
 OUT=$(mktemp -d)
 swift build -c release -Xswiftc -emit-localized-strings -Xswiftc -emit-localized-strings-path -Xswiftc "$OUT" >/dev/null 2>&1 \
   || { echo "build fallita: swift build -c release"; exit 1; }

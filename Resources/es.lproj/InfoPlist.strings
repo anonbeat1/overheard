@@ -1,0 +1,5 @@
+/* Overheard (es). Machine-assisted draft; see docs/localization-review.md. */
+"NSAudioCaptureUsageDescription" = "Graba el audio de los demás participantes de la reunión.";
+"NSCalendarsFullAccessUsageDescription" = "Usa el título y los invitados del evento del calendario para identificar las reuniones grabadas.";
+"NSCalendarsUsageDescription" = "Usa el título y los invitados del evento del calendario para identificar las reuniones grabadas.";
+"NSMicrophoneUsageDescription" = "Graba tu voz durante las reuniones.";
