@@ -177,6 +177,30 @@ struct LocalFolderProvider: CloudLibraryProvider {
             throw CocoaError(.fileWriteUnknown)
         }
     }
+    /// How much of what Overheard wrote here has actually left the Mac, as macOS reports it. Files in a folder
+    /// macOS does not track (a plain folder) are not counted: nothing can be said about them.
+    struct UploadState: Equatable, Sendable {
+        var files = 0, pendingFiles = 0
+        var bytes: Int64 = 0, pendingBytes: Int64 = 0
+        var doneFiles: Int { files - pendingFiles }
+        /// Share of the bytes already uploaded.
+        var fraction: Double { bytes > 0 ? Double(bytes - pendingBytes) / Double(bytes) : 1 }
+    }
+    func uploadState() -> UploadState {
+        var state = UploadState()
+        let keys: [URLResourceKey] = [.isRegularFileKey, .isUbiquitousItemKey, .ubiquitousItemIsUploadedKey, .fileSizeKey]
+        guard let walker = FileManager.default.enumerator(at: root, includingPropertiesForKeys: keys, options: []) else { return state }
+        for case let file as URL in walker {
+            guard !file.lastPathComponent.hasPrefix(".overheard-upload-"),
+                  let values = try? file.resourceValues(forKeys: Set(keys)),
+                  values.isRegularFile == true, values.isUbiquitousItem == true else { continue }
+            let size = Int64(values.fileSize ?? 0)
+            state.files += 1; state.bytes += size
+            if values.ubiquitousItemIsUploaded != true { state.pendingFiles += 1; state.pendingBytes += size }
+        }
+        return state
+    }
+
     /// True only when macOS reports the file as uploaded by iCloud or the File Provider app.
     func isSafelyStored(_ id: String) async throws -> Bool {
         let values = try url(id).resourceValues(forKeys: [.isUbiquitousItemKey, .ubiquitousItemIsUploadedKey])

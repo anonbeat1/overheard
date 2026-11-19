@@ -573,6 +573,7 @@
 "Permesso negato dal servizio cloud. Controlla la cartella di destinazione." = "Le service cloud a refusé l'accès. Vérifiez le dossier de destination.";
 "Poco spazio libero sul Mac: il caricamento dell'audio riprenderà quando ci sarà più spazio." = "Il reste peu de place sur le Mac. L’envoi de l’audio reprendra dès qu’il y aura assez d’espace.";
 "Poco spazio libero sul Mac: il download riprenderà quando ci sarà più spazio." = "Peu d'espace libre sur le Mac : le téléchargement reprendra dès qu'il y aura plus de place.";
+"iCloud ha caricato %lld file su %lld" = "iCloud a envoyé %lld fichiers sur %lld";
 "Nessun account collegato: la sincronizzazione è in pausa. Collega l'account oppure disattiva “Sincronizza le riunioni”." = "Aucun compte connecté : la synchronisation est en pause. Connectez le compte ou désactivez « Synchroniser les réunions ».";
 "iCloud non ha ancora scaricato il file: la sincronizzazione riprenderà quando sarà disponibile." = "iCloud n'a pas encore téléchargé le fichier : la synchronisation reprendra dès qu'il sera disponible.";
 "Accesso scaduto: %@" = "Accès expiré : %@";

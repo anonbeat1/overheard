@@ -61,13 +61,63 @@ final class CloudSync: ObservableObject {
     var running: Bool { sweeping || !requested.isEmpty || purging }
     /// What the app is doing right now, shown next to a spinner in Settings and in the library.
     var activity: String? {
-        if !progress.isEmpty { return progress }
+        let upload = cloudUpload.map { String(localized: "iCloud ha caricato \($0.doneFiles) file su \($0.files)") }
+        if !progress.isEmpty { return [progress, upload].compactMap { $0 }.joined(separator: " · ") }
         if let task { return task }
         if purging { return String(localized: "Elimino le copie cloud…") }
         if exporting { return String(localized: "Esportazione in corso…") }
         if sweeping { return String(localized: "Controllo le riunioni…") }
         if !requested.isEmpty { return String(localized: "Trasferimento in corso…") }
-        return nil
+        // The copy into the folder is done, but the sync is not: it ends when macOS has uploaded everything.
+        return upload
+    }
+    /// What this pass has to upload, in bytes. The bar shows how much of it is done, not which meeting the pass is at:
+    /// meetings already in the cloud cost nothing, so a new pass does not start over from zero.
+    private struct PassBytes { var total: Int64; var done: Int64 = 0; var current: Int64 = 0 }
+    @Published private var passBytes: PassBytes?
+
+    /// The bar, from real numbers: bytes iCloud reports as uploaded; else bytes this pass has sent of those it has
+    /// to send (the meeting in progress counts by how much of its current file went); else nothing is claimed.
+    var activityFraction: Double? {
+        if let cloudUpload { return cloudUpload.fraction }
+        guard let pass = passBytes, pass.total > 0 else { return nil }
+        var inProgress: Int64 = 0
+        if case .uploading(_, let sent, let total)? = syncProgress, let sent, total > 0 {
+            inProgress = Int64(Double(min(sent, total)) / Double(total) * Double(pass.current))
+        }
+        return min(1, Double(pass.done + inProgress) / Double(pass.total))
+    }
+
+    /// Bytes of a meeting still to upload: files never uploaded or changed since (what a pass would send).
+    nonisolated static func pendingBytes(_ dir: URL, options: CloudOptions) -> Int64 {
+        let manifest = manifest(dir)
+        var total: Int64 = 0
+        for name in (try? CloudFiles.names(in: dir, options: options)) ?? [] {
+            guard manifest?.remoteDeleted?[name] == nil, let stamp = try? CloudLocalStamp.read(dir.appendingPathComponent(name)) else { continue }
+            if manifest?.files[name] == nil || manifest?.pendingVersions[name] != nil || manifest?.localStamps[name] != stamp {
+                total += Int64(stamp.bytes)
+            }
+        }
+        return total
+    }
+
+    /// Upload state of the synced folder (iCloud Drive), while files are still waiting to leave the Mac.
+    @Published private(set) var cloudUpload: LocalFolderProvider.UploadState?
+    private var uploadWatch: Task<Void, Never>?
+    /// Reads what macOS says about the files Overheard wrote, now and every few seconds until all are uploaded.
+    func refreshCloudUpload() {
+        uploadWatch?.cancel()
+        uploadWatch = Task { [weak self] in
+            while !Task.isCancelled {
+                guard let self, self.enabled, let local = (try? await self.provider()) as? LocalFolderProvider else {
+                    self?.cloudUpload = nil; return
+                }
+                let state = await Task.detached(priority: .utility) { local.uploadState() }.value
+                self.cloudUpload = state.pendingFiles > 0 ? state : nil
+                guard state.pendingFiles > 0 else { return }
+                try? await Task.sleep(nanoseconds: 5_000_000_000)
+            }
+        }
     }
     var root: URL { URL(fileURLWithPath: "\(home)/Meetings") }
 
@@ -98,6 +148,7 @@ final class CloudSync: ObservableObject {
             if recording { Task { @MainActor in CloudSync.shared.pauseAutomatic() } }
         }
         monitor.start(queue: DispatchQueue(label: "overheard.cloud.network"))
+        refreshCloudUpload() // files left uploading by an earlier run show up again after a restart
         timer = Timer.scheduledTimer(withTimeInterval: 60, repeats: true) { _ in
             Task { @MainActor in await CloudSync.shared.perform(.sync) }
         }
@@ -760,6 +811,8 @@ final class CloudSync: ObservableObject {
             progress = ""
             sweepFraction = nil
             syncProgress = nil
+            passBytes = nil
+            refreshCloudUpload() // the copy is done; for iCloud the upload may still be going
         }
         do {
             let provider = try await provider()
@@ -806,6 +859,13 @@ final class CloudSync: ObservableObject {
                 return (directories, conflicts, transfers)
             }.value
             let context = await engine.context(for: directories, destination: provider.id)
+            // What this pass really has to send, so the bar can count it instead of counting meetings.
+            let pendingByMeeting = await Task.detached(priority: .utility) {
+                Dictionary(uniqueKeysWithValues: directories.map { ($0.path, CloudSync.pendingBytes($0, options: options)) })
+            }.value
+            let pendingTotal = pendingByMeeting.values.reduce(0, +)
+            passBytes = pendingTotal > 0 ? PassBytes(total: pendingTotal) : nil
+            refreshCloudUpload()
             var changed = false
             var undecided: [String: Int] = [:], counts: [String: Int] = [:]
             for (key, found) in transfers where !key.hasPrefix("pending:") { counts[found.destination, default: 0] += 1 }
@@ -827,6 +887,7 @@ final class CloudSync: ObservableObject {
                     doing = String(localized: "Elimino le vecchie copie")
                 }
                 sweepFraction = Double(index) / Double(directories.count)
+                passBytes?.current = pendingByMeeting[dir.path] ?? 0
                 progress = String(localized: "\(doing): riunione \(index + 1) di \(directories.count)")
                 await acquire()
                 // The lock may have waited behind a deletion or a settings change.
@@ -910,6 +971,7 @@ final class CloudSync: ObservableObject {
                 active = nil
                 release()
                 if apply(report) { changed = true; refreshFlags(dir) }
+                if var pass = passBytes { pass.done += pass.current; pass.current = 0; passBytes = pass }
                 if missingText.contains(where: { CloudFiles.exists(dir.appendingPathComponent($0)) }) { changed = true }
                 if let stopped = report.stopped {
                     message = stopped
@@ -1219,7 +1281,7 @@ struct CloudSettingsView: View {
                 Link("Come funziona", destination: URL(string: "https://getoverheard.dev/cloud-storage/")!)
                     .font(.caption)
             }
-            if let activity = cloud.activity { CloudActivityRow(text: activity, fraction: cloud.sweepFraction, phase: cloud.syncProgress) }
+            if let activity = cloud.activity { CloudActivityRow(text: activity, fraction: cloud.activityFraction, phase: cloud.syncProgress) }
             if !cloud.message.isEmpty { CloudNotice(message: $cloud.message) }
             if enabled, !cloud.failures.isEmpty {
                 DisclosureGroup {

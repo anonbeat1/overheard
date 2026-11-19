@@ -857,7 +857,7 @@ struct LibraryView: View {
                 }
 
                 if let activity = cloud.activity {
-                    CloudActivityRow(text: activity, fraction: cloud.sweepFraction, phase: cloud.syncProgress)
+                    CloudActivityRow(text: activity, fraction: cloud.activityFraction, phase: cloud.syncProgress)
                         .padding(10)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .background(Color.blue.opacity(0.15), in: RoundedRectangle(cornerRadius: 11, style: .continuous))

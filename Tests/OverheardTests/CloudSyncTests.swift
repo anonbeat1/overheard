@@ -1379,6 +1379,35 @@ final class CloudSyncTests: XCTestCase {
         var empty = state; empty.files = [:]
         XCTAssertFalse(try CloudTrashQueue.shared.enqueue(manifest: empty, folder: "x"))
     }
+    func testTheProgressCountsOnlyWhatStillHasToBeUploaded() async throws {
+        let cloud = MemoryCloud()
+        // Nothing synced yet: every file counts, by its real size.
+        let everything = CloudSync.pendingBytes(meeting, options: CloudOptions())
+        let sizes = try ["recording.wav", "mic.wav", "transcript.md"].reduce(Int64(0)) {
+            $0 + Int64(try Data(contentsOf: meeting.appendingPathComponent($1)).count)
+        }
+        XCTAssertGreaterThanOrEqual(everything, sizes)
+        await run(.sync, cloud)
+        // Uploaded and unchanged: nothing is left, so a new pass has no bar to fill from zero.
+        XCTAssertEqual(CloudSync.pendingBytes(meeting, options: CloudOptions()), 0)
+        // One file edited: only that file is pending.
+        try write("transcript.md", "# Meeting\n\nedited after the upload")
+        let edited = Int64(try Data(contentsOf: meeting.appendingPathComponent("transcript.md")).count)
+        XCTAssertEqual(CloudSync.pendingBytes(meeting, options: CloudOptions()), edited)
+    }
+    func testUploadStateIgnoresFoldersMacOSDoesNotTrack() throws {
+        let base = root.appendingPathComponent("plain")
+        let folder = base.appendingPathComponent("Overheard/2026-11-17_130000")
+        try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+        try Data("text".utf8).write(to: folder.appendingPathComponent("transcript.md"))
+        let state = LocalFolderProvider(kind: .folder, base: base).uploadState()
+        XCTAssertEqual(state, LocalFolderProvider.UploadState()) // nothing claimed about files macOS cannot report on
+        XCTAssertEqual(state.fraction, 1)
+        // The fraction is the share of bytes already uploaded.
+        let partial = LocalFolderProvider.UploadState(files: 4, pendingFiles: 1, bytes: 1000, pendingBytes: 250)
+        XCTAssertEqual(partial.fraction, 0.75, accuracy: 0.0001)
+        XCTAssertEqual(partial.doneFiles, 3)
+    }
     func testRetentionDeletingEverythingAlsoQueuesTheCloudCopiesForTheTrash() async throws {
         let cloud = MemoryCloud()
         await run(.sync, cloud)
