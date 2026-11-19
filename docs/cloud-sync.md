@@ -187,6 +187,28 @@ The transcript’s circular share and folder menus retain local export and Finde
 
 Automated tests use simulated providers and temporary files; no live account acceptance is claimed. Real OAuth revocation, quota exhaustion and genuine iCloud conflict creation still require a dedicated test account/environment. Existing user meetings must not be used for destructive acceptance scenarios.
 
+## Progress and the pending state
+
+The bar and counters come from real numbers, not from the position in the list of meetings.
+
+- **Network providers (Drive, Dropbox, OneDrive, WebDAV, S3).** At the start of a pass `CloudSync.pendingBytes` sums, per meeting, the size of every file that is new, changed since its last upload (stamp differs) or has an unfinished upload, skipping files deleted on the cloud side. The bar is `bytes done / bytes to send`; the meeting in progress contributes in proportion to the bytes sent of its current file. Meetings already in the cloud add nothing, so a new pass does not restart from zero, and when nothing is pending there is no bar. The estimate uses local sizes: audio uploaded as ALAC or AAC weighs less, so a meeting can finish "early"; the bar never exceeds 100%.
+- **iCloud Drive and synced folders.** Overheard only copies into the folder; the system uploads. `LocalFolderProvider.uploadState()` walks `<folder>/Overheard` and, for each regular file the system tracks (`isUbiquitousItem`), reads `ubiquitousItemIsUploaded` and the size. While at least one file is not uploaded the activity row stays visible with "iCloud has uploaded N of M files" and the bar is the share of bytes uploaded. The state is re-read every 5 seconds until nothing is pending, after each pass and when the app starts. Files in a folder the system does not track are not counted: nothing is claimed about them. The system exposes no per-file percentage, so the count moves in steps.
+- **Account state.** For Drive, Dropbox and OneDrive, "Sync meetings" cannot be switched on and "Sync now" is disabled while no account is connected; if it was already on, a warning explains the pause. Only a rejected grant (`invalid_grant`) is `CloudError.authExpired`: automatic passes stop and a **Reconnect** button appears next to the account until a pass succeeds or the account is reconnected. Other 400 answers from the token endpoint are setup errors that reconnecting cannot fix.
+
+## Scope
+
+Included: the destinations in "Supported destinations", verified uploads, resumable transfers, keep-both conflict copies, trash-based removal on every provider (Drive Trash, Dropbox deleted files, OneDrive recycle bin, the Mac's Trash for synced folders, `.overheard-trash/<date>/` on WebDAV, `<prefix>.trash/<time>/` on S3), the durable deletion queue, and a "Deleted from the cloud" state that waits for the person's choice.
+
+Not included, or known limits:
+
+- No merging of edits and no live co-editing.
+- Overheard never empties any trash.
+- Replacing uploads are re-checked just before the commit; only Dropbox (commit against the verified `rev`) and a synced folder (target re-checked before the swap) close the window completely. On Drive and OneDrive a version that lands in the last moment can be replaced; it then survives only in the service's version history. Their server-side preconditions are not used because their behaviour has not been verified against real accounts.
+- OneDrive's `name-computer.ext` conflict copies are not recognised; Drive-style `name (1).ext` ones are, under the same content-or-timestamp rule as numeric suffixes.
+- Conflict copies that a sync client creates in the remote folder (not in `~/Meetings`) are not listed; a folder duplicated by Finder with the same cloud identity blocks both meetings until one is removed.
+- Automatic retention in "audio only" mode stays off while cloud storage is on.
+- Real-account acceptance is tracked in [cloud-sync-acceptance.md](cloud-sync-acceptance.md).
+
 ## When things go wrong mid-transfer
 
 - **Connection lost, Mac asleep, app quit or crashed:** the reserved remote ID and the resumable session

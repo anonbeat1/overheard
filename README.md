@@ -69,6 +69,8 @@ Nextcloud/WebDAV and S3-compatible storage (Amazon S3, Cloudflare R2, Backblaze 
 
 If `~/Meetings` lives in Dropbox, iCloud Drive or Syncthing, the library also flags their conflict copies for review instead of showing them as new meetings. You choose which version to keep; nothing is deleted for you.
 
+Deleting a meeting sends its cloud copies to the service's trash (Drive Trash, Dropbox deleted files, OneDrive recycle bin, `.overheard-trash` on WebDAV, `.trash` on S3), where you can restore them; Overheard never empties it. When two Macs change the same file, both versions are kept as a conflict copy. The progress bar counts real bytes, and with iCloud Drive the sync stays in progress until macOS has uploaded every file. The guide lists [what is and isn't included](https://getoverheard.dev/cloud-storage/).
+
 **[Read the guide: how cloud storage works →](https://getoverheard.dev/cloud-storage/)** Developers and self-hosters: [technical reference](docs/cloud-sync.md).
 
 ## Features
