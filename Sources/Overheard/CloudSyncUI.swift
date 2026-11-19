@@ -59,6 +59,8 @@ final class CloudSync: ObservableObject {
     private var waiters: [CheckedContinuation<Void, Never>] = []
     var enabled: Bool { UserDefaults.standard.bool(forKey: "cloud.enabled") }
     var running: Bool { sweeping || !requested.isEmpty || purging }
+    /// Syncing is not over while macOS is still uploading what Overheard copied into an iCloud or synced folder.
+    var inProgress: Bool { running || cloudUpload != nil }
     /// What the app is doing right now, shown next to a spinner in Settings and in the library.
     var activity: String? {
         let upload = cloudUpload.map { String(localized: "iCloud ha caricato \($0.doneFiles) file su \($0.files)") }
@@ -1258,8 +1260,8 @@ struct CloudSettingsView: View {
                     .font(.caption).foregroundStyle(.orange).fixedSize(horizontal: false, vertical: true)
             }
             HStack {
-                Button(cloud.running ? "Sincronizzazione in corso" : "Sincronizza ora") { Task { await cloud.perform(.sync, force: true) } }
-                    .disabled(!enabled || needsAccount || cloud.running || connecting)
+                Button(cloud.inProgress ? "Sincronizzazione in corso" : "Sincronizza ora") { Task { await cloud.perform(.sync, force: true) } }
+                    .disabled(!enabled || needsAccount || cloud.inProgress || connecting)
                 if cloud.sweeping { Button("Interrompi") { cloud.stop() } }
                 Spacer()
                 Menu("Altro") {
