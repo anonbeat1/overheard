@@ -175,6 +175,13 @@
   <h2>Using two Macs</h2>
   <p>Use the same account and the same cloud folder on both. If the same file changed on both Macs, neither version is overwritten: the cloud's version is saved next to yours as <code>transcript (conflicted copy MacName date).md</code>, syncing that meeting waits, and <strong>Review conflict copies</strong> lets you <strong>Use this copy</strong> or <strong>Keep both</strong>. Just before replacing a file, Overheard checks again that nobody changed it meanwhile. If two Macs connect to the same empty iCloud folder at the very same moment, the one whose marker was set aside adopts the other's library by itself.</p>
 
+  <h2>Downloads and uploads, and how to stop them</h2>
+  <p>Every transfer shows what it is doing: the file, how much is done out of the total (for example <em>40 MB / 125 MB</em>), a bar with the percentage, the speed and an estimate of the time left. This is the same for an upload and for <strong>Download and play</strong>. Where a service cannot report bytes as they arrive (a synced folder copying a file), you see the file and its size, without the bar.</p>
+  <ul>
+    <li><strong>Stop</strong> (the stop button next to the progress, or <strong>Stop</strong> next to <em>Downloading</em> in the meeting) cancels that transfer. A download that is stopped leaves nothing half-written on your Mac, and a meeting is not marked as failed because you stopped it. Uploads continue from where they stopped next time.</li>
+    <li><strong>Transfers (N)</strong> opens the list of everything queued or running: each meeting with what is happening to it, the progress of the one in progress, a <strong>Cancel</strong> for each and <strong>Stop all</strong>. Use it when you started several downloads and want to drop some.</li>
+  </ul>
+
   <h2>Reading the progress</h2>
   <p>The bar shows real numbers, not which meeting it is at. With Dropbox, Google Drive, OneDrive, WebDAV and S3 it counts the bytes still to upload: meetings already in the cloud cost nothing, so a new <strong>Sync now</strong> does not start over from zero. With iCloud Drive Overheard only copies the files into the folder and macOS does the upload afterwards, so the sync stays <strong>in progress</strong> until the system reports everything uploaded, with a line like “iCloud has uploaded 120 of 340 files”. Audio leaves your Mac only after that.</p>
 
