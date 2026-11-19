@@ -573,6 +573,7 @@
 "Permesso negato dal servizio cloud. Controlla la cartella di destinazione." = "クラウド サービスがアクセスを拒否しました。保存先のフォルダーを確認してください。";
 "Poco spazio libero sul Mac: il caricamento dell'audio riprenderà quando ci sarà più spazio." = "Macの空き容量が不足しています。空き容量が増えると音声のアップロードを再開します。";
 "Poco spazio libero sul Mac: il download riprenderà quando ci sarà più spazio." = "Macの空き容量が少なくなっています。空きができたらダウンロードを再開します。";
+"Nessun account collegato: la sincronizzazione è in pausa. Collega l'account oppure disattiva “Sincronizza le riunioni”." = "アカウントが接続されていないため、同期は一時停止中です。アカウントを接続するか、「会議を同期」をオフにしてください。";
 "iCloud non ha ancora scaricato il file: la sincronizzazione riprenderà quando sarà disponibile." = "iCloudがまだファイルをダウンロードしていません。利用可能になり次第、同期を再開します。";
 "Accesso scaduto: %@" = "アクセスの有効期限が切れました: %@";
 "Riconnetti" = "再接続";

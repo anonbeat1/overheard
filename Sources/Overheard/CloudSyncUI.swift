@@ -1099,7 +1099,8 @@ struct CloudSettingsView: View {
                     .onChange(of: enabled) { _, value in
                         if value { Task { await cloud.perform(.sync, force: true) } } else { cloud.stop(); cloud.resetStatuses() }
                     }
-                    .disabled(cloud.running)
+                    // Nothing to sync to without an account: it cannot be switched on, only off.
+                    .disabled(cloud.running || (needsAccount && !enabled))
             }
             if let account {
                 HStack {
@@ -1190,9 +1191,13 @@ struct CloudSettingsView: View {
                     }
                 }
             }.disabled(cloud.running)
+            if enabled, needsAccount {
+                Text("Nessun account collegato: la sincronizzazione è in pausa. Collega l'account oppure disattiva “Sincronizza le riunioni”.")
+                    .font(.caption).foregroundStyle(.orange).fixedSize(horizontal: false, vertical: true)
+            }
             HStack {
                 Button(cloud.running ? "Sincronizzazione in corso" : "Sincronizza ora") { Task { await cloud.perform(.sync, force: true) } }
-                    .disabled(!enabled || cloud.running || connecting)
+                    .disabled(!enabled || needsAccount || cloud.running || connecting)
                 if cloud.sweeping { Button("Interrompi") { cloud.stop() } }
                 Spacer()
                 Menu("Altro") {
@@ -1635,6 +1640,12 @@ struct CloudSettingsView: View {
             }
         }
     }
+    /// Drive, Dropbox and OneDrive sync to an account: with none connected there is nothing to sync to.
+    /// (WebDAV, S3 and synced folders keep their own credentials, checked when they are set up.)
+    private var needsAccount: Bool {
+        !["icloud", "folder", "webdav", "s3"].contains(provider) && account == nil
+    }
+
     private func refreshAccount() async {
         let current = provider
         let found: String?

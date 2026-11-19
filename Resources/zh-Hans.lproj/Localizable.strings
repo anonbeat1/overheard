@@ -573,6 +573,7 @@
 "Permesso negato dal servizio cloud. Controlla la cartella di destinazione." = "云服务拒绝访问。检查目标文件夹。";
 "Poco spazio libero sul Mac: il caricamento dell'audio riprenderà quando ci sarà più spazio." = "Mac 的可用空间不足。空间充足后将继续上传音频。";
 "Poco spazio libero sul Mac: il download riprenderà quando ci sarà più spazio." = "Mac 可用空间不足：有更多空间后将继续下载。";
+"Nessun account collegato: la sincronizzazione è in pausa. Collega l'account oppure disattiva “Sincronizza le riunioni”." = "未连接账户：同步已暂停。请连接账户，或关闭“同步会议”。";
 "iCloud non ha ancora scaricato il file: la sincronizzazione riprenderà quando sarà disponibile." = "iCloud 尚未下载该文件：可用后将继续同步。";
 "Accesso scaduto: %@" = "访问已过期：%@";
 "Riconnetti" = "重新连接";

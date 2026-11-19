@@ -573,6 +573,7 @@
 "Permesso negato dal servizio cloud. Controlla la cartella di destinazione." = "رفضت الخدمة السحابية الوصول. تحقق من المجلد الوجهة.";
 "Poco spazio libero sul Mac: il caricamento dell'audio riprenderà quando ci sarà più spazio." = "المساحة المتاحة على الـ Mac قليلة. سيُستأنف رفع الصوت عند توفر مساحة كافية.";
 "Poco spazio libero sul Mac: il download riprenderà quando ci sarà più spazio." = "المساحة الفارغة على الـ Mac قليلة: سيُستأنف التنزيل عندما تتوفر مساحة أكبر.";
+"Nessun account collegato: la sincronizzazione è in pausa. Collega l'account oppure disattiva “Sincronizza le riunioni”." = "لا يوجد حساب متصل: المزامنة متوقفة مؤقتًا. اربط الحساب أو أوقف «مزامنة الاجتماعات».";
 "iCloud non ha ancora scaricato il file: la sincronizzazione riprenderà quando sarà disponibile." = "لم ينزّل iCloud الملف بعد: ستستأنف المزامنة عندما يصبح متاحًا.";
 "Accesso scaduto: %@" = "انتهت صلاحية الوصول: %@";
 "Riconnetti" = "إعادة الاتصال";

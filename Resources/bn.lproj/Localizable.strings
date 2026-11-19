@@ -573,6 +573,7 @@
 "Permesso negato dal servizio cloud. Controlla la cartella di destinazione." = "ক্লাউড পরিষেবা অ্যাক্সেস অস্বীকার করেছে। গন্তব্য ফোল্ডার চেক করুন।";
 "Poco spazio libero sul Mac: il caricamento dell'audio riprenderà quando ci sarà più spazio." = "এই Mac-এ জায়গা কম। পর্যাপ্ত জায়গা খালি হলে অডিও আপলোড আবার শুরু হবে।";
 "Poco spazio libero sul Mac: il download riprenderà quando ci sarà più spazio." = "Mac-এ ফাঁকা জায়গা কম: আরও জায়গা হলে ডাউনলোড আবার শুরু হবে।";
+"Nessun account collegato: la sincronizzazione è in pausa. Collega l'account oppure disattiva “Sincronizza le riunioni”." = "কোনো অ্যাকাউন্ট সংযুক্ত নেই: সিঙ্ক বিরতিতে আছে। অ্যাকাউন্ট সংযুক্ত করুন বা “মিটিং সিঙ্ক করুন” বন্ধ করুন।";
 "iCloud non ha ancora scaricato il file: la sincronizzazione riprenderà quando sarà disponibile." = "iCloud এখনও ফাইলটি ডাউনলোড করেনি: পাওয়া গেলেই সিঙ্ক আবার শুরু হবে।";
 "Accesso scaduto: %@" = "অ্যাক্সেসের মেয়াদ শেষ: %@";
 "Riconnetti" = "আবার সংযোগ করুন";

@@ -573,6 +573,7 @@
 "Permesso negato dal servizio cloud. Controlla la cartella di destinazione." = "क्लाउड सेवा ने पहुंच से इनकार कर दिया. गंतव्य फ़ोल्डर की जाँच करें.";
 "Poco spazio libero sul Mac: il caricamento dell'audio riprenderà quando ci sarà più spazio." = "Mac पर जगह कम है। पर्याप्त जगह मिलने पर ऑडियो अपलोड फिर शुरू होगा।";
 "Poco spazio libero sul Mac: il download riprenderà quando ci sarà più spazio." = "Mac पर खाली जगह कम है: जगह मिलने पर डाउनलोड फिर शुरू हो जाएगा।";
+"Nessun account collegato: la sincronizzazione è in pausa. Collega l'account oppure disattiva “Sincronizza le riunioni”." = "कोई खाता कनेक्ट नहीं है: सिंक रुका हुआ है। खाता कनेक्ट करें या “मीटिंग सिंक करें” बंद करें।";
 "iCloud non ha ancora scaricato il file: la sincronizzazione riprenderà quando sarà disponibile." = "iCloud ने अभी फ़ाइल डाउनलोड नहीं की है: उपलब्ध होते ही सिंक फिर शुरू होगा।";
 "Accesso scaduto: %@" = "एक्सेस समाप्त हो गया: %@";
 "Riconnetti" = "फिर से कनेक्ट करें";
