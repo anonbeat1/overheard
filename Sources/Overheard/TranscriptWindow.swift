@@ -436,7 +436,11 @@ struct TranscriptView: View {
                         if !CloudSync.hasArchivedAudio(meeting.url) { player.play() }
                     }
                 }.disabled(!cloud.enabled || cloud.isBusy(meeting.url))
+                // Queued or downloading: it can be stopped from right here.
+                if cloud.isBusy(meeting.url) { Button("Interrompi") { cloud.cancelAction(meeting.url.path) } }
             }.font(.caption)
+            // Size, share done, speed and time left of this meeting's download.
+            if cloud.isTransferring(meeting.url), let phase = cloud.syncProgress { CloudPhaseView(phase: phase, rate: cloud.transferRate) }
             if !cloud.enabled { Text("Attiva il cloud nelle impostazioni per scaricare l'audio.").font(.caption) }
             if let status = cloud.status(meeting.url) { Text(status).font(.caption).foregroundStyle(.secondary) }
         }
@@ -857,10 +861,14 @@ struct LibraryView: View {
                 }
 
                 if let activity = cloud.activity {
-                    CloudActivityRow(text: activity, fraction: cloud.activityFraction, phase: cloud.syncProgress)
-                        .padding(10)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .background(Color.blue.opacity(0.15), in: RoundedRectangle(cornerRadius: 11, style: .continuous))
+                    VStack(alignment: .leading, spacing: 6) {
+                        CloudActivityRow(text: activity, fraction: cloud.activityFraction, phase: cloud.syncProgress, rate: cloud.transferRate,
+                                         onStop: cloud.running ? { cloud.cancelAllTransfers() } : nil)
+                        CloudTransfersButton(cloud: cloud)
+                    }
+                    .padding(10)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(Color.blue.opacity(0.15), in: RoundedRectangle(cornerRadius: 11, style: .continuous))
                 }
 
                 ScrollView {

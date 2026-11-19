@@ -573,6 +573,13 @@
 "Permesso negato dal servizio cloud. Controlla la cartella di destinazione." = "Der Cloud-Dienst hat den Zugriff verweigert. Überprüfen Sie den Zielordner.";
 "Poco spazio libero sul Mac: il caricamento dell'audio riprenderà quando ci sarà più spazio." = "Wenig freier Speicher auf dem Mac. Der Audio-Upload wird fortgesetzt, sobald genügend Platz frei ist.";
 "Poco spazio libero sul Mac: il download riprenderà quando ci sarà più spazio." = "Wenig freier Speicherplatz auf dem Mac: Der Download wird fortgesetzt, sobald mehr Platz vorhanden ist.";
+"Scarico %@ · %@ / %@" = "Lade %@ herunter · %@ / %@";
+"Scarico %@ · %@" = "Lade %@ herunter · %@";
+"Trasferimenti (%lld)" = "Übertragungen (%lld)";
+"Trasferimenti in corso" = "Laufende Übertragungen";
+"Nessun trasferimento" = "Keine Übertragungen";
+"Interrompi tutto" = "Alle stoppen";
+"Trasferimento annullato" = "Übertragung abgebrochen";
 "iCloud ha caricato %lld file su %lld" = "iCloud hat %lld von %lld Dateien hochgeladen";
 "Nessun account collegato: la sincronizzazione è in pausa. Collega l'account oppure disattiva “Sincronizza le riunioni”." = "Kein Konto verbunden: Die Synchronisierung ist pausiert. Konto verbinden oder „Meetings synchronisieren“ ausschalten.";
 "iCloud non ha ancora scaricato il file: la sincronizzazione riprenderà quando sarà disponibile." = "iCloud hat die Datei noch nicht heruntergeladen: Die Synchronisierung wird fortgesetzt, sobald sie verfügbar ist.";

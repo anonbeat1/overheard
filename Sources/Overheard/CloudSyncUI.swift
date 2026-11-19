@@ -21,7 +21,28 @@ final class CloudSync: ObservableObject {
     @Published private(set) var sweeping = false
     @Published private(set) var progress = ""
     @Published private(set) var sweepFraction: Double?
-    @Published private(set) var syncProgress: CloudSyncEngine.SyncProgress?
+    @Published private(set) var syncProgress: CloudSyncEngine.SyncProgress? { didSet { sampleRate() } }
+    /// Bytes per second of the transfer in progress, smoothed; nil until a second of it has been seen.
+    @Published private(set) var transferRate: Double?
+    private var rateSample: (file: String, at: Date, bytes: Int64)?
+    private func sampleRate() {
+        let current: (String, Int64)?
+        switch syncProgress {
+        case .uploading(let file, let sent?, _)?: current = (file, sent)
+        case .downloading(let file, let received?, _)?: current = (file, received)
+        default: current = nil
+        }
+        guard let (file, bytes) = current else { rateSample = nil; transferRate = nil; return }
+        let now = Date()
+        guard let sample = rateSample, sample.file == file, bytes >= sample.bytes else {
+            rateSample = (file, now, bytes); transferRate = nil; return
+        }
+        let seconds = now.timeIntervalSince(sample.at)
+        guard seconds >= 1 else { return }
+        let instant = Double(bytes - sample.bytes) / seconds
+        transferRate = transferRate.map { $0 * 0.6 + instant * 0.4 } ?? instant
+        rateSample = (file, now, bytes)
+    }
     @Published private(set) var statuses: [String: String] = [:]
     @Published private(set) var failures: [String: String] = [:]
     @Published private(set) var requested: Set<String> = [] // meetings with a user action queued or running
@@ -641,10 +662,36 @@ final class CloudSync: ObservableObject {
             message = String(localized: "Un'altra copia di Overheard aperta su questo Mac sta già sincronizzando. Chiudine una.")
             return
         }
-        if let meeting { await run(action, on: meeting, restoreOnly: restoreOnly) } else if action == .sync { await sweep(manual: force) }
+        if let meeting {
+            // Its own task, so this one action can be cancelled without touching the others.
+            let id = UUID()
+            let work = Task { await self.run(action, on: meeting, restoreOnly: restoreOnly) }
+            actionTasks[id] = (meeting.path, work)
+            await work.value
+            actionTasks[id] = nil
+        } else if action == .sync { await sweep(manual: force) }
     }
+    /// Actions on one meeting, queued or running, by the meeting they act on.
+    private var actionTasks: [UUID: (path: String, task: Task<Void, Never>)] = [:]
     /// Stops the pass, including the transfer in flight (resumable uploads continue next time).
     func stop() { stopRequested = true; cancelCurrent?() }
+    /// Cancels what is queued or running for one meeting. A download stops and its partial file is dropped.
+    func cancelAction(_ path: String) {
+        for entry in actionTasks.values where entry.path == path { entry.task.cancel() }
+    }
+    /// Cancels every queued and running transfer, and the background pass.
+    func cancelAllTransfers() {
+        for entry in actionTasks.values { entry.task.cancel() }
+        stop()
+    }
+    func isTransferring(_ directory: URL) -> Bool { active?.path == directory.path }
+
+    /// Queued and running actions, the one in progress first, for the transfers list.
+    struct Transfer: Identifiable { let id: String; let label: String; let isActive: Bool }
+    var transfers: [Transfer] {
+        tasks.map { Transfer(id: $0.key, label: $0.value, isActive: active?.path == $0.key) }
+            .sorted { ($0.isActive ? 0 : 1, $0.id) < ($1.isActive ? 0 : 1, $1.id) }
+    }
     /// Why an automatic pass should not run now: metered network or a recording in progress.
     private var automaticPause: String? {
         if Recorder.shared.recording {
@@ -745,6 +792,8 @@ final class CloudSync: ObservableObject {
         defer { tasks[dir.path] = nil }
         await acquire()
         defer { release() }
+        // Cancelled while it waited its turn: nothing to do.
+        guard !Task.isCancelled else { return }
         // Checked once the lock is held: an action queued before a deletion started must not re-upload.
         guard !purging else { message = String(localized: "Eliminazione dal cloud in corso: riprova tra poco."); return }
         active = dir
@@ -784,6 +833,10 @@ final class CloudSync: ObservableObject {
             // Local audio may have appeared or disappeared: let open views reload.
             NotificationCenter.default.post(name: .meetingsChanged, object: nil)
         } catch {
+            if error is CancellationError || (error as? URLError)?.code == .cancelled {
+                message = String(localized: "Trasferimento annullato")
+                return
+            }
             // Raised before the engine ran (provider missing, signed out, other account): show it on the
             // meeting too, because the transcript view reads that status, not the global notice.
             message = error.localizedDescription
@@ -1283,7 +1336,11 @@ struct CloudSettingsView: View {
                 Link("Come funziona", destination: URL(string: "https://getoverheard.dev/cloud-storage/")!)
                     .font(.caption)
             }
-            if let activity = cloud.activity { CloudActivityRow(text: activity, fraction: cloud.activityFraction, phase: cloud.syncProgress) }
+            if let activity = cloud.activity {
+                CloudActivityRow(text: activity, fraction: cloud.activityFraction, phase: cloud.syncProgress, rate: cloud.transferRate,
+                                 onStop: cloud.running ? { cloud.cancelAllTransfers() } : nil)
+            }
+            CloudTransfersButton(cloud: cloud)
             if !cloud.message.isEmpty { CloudNotice(message: $cloud.message) }
             if enabled, !cloud.failures.isEmpty {
                 DisclosureGroup {
@@ -1863,39 +1920,129 @@ struct CloudActivityRow: View {
     let text: String
     var fraction: Double? = nil
     var phase: CloudSyncEngine.SyncProgress? = nil
+    var rate: Double? = nil
+    /// Stops what is running. Absent when there is nothing to stop (macOS is uploading on its own).
+    var onStop: (() -> Void)? = nil
 
     var body: some View {
         VStack(alignment: .leading, spacing: 5) {
-            if let fraction {
-                ProgressView(value: fraction) { Text(text) }
-            } else {
-                HStack(spacing: 8) {
-                    ProgressView().controlSize(.small)
-                    Text(text)
-                }
-                .accessibilityElement(children: .combine)
-            }
-            if let phase {
-                switch phase {
-                case .preparing(let file):
-                    Text("Preparo \(file)")
-                case .uploading(let file, let sent, let total):
-                    if let sent {
-                        Text("Carico \(file) · \(size(sent)) / \(size(total))")
-                    } else {
-                        Text("Carico \(file) · \(size(total))")
+            HStack(alignment: .top, spacing: 8) {
+                if let fraction {
+                    ProgressView(value: fraction) { Text(text) }
+                } else {
+                    HStack(spacing: 8) {
+                        ProgressView().controlSize(.small)
+                        Text(text)
                     }
-                case .verifying(let file):
-                    Text("Verifico \(file)")
+                    .accessibilityElement(children: .combine)
                 }
+                if let onStop {
+                    Button { onStop() } label: { Image(systemName: "stop.circle.fill") }
+                        .buttonStyle(.plain).help("Interrompi").accessibilityLabel("Interrompi")
+                }
+            }
+            if let phase { CloudPhaseView(phase: phase, rate: rate) }
+        }
+        .font(.caption)
+        .foregroundStyle(.secondary)
+    }
+}
+
+/// What the transfer in progress is doing: file, size, share done, speed and time left.
+struct CloudPhaseView: View {
+    let phase: CloudSyncEngine.SyncProgress
+    var rate: Double? = nil
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 3) {
+            switch phase {
+            case .preparing(let file):
+                Text("Preparo \(file)")
+            case .verifying(let file):
+                Text("Verifico \(file)")
+            case .uploading(let file, let sent, let total):
+                if let sent {
+                    Text("Carico \(file) · \(size(sent)) / \(size(total))")
+                } else {
+                    Text("Carico \(file) · \(size(total))")
+                }
+                detail(done: sent, total: total)
+            case .downloading(let file, let received, let total):
+                if let received {
+                    Text("Scarico \(file) · \(size(received)) / \(size(total))")
+                } else {
+                    Text("Scarico \(file) · \(size(total))")
+                }
+                detail(done: received, total: total)
             }
         }
         .font(.caption)
         .foregroundStyle(.secondary)
     }
 
+    /// The file's own bar, with the share done, the speed and the time left.
+    @ViewBuilder private func detail(done: Int64?, total: Int64) -> some View {
+        if let done, total > 0 {
+            ProgressView(value: min(1, Double(done) / Double(total)))
+            Text(verbatim: Self.summary(done: done, total: total, rate: rate))
+        }
+    }
+    static func summary(done: Int64, total: Int64, rate: Double?) -> String {
+        var parts = ["\(Int(min(1, Double(done) / Double(total)) * 100))%"]
+        if let rate, rate > 0 {
+            parts.append(ByteCountFormatter.string(fromByteCount: Int64(rate), countStyle: .file) + "/s")
+            let left = Double(max(0, total - done)) / rate
+            parts.append("~" + Duration.seconds(left).formatted(.units(allowed: [.hours, .minutes, .seconds], width: .abbreviated, maximumUnitCount: 2)))
+        }
+        return parts.joined(separator: " · ")
+    }
     private func size(_ bytes: Int64) -> String {
         ByteCountFormatter.string(fromByteCount: bytes, countStyle: .file)
+    }
+}
+
+/// Opens the list of queued and running transfers, each with its own Cancel.
+struct CloudTransfersButton: View {
+    @ObservedObject var cloud: CloudSync
+    @State private var open = false
+
+    var body: some View {
+        if !cloud.transfers.isEmpty {
+            Button { open.toggle() } label: {
+                Label("Trasferimenti (\(cloud.transfers.count))", systemImage: "arrow.up.arrow.down.circle")
+            }
+            .buttonStyle(.plain).font(.caption).foregroundStyle(.secondary)
+            .popover(isPresented: $open) { CloudTransfersList(cloud: cloud).padding(14).frame(width: 340) }
+        }
+    }
+}
+
+struct CloudTransfersList: View {
+    @ObservedObject var cloud: CloudSync
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Trasferimenti in corso").font(.headline)
+            if cloud.transfers.isEmpty { Text("Nessun trasferimento").font(.caption).foregroundStyle(.secondary) }
+            ForEach(cloud.transfers) { item in
+                VStack(alignment: .leading, spacing: 4) {
+                    HStack(alignment: .top) {
+                        VStack(alignment: .leading, spacing: 2) {
+                            let url = URL(fileURLWithPath: item.id)
+                            Text(Meeting.at(url).title ?? url.lastPathComponent).lineLimit(1)
+                            Text(item.label).font(.caption).foregroundStyle(.secondary)
+                        }
+                        Spacer()
+                        Button("Annulla") { cloud.cancelAction(item.id) }.controlSize(.small)
+                    }
+                    if item.isActive, let phase = cloud.syncProgress { CloudPhaseView(phase: phase, rate: cloud.transferRate) }
+                }
+            }
+            if cloud.transfers.count > 1 {
+                Divider()
+                Button("Interrompi tutto", role: .destructive) { cloud.cancelAllTransfers() }
+            }
+        }
     }
 }
 

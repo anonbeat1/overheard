@@ -573,6 +573,13 @@
 "Permesso negato dal servizio cloud. Controlla la cartella di destinazione." = "Облачный сервис отказал в доступе. Проверьте папку назначения.";
 "Poco spazio libero sul Mac: il caricamento dell'audio riprenderà quando ci sarà più spazio." = "На Mac мало свободного места. Выгрузка аудио возобновится, когда места станет достаточно.";
 "Poco spazio libero sul Mac: il download riprenderà quando ci sarà più spazio." = "На Mac мало свободного места: загрузка продолжится, когда места станет больше.";
+"Scarico %@ · %@ / %@" = "Загрузка %@ · %@ / %@";
+"Scarico %@ · %@" = "Загрузка %@ · %@";
+"Trasferimenti (%lld)" = "Передачи (%lld)";
+"Trasferimenti in corso" = "Текущие передачи";
+"Nessun trasferimento" = "Нет передач";
+"Interrompi tutto" = "Остановить все";
+"Trasferimento annullato" = "Передача отменена";
 "iCloud ha caricato %lld file su %lld" = "iCloud загрузил %lld из %lld файлов";
 "Nessun account collegato: la sincronizzazione è in pausa. Collega l'account oppure disattiva “Sincronizza le riunioni”." = "Аккаунт не подключён: синхронизация приостановлена. Подключите аккаунт или отключите «Синхронизировать встречи».";
 "iCloud non ha ancora scaricato il file: la sincronizzazione riprenderà quando sarà disponibile." = "iCloud ещё не загрузил файл: синхронизация продолжится, когда он станет доступен.";

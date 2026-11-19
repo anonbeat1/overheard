@@ -240,6 +240,59 @@ final class CloudProviderTests: XCTestCase {
         let missing = try await provider.size("missing")
         XCTAssertNil(missing)
     }
+    private final class Reports: @unchecked Sendable {
+        private let lock = NSLock()
+        private var values: [(Int64, Int64)] = []
+        func add(_ done: Int64, _ total: Int64) { lock.withLock { values.append((done, total)) } }
+        var all: [(Int64, Int64)] { lock.withLock { values } }
+    }
+    func testDownloadReportsTheBytesReceivedAndReturnsTheFile() async throws {
+        let body = Data((0..<1000).map { UInt8($0 % 251) })
+        CloudProtocolStub.handler = { _ in (200, ["Content-Length": "1000"], body) }
+        let reports = Reports()
+        let (file, response) = try await CloudSyncEngine.SyncProgress.$downloadBytes.withValue({ done, total in reports.add(done, total) }) {
+            try await CloudHTTP.download(for: URLRequest(url: URL(string: "https://example.com/audio")!))
+        }
+        defer { try? FileManager.default.removeItem(at: file) }
+        XCTAssertEqual((response as? HTTPURLResponse)?.statusCode, 200)
+        XCTAssertEqual(try Data(contentsOf: file), body)
+        try await Task.sleep(nanoseconds: 300_000_000) // the callbacks are delivered asynchronously
+        let last = try XCTUnwrap(reports.all.last)
+        XCTAssertEqual(last.0, 1000)
+        XCTAssertEqual(last.1, 1000)
+    }
+    func testDownloadWithoutAListenerIsThePlainDownload() async throws {
+        CloudProtocolStub.handler = { _ in (200, [:], Data("plain".utf8)) }
+        let (file, _) = try await CloudHTTP.download(for: URLRequest(url: URL(string: "https://example.com/a")!))
+        defer { try? FileManager.default.removeItem(at: file) }
+        XCTAssertEqual(try String(contentsOf: file, encoding: .utf8), "plain")
+    }
+    func testCancellingTheTaskStopsADownloadAndReportsCancellation() async throws {
+        CloudProtocolStub.handler = { _ in Thread.sleep(forTimeInterval: 1.5); return (200, [:], Data("late".utf8)) }
+        let started = Date()
+        let work = Task { () -> Error? in
+            do {
+                _ = try await CloudSyncEngine.SyncProgress.$downloadBytes.withValue({ _, _ in }) {
+                    try await CloudHTTP.download(for: URLRequest(url: URL(string: "https://example.com/slow")!))
+                }
+                return nil
+            } catch { return error }
+        }
+        try await Task.sleep(nanoseconds: 200_000_000)
+        work.cancel()
+        let error = await work.value
+        XCTAssertTrue(error is CancellationError, "a stopped transfer is a cancellation, not a failure of the meeting: \(String(describing: error))")
+        XCTAssertLessThan(Date().timeIntervalSince(started), 1.2) // it did not wait for the slow answer
+    }
+    func testTransferSummaryShowsShareSpeedAndTimeLeft() {
+        let full = CloudPhaseView.summary(done: 250_000_000, total: 1_000_000_000, rate: 5_000_000)
+        XCTAssertTrue(full.hasPrefix("25%"), full)
+        XCTAssertTrue(full.contains("/s"), full)
+        XCTAssertTrue(full.contains("~"), full)
+        // No speed yet (first second of a transfer): only the share is claimed.
+        XCTAssertEqual(CloudPhaseView.summary(done: 500, total: 1000, rate: nil), "50%")
+        XCTAssertEqual(CloudPhaseView.summary(done: 2000, total: 1000, rate: nil), "100%") // never beyond 100%
+    }
     func testOnlyARejectedGrantMeansReconnect() async throws {
         let url = URL(string: "https://oauth.example.com/token")!
         CloudProtocolStub.handler = { _ in (400, [:], Data(#"{"error":"invalid_grant"}"#.utf8)) }

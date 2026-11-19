@@ -35,6 +35,54 @@ enum CloudKeychain {
     }
 }
 
+/// One download with a per-chunk callback. Same rule as `CloudHTTP.shared`: redirects are refused.
+final class ProgressDownload: NSObject, URLSessionDownloadDelegate, @unchecked Sendable {
+    private let report: @Sendable (Int64, Int64) async -> Void
+    private let lock = NSLock()
+    private var continuation: CheckedContinuation<(URL, URLResponse), Error>?
+    private var task: URLSessionDownloadTask?
+    private var file: URL?
+    private var cancelled = false
+
+    init(report: @escaping @Sendable (Int64, Int64) async -> Void) { self.report = report }
+
+    func run(_ session: URLSession, _ request: URLRequest) async throws -> (URL, URLResponse) {
+        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<(URL, URLResponse), Error>) in
+            let task = session.downloadTask(with: request)
+            lock.lock()
+            self.continuation = continuation
+            self.task = task
+            let stop = cancelled
+            lock.unlock()
+            if stop { task.cancel() } else { task.resume() }
+        }
+    }
+    func cancel() {
+        lock.lock(); cancelled = true; let task = self.task; lock.unlock()
+        task?.cancel()
+    }
+
+    func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didWriteData bytesWritten: Int64,
+                    totalBytesWritten: Int64, totalBytesExpectedToWrite: Int64) {
+        let report = self.report
+        Task { await report(totalBytesWritten, max(totalBytesExpectedToWrite, 0)) }
+    }
+    /// The system deletes `location` when this returns: move it somewhere that outlives the callback.
+    func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
+        let kept = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        if (try? FileManager.default.moveItem(at: location, to: kept)) != nil { lock.lock(); file = kept; lock.unlock() }
+    }
+    func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
+        lock.lock(); let continuation = self.continuation; self.continuation = nil; let file = self.file; lock.unlock()
+        guard let continuation else { return }
+        if let error { if let file { try? FileManager.default.removeItem(at: file) }; continuation.resume(throwing: error) }
+        else if let file, let response = task.response { continuation.resume(returning: (file, response)) }
+        else { continuation.resume(throwing: URLError(.badServerResponse)) }
+    }
+    func urlSession(_ session: URLSession, task: URLSessionTask, willPerformHTTPRedirection response: HTTPURLResponse,
+                    newRequest request: URLRequest, completionHandler: @escaping (URLRequest?) -> Void) { completionHandler(nil) }
+}
+
 /// Refuses redirects: credentials and uploads must never follow an untrusted destination.
 final class CloudHTTP: NSObject, URLSessionTaskDelegate, @unchecked Sendable {
     static let shared = CloudHTTP()
@@ -48,6 +96,21 @@ final class CloudHTTP: NSObject, URLSessionTaskDelegate, @unchecked Sendable {
     }()
     func urlSession(_ session: URLSession, task: URLSessionTask, willPerformHTTPRedirection response: HTTPURLResponse,
                     newRequest request: URLRequest, completionHandler: @escaping (URLRequest?) -> Void) { completionHandler(nil) }
+
+    /// Like `session.download(for:)`, and reporting bytes received when someone is listening (a restore binds
+    /// `SyncProgress.downloadBytes`). Without a listener it is exactly the plain download. Cancelling the task
+    /// cancels the transfer.
+    static func download(for request: URLRequest) async throws -> (URL, URLResponse) {
+        guard let report = CloudSyncEngine.SyncProgress.downloadBytes else { return try await shared.session.download(for: request) }
+        let delegate = ProgressDownload(report: report)
+        let session = URLSession(configuration: shared.session.configuration, delegate: delegate, delegateQueue: nil)
+        defer { session.finishTasksAndInvalidate() }
+        do {
+            return try await withTaskCancellationHandler { try await delegate.run(session, request) } onCancel: { delegate.cancel() }
+        } catch let error as URLError where error.code == .cancelled {
+            throw CancellationError() // stopping a transfer is not a failure of the meeting
+        }
+    }
     static func check(_ response: URLResponse, data: Data? = nil, allowing: Set<Int> = []) throws {
         guard let http = response as? HTTPURLResponse else { throw CloudError.message(String(localized: "Risposta cloud non valida")) }
         guard (200...299).contains(http.statusCode) || allowing.contains(http.statusCode) else {
@@ -205,7 +268,7 @@ struct WebDAVProvider: CloudLibraryProvider {
         try CloudHTTP.check(response, data: data)
     }
     func download(_ id: String, to destination: URL) async throws {
-        let (file, response) = try await CloudHTTP.shared.session.download(for: request(try url(id), method: "GET"))
+        let (file, response) = try await CloudHTTP.download(for: request(try url(id), method: "GET"))
         defer { try? FileManager.default.removeItem(at: file) }
         try CloudHTTP.check(response)
         try FileManager.default.moveItem(at: file, to: destination)
@@ -590,7 +653,7 @@ struct GoogleDriveProvider: CloudLibraryProvider {
     }
     func download(_ id: String, to destination: URL) async throws {
         let req = try await request("https://www.googleapis.com/drive/v3/files/\(try valid(id))?alt=media")
-        let (file, response) = try await CloudHTTP.shared.session.download(for: req)
+        let (file, response) = try await CloudHTTP.download(for: req)
         defer { try? FileManager.default.removeItem(at: file) }
         try CloudHTTP.check(response)
         try FileManager.default.moveItem(at: file, to: destination)

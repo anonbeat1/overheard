@@ -267,7 +267,7 @@ struct DropboxProvider: CloudLibraryProvider {
     func download(_ id: String, to destination: URL) async throws {
         var request = try await content("files/download", ["path": try path(id)])
         request.setValue(nil, forHTTPHeaderField: "Content-Type")
-        let (file, response) = try await CloudHTTP.shared.session.download(for: request)
+        let (file, response) = try await CloudHTTP.download(for: request)
         defer { try? FileManager.default.removeItem(at: file) }
         if (response as? HTTPURLResponse)?.statusCode == 409 {
             try Self.check(response, data: (try? Data(contentsOf: file)) ?? Data())

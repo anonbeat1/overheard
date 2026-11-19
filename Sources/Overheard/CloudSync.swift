@@ -815,9 +815,11 @@ actor CloudSyncEngine {
     enum SyncProgress: Sendable {
         case preparing(String)
         case uploading(String, sent: Int64?, total: Int64)
+        case downloading(String, received: Int64?, total: Int64)
         case verifying(String)
 
         @TaskLocal static var uploadBytes: (@Sendable (Int64, Int64) async -> Void)?
+        @TaskLocal static var downloadBytes: (@Sendable (Int64, Int64) async -> Void)?
         @TaskLocal static var update: (@Sendable (SyncProgress) async -> Void)?
     }
 
@@ -1396,7 +1398,16 @@ actor CloudSyncEngine {
             }
             let temporary = dir.appendingPathComponent(".cloud-\(UUID().uuidString)")
             defer { try? FileManager.default.removeItem(at: temporary) }
-            try await provider.download(remote.id, to: temporary)
+            // Size known up front, bytes received as they arrive (providers that stream report them).
+            let shown = Self.remoteName(name, encoded: remote.encoding != nil), expected = remote.version.byteCount
+            let update = SyncProgress.update
+            await update?(.downloading(shown, received: nil, total: expected))
+            try await SyncProgress.$downloadBytes.withValue({ received, total in
+                await update?(.downloading(shown, received: received, total: total > 0 ? total : expected))
+            }) {
+                try await provider.download(remote.id, to: temporary)
+            }
+            await update?(.verifying(shown))
             guard CloudVerification.matches(local: try provider.fingerprint(temporary), remote: remote.version) else { throw CloudError.message(String(localized: "Audio scaricato non valido. Riprova.")) }
             var installed = temporary
             if remote.encoding != nil, CloudFiles.audio.contains(name) {
@@ -1404,6 +1415,7 @@ actor CloudSyncEngine {
                 let m4a = temporary.appendingPathExtension("m4a"), wav = temporary.appendingPathExtension("wav")
                 defer { try? FileManager.default.removeItem(at: m4a); try? FileManager.default.removeItem(at: wav) }
                 try FileManager.default.moveItem(at: temporary, to: m4a)
+                await update?(.preparing(name)) // rebuilding the original WAV from the lossless copy
                 try CloudAudio.decode(m4a, to: wav, format: format)
                 installed = wav
                 try await check(dir, isActive)

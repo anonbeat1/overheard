@@ -310,7 +310,7 @@ struct OneDriveProvider: CloudLibraryProvider {
         guard let location = http.value(forHTTPHeaderField: "Location"), let url = Self.trusted(location) else {
             throw CloudError.message(String(localized: "Risposta cloud non valida"))
         }
-        let (file, fileResponse) = try await CloudHTTP.shared.session.download(for: URLRequest(url: url))
+        let (file, fileResponse) = try await CloudHTTP.download(for: URLRequest(url: url))
         defer { try? FileManager.default.removeItem(at: file) }
         try CloudHTTP.check(fileResponse)
         try FileManager.default.moveItem(at: file, to: destination)

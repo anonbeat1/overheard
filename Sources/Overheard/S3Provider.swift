@@ -272,7 +272,7 @@ struct S3Provider: CloudStorageProvider {
         }
     }
     func download(_ id: String, to destination: URL) async throws {
-        let (file, response) = try await CloudHTTP.shared.session.download(for: try request("GET", id))
+        let (file, response) = try await CloudHTTP.download(for: try request("GET", id))
         defer { try? FileManager.default.removeItem(at: file) }
         if let http = response as? HTTPURLResponse, !(200...299).contains(http.statusCode) {
             try Self.check(response, data: (try? Data(contentsOf: file)) ?? Data())

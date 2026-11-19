@@ -693,6 +693,13 @@
 "La rete chiede un accesso (Wi-Fi di hotel, treno, aeroporto…) o il servizio ha cambiato indirizzo. La sincronizzazione riprenderà da sola." = "This network asks you to sign in (hotel, train or airport Wi-Fi), or the service moved. Syncing will resume on its own.";
 "Poco spazio libero sul Mac: il caricamento dell'audio riprenderà quando ci sarà più spazio." = "Not much free space on this Mac: audio uploads will resume when there is more room.";
 "Poco spazio libero sul Mac: il download riprenderà quando ci sarà più spazio." = "Not much free space on this Mac: the download will resume when there is more room.";
+"Scarico %@ · %@ / %@" = "Downloading %@ · %@ / %@";
+"Scarico %@ · %@" = "Downloading %@ · %@";
+"Trasferimenti (%lld)" = "Transfers (%lld)";
+"Trasferimenti in corso" = "Transfers in progress";
+"Nessun trasferimento" = "No transfers";
+"Interrompi tutto" = "Stop all";
+"Trasferimento annullato" = "Transfer cancelled";
 "iCloud ha caricato %lld file su %lld" = "iCloud has uploaded %lld of %lld files";
 "Nessun account collegato: la sincronizzazione è in pausa. Collega l'account oppure disattiva “Sincronizza le riunioni”." = "No account connected: syncing is paused. Connect the account or turn off “Sync meetings”.";
 "iCloud non ha ancora scaricato il file: la sincronizzazione riprenderà quando sarà disponibile." = "iCloud has not downloaded the file yet: syncing will resume when it is available.";
