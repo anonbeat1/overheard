@@ -18,8 +18,11 @@ enum CloudProvenance {
         lock.lock(); defer { lock.unlock() }
         // The app and the MCP server are separate processes writing the same file: a file lock keeps one
         // from overwriting the other's receipt (the NSLock above only covers this process).
-        let descriptor = open(url.deletingLastPathComponent().appendingPathComponent(".overheard-generated.lock").path,
-                              O_CREAT | O_RDWR | O_CLOEXEC, 0o600)
+        // One lock file beside the cloud map, not one per meeting: nothing is added to the meeting folders (which a
+        // sync app may be watching). The app and the MCP server resolve the same path.
+        let lockDirectory = CloudLedger.current.directory.deletingLastPathComponent()
+        try? FileManager.default.createDirectory(at: lockDirectory, withIntermediateDirectories: true)
+        let descriptor = open(lockDirectory.appendingPathComponent("receipts.lock").path, O_CREAT | O_RDWR | O_CLOEXEC, 0o600)
         if descriptor >= 0 { flock(descriptor, LOCK_EX) }
         defer { if descriptor >= 0 { flock(descriptor, LOCK_UN); close(descriptor) } }
         var receipts = try read(url.deletingLastPathComponent())

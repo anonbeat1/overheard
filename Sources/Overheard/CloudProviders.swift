@@ -35,20 +35,26 @@ enum CloudKeychain {
     }
 }
 
-/// One download with a per-chunk callback. Same rule as `CloudHTTP.shared`: redirects are refused.
-final class ProgressDownload: NSObject, URLSessionDownloadDelegate, @unchecked Sendable {
+/// One download with a per-chunk callback, written to a file we own. A download task keeps its partial data in the
+/// system's temporary folder and leaves it there when cancelled (tens of MB for a long recording); here the file is
+/// ours, so a cancelled or failed transfer removes it. Same rule as `CloudHTTP.shared`: redirects are refused.
+final class ProgressDownload: NSObject, URLSessionDataDelegate, @unchecked Sendable {
     private let report: @Sendable (Int64, Int64) async -> Void
     private let lock = NSLock()
     private var continuation: CheckedContinuation<(URL, URLResponse), Error>?
-    private var task: URLSessionDownloadTask?
+    private var task: URLSessionDataTask?
+    private var handle: FileHandle?
     private var file: URL?
+    private var received: Int64 = 0
+    private var expected: Int64 = 0
+    private var failure: Error?
     private var cancelled = false
 
     init(report: @escaping @Sendable (Int64, Int64) async -> Void) { self.report = report }
 
     func run(_ session: URLSession, _ request: URLRequest) async throws -> (URL, URLResponse) {
         try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<(URL, URLResponse), Error>) in
-            let task = session.downloadTask(with: request)
+            let task = session.dataTask(with: request)
             lock.lock()
             self.continuation = continuation
             self.task = task
@@ -62,22 +68,42 @@ final class ProgressDownload: NSObject, URLSessionDownloadDelegate, @unchecked S
         task?.cancel()
     }
 
-    func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didWriteData bytesWritten: Int64,
-                    totalBytesWritten: Int64, totalBytesExpectedToWrite: Int64) {
-        let report = self.report
-        Task { await report(totalBytesWritten, max(totalBytesExpectedToWrite, 0)) }
+    func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive response: URLResponse,
+                    completionHandler: @escaping (URLSession.ResponseDisposition) -> Void) {
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        if FileManager.default.createFile(atPath: url.path, contents: nil), let handle = try? FileHandle(forWritingTo: url) {
+            lock.lock(); file = url; self.handle = handle; expected = max(response.expectedContentLength, 0); lock.unlock()
+            completionHandler(.allow)
+        } else {
+            lock.lock(); failure = CocoaError(.fileWriteUnknown); lock.unlock()
+            completionHandler(.cancel)
+        }
     }
-    /// The system deletes `location` when this returns: move it somewhere that outlives the callback.
-    func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
-        let kept = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
-        if (try? FileManager.default.moveItem(at: location, to: kept)) != nil { lock.lock(); file = kept; lock.unlock() }
+    func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
+        lock.lock()
+        do { try handle?.write(contentsOf: data); received += Int64(data.count) } catch { failure = error }
+        let done = received, total = expected, failed = failure != nil
+        lock.unlock()
+        if failed { dataTask.cancel(); return } // a full disk ends the transfer; the error is reported at completion
+        let report = self.report
+        Task { await report(done, total) }
     }
     func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
-        lock.lock(); let continuation = self.continuation; self.continuation = nil; let file = self.file; lock.unlock()
+        lock.lock()
+        let continuation = self.continuation; self.continuation = nil
+        let file = self.file
+        try? handle?.close(); handle = nil
+        let failure = self.failure
+        lock.unlock()
         guard let continuation else { return }
-        if let error { if let file { try? FileManager.default.removeItem(at: file) }; continuation.resume(throwing: error) }
-        else if let file, let response = task.response { continuation.resume(returning: (file, response)) }
-        else { continuation.resume(throwing: URLError(.badServerResponse)) }
+        if let error = failure ?? error {
+            if let file { try? FileManager.default.removeItem(at: file) } // never leave half a download behind
+            continuation.resume(throwing: error)
+        } else if let file, let response = task.response {
+            continuation.resume(returning: (file, response))
+        } else {
+            continuation.resume(throwing: URLError(.badServerResponse))
+        }
     }
     func urlSession(_ session: URLSession, task: URLSessionTask, willPerformHTTPRedirection response: HTTPURLResponse,
                     newRequest request: URLRequest, completionHandler: @escaping (URLRequest?) -> Void) { completionHandler(nil) }
