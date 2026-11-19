@@ -63,11 +63,23 @@ final class MeetingPlayer: ObservableObject {
     @Published var playing = false
     @Published var time: TimeInterval = 0
     private var players: [AVAudioPlayer] = []
+    private let directory: URL
+    private var loadedNames: Set<String> = []
     private var timer: Timer?
 
     init(dir: URL) {
-        players = ["recording.wav", "mic.wav"].compactMap { try? AVAudioPlayer(contentsOf: dir.appendingPathComponent($0)) }
+        directory = dir
+        reload()
+    }
+
+    func reload() {
+        let names = Set(CloudFiles.audio.filter { CloudFiles.exists(directory.appendingPathComponent($0)) })
+        guard names != loadedNames else { return }
+        pause()
+        players = names.sorted().compactMap { try? AVAudioPlayer(contentsOf: directory.appendingPathComponent($0)) }
+        loadedNames = names
         players.forEach { $0.prepareToPlay() }
+        objectWillChange.send()
     }
 
     var available: Bool { !players.isEmpty }
@@ -76,6 +88,7 @@ final class MeetingPlayer: ObservableObject {
     func toggle() { playing ? pause() : play() }
 
     func play() {
+        guard !playing else { return }
         guard let first = players.first else { return }
         if time >= duration - 0.5 { time = 0 }
         let at = first.deviceCurrentTime + 0.05 // stesso istante per entrambe le tracce
@@ -84,6 +97,7 @@ final class MeetingPlayer: ObservableObject {
             p.play(atTime: at)
         }
         playing = true
+        CloudAudioUse.begin(directory)
         timer?.invalidate()
         timer = Timer.scheduledTimer(withTimeInterval: 0.2, repeats: true) { [weak self] _ in
             MainActor.assumeIsolated { self?.tick() }
@@ -91,6 +105,7 @@ final class MeetingPlayer: ObservableObject {
     }
 
     func pause() {
+        if playing { CloudAudioUse.end(directory) }
         players.forEach { $0.pause() }
         timer?.invalidate()
         playing = false
@@ -115,6 +130,8 @@ struct TranscriptView: View {
     @StateObject private var player: MeetingPlayer
     @State private var lines: [TranscriptLine] = []
     @State private var status = ""
+    @State private var loadingCloudText = false
+    @State private var cloudTextError: String?
     @State private var query = ""
     @State private var onlySpeaker: String?
     @State private var renaming: String?
@@ -122,6 +139,7 @@ struct TranscriptView: View {
     @State private var editing: Int?        // id della card in modifica
     @State private var editText = ""
     @State private var exportStart: TranscriptLine? // inizio di una sezione audio da esportare
+    @ObservedObject private var cloud = CloudSync.shared
     @State private var exportStatus = ""
     @State private var tab = "transcript"           // "summary" | "transcript"
     @State private var summary: [SummaryLine] = []
@@ -179,6 +197,10 @@ struct TranscriptView: View {
                     Button("Copia transcript") { copy() }
                     Divider()
                     Button("Esporta nota (Obsidian…)") { exportNote() }
+                    if cloud.enabled {
+                        Divider()
+                        Button("Copia link della cartella cloud") { Task { await cloud.openRemote(meeting.url, copyLink: true) } }
+                    }
                 } label: {
                     Image(systemName: "square.and.arrow.up").font(.system(size: 15, weight: .semibold))
                         .frame(width: 40, height: 40)
@@ -186,12 +208,40 @@ struct TranscriptView: View {
                 }
                 .menuStyle(.button).buttonStyle(.plain).menuIndicator(.hidden).fixedSize()
                 .help("Condividi, copia, esporta")
-                RoundButton(icon: "folder") { NSWorkspace.shared.activateFileViewerSelecting([meeting.url]) }.help("Mostra nel Finder")
+                Menu {
+                    Button("Mostra nel Finder") { NSWorkspace.shared.activateFileViewerSelecting([meeting.url]) }
+                    if cloud.enabled {
+                        Button("Apri cartella cloud") { Task { await cloud.openRemote(meeting.url) } }
+                        Button("Sincronizza ora") { Task { await cloud.perform(.sync, meeting: meeting.url, force: true) } }
+                    }
+                } label: {
+                    Image(systemName: "folder").font(.system(size: 15, weight: .semibold))
+                        .frame(width: 40, height: 40)
+                        .background(Color.white.opacity(0.1), in: Circle())
+                }
+                .menuStyle(.button).buttonStyle(.plain).menuIndicator(.hidden).fixedSize()
+                .help("Cartella locale e cloud")
             }
 
-            if lines.isEmpty {
+            if CloudSync.hasArchivedText(meeting.url) {
+                HStack {
+                    if loadingCloudText {
+                        ProgressView().controlSize(.small)
+                        Text("Scarico i testi dal cloud…")
+                    } else if cloud.enabled {
+                        Button(cloudTextError == nil ? "Scarica i testi" : "Riprova") {
+                            Task { await loadCloudText() }
+                        }
+                    }
+                    if let cloudTextError { Text(cloudTextError).foregroundStyle(.secondary) }
+                }.font(.caption)
+            }
+
+            if lines.isEmpty && summary.isEmpty {
                 Spacer()
-                Text(status).font(.callout).foregroundStyle(.white.opacity(0.6)).frame(maxWidth: .infinity)
+                if !loadingCloudText {
+                    Text(status).font(.callout).foregroundStyle(.white.opacity(0.6)).frame(maxWidth: .infinity)
+                }
                 if FileManager.default.fileExists(atPath: meeting.url.appendingPathComponent("transcript.error").path) {
                     Button("Riprova") { retry() }.frame(maxWidth: .infinity).padding(.top, 6)
                 }
@@ -204,9 +254,8 @@ struct TranscriptView: View {
                 .pickerStyle(.segmented).labelsHidden().frame(width: 260)
             }
 
-            if !lines.isEmpty, tab == "summary" {
+            if (!lines.isEmpty || !summary.isEmpty), tab == "summary" {
                 summaryView
-                if player.available { playerBar }
             } else if !lines.isEmpty {
                 speakers
                 HStack {
@@ -233,8 +282,9 @@ struct TranscriptView: View {
                         if let id, player.playing { withAnimation { proxy.scrollTo(id, anchor: .center) } }
                     }
                 }
-                if player.available { playerBar }
             }
+            cloudAudioControls
+            if player.available { playerBar }
         }
         .padding(.horizontal, 22)
         .padding(.top, 38) // spazio per i pulsanti della finestra (barra del titolo trasparente)
@@ -249,6 +299,7 @@ struct TranscriptView: View {
             // con un riassunto si parte da lì, tranne quando si arriva da una ricerca
             if FileManager.default.fileExists(atPath: meeting.url.appendingPathComponent("summary.md").path), highlight.isEmpty, startAt == nil { tab = "summary" }
         }
+        .task(id: cloud.enabled) { await loadCloudText() }
         .onReceive(NotificationCenter.default.publisher(for: .meetingsChanged)) { _ in load() }
         .onDisappear { player.pause() }
         .alert("Rinomina \(renaming ?? "")", isPresented: Binding(get: { renaming != nil }, set: { if !$0 { renaming = nil } })) {
@@ -373,15 +424,52 @@ struct TranscriptView: View {
         return s >= 3600 ? String(format: "%d:%02d:%02d", s / 3600, s / 60 % 60, s % 60) : String(format: "%02d:%02d", s / 60, s % 60)
     }
 
+    @ViewBuilder
+    private var cloudAudioControls: some View {
+        if cloud.isArchived(meeting.url) {
+            HStack {
+                Text("Audio archiviato nel cloud")
+                Button(cloud.tasks[meeting.url.path] == String(localized: "Scarico l'audio dal cloud…") ? "Download in corso" : "Scarica e riproduci") {
+                    Task {
+                        await cloud.perform(.restore, meeting: meeting.url, force: true, restoreOnly: Set(CloudFiles.audio))
+                        player.reload()
+                        if !CloudSync.hasArchivedAudio(meeting.url) { player.play() }
+                    }
+                }.disabled(!cloud.enabled || cloud.isBusy(meeting.url))
+            }.font(.caption)
+            if !cloud.enabled { Text("Attiva il cloud nelle impostazioni per scaricare l'audio.").font(.caption) }
+            if let status = cloud.status(meeting.url) { Text(status).font(.caption).foregroundStyle(.secondary) }
+        }
+    }
+
+    private func loadCloudText() async {
+        guard cloud.enabled, !loadingCloudText, CloudSync.hasArchivedText(meeting.url) else { return }
+        loadingCloudText = true
+        cloudTextError = nil
+        let hadText = !lines.isEmpty || !summary.isEmpty
+        defer { loadingCloudText = false }
+        await cloud.perform(.restore, meeting: meeting.url, force: true, restoreOnly: Set(CloudFiles.text))
+        load()
+        if !hadText, !summary.isEmpty, highlight.isEmpty, startAt == nil { tab = "summary" }
+        if CloudSync.hasArchivedText(meeting.url) {
+            cloudTextError = cloud.failures[meeting.url.path] ?? cloud.message.nilIfEmpty
+        }
+    }
+
     private func load() {
         let dir = meeting.url
+        player.reload()
+        cloud.refreshFlags(dir)
         summary = SummaryLine.parse((try? String(contentsOf: dir.appendingPathComponent("summary.md"), encoding: .utf8)) ?? "")
         bookmarks = Bookmarks.load(dir)
         attendees = MeetingCalendar.attendees(dir)
+        lines = []
         if let md = try? String(contentsOf: dir.appendingPathComponent("transcript.md"), encoding: .utf8) {
             lines = TranscriptLine.parse(md)
         } else if let err = try? String(contentsOf: dir.appendingPathComponent("transcript.error"), encoding: .utf8) {
             status = String(localized: "Trascrizione fallita: \(err.trimmingCharacters(in: .whitespacesAndNewlines))")
+        } else if CloudSync.hasArchivedContent(dir) {
+            status = String(localized: "Nel cloud")
         } else if FileManager.default.fileExists(atPath: dir.appendingPathComponent("recording.wav").path) {
             status = String(localized: "Trascrizione in corso…")
         } else if Recorder.shared.isRecording(dir) {
@@ -423,11 +511,21 @@ struct TranscriptView: View {
     /// Trascrizione fallita (chiave mancante, rete…): riprova con il motore attuale
     private func retry() {
         let dir = meeting.url, engine = Recorder.shared.engine
-        try? FileManager.default.removeItem(at: dir.appendingPathComponent("transcript.error"))
-        status = String(localized: "Trascrizione in corso…")
-        Task.detached {
-            _ = await Transcriber.run(dir: dir, engine: engine)
-            await MainActor.run { load() }
+        Task {
+            if CloudSync.hasArchivedAudio(dir) {
+                // Audio only, from the destination it was uploaded to: never a transfer to another service.
+                await cloud.perform(.restore, meeting: dir, force: true, restoreOnly: Set(CloudFiles.audio))
+                guard !CloudSync.hasArchivedAudio(dir) else {
+                    status = cloud.status(dir) ?? (cloud.message.isEmpty ? String(localized: "Audio archiviato nel cloud") : cloud.message)
+                    return
+                }
+            }
+            CloudAudioUse.begin(dir)
+            defer { CloudAudioUse.end(dir) }
+            try? FileManager.default.removeItem(at: dir.appendingPathComponent("transcript.error"))
+            status = String(localized: "Trascrizione in corso…")
+            _ = await Task.detached { await Transcriber.run(dir: dir, engine: engine) }.value
+            load()
         }
     }
 
@@ -442,7 +540,10 @@ struct TranscriptView: View {
         let trailing = blocks[line.id].hasSuffix("\n") ? "\n" : ""
         blocks[line.id] = "**[\(line.time)] \(line.speaker):** \(text)" + trailing
         let out = blocks.joined(separator: "\n\n")
-        try? out.write(to: url, atomically: true, encoding: .utf8)
+        do {
+            try out.write(to: url, atomically: true, encoding: .utf8)
+            try CloudProvenance.record(url)
+        } catch { /* Leave the file untrusted on failure. */ }
         lines = TranscriptLine.parse(out)
         NotesExport.exportIfEnabled(meeting.url)
     }
@@ -583,7 +684,10 @@ struct TranscriptView: View {
         let r = rows[l.id]
         rows[l.id] = r.contains("- [ ] ") ? r.replacingOccurrences(of: "- [ ] ", with: "- [x] ")
             : r.replacingOccurrences(of: "- [x] ", with: "- [ ] ").replacingOccurrences(of: "- [X] ", with: "- [ ] ")
-        try? rows.joined(separator: "\n").write(to: url, atomically: true, encoding: .utf8)
+        do {
+            try rows.joined(separator: "\n").write(to: url, atomically: true, encoding: .utf8)
+            try CloudProvenance.record(url)
+        } catch { /* Leave the file untrusted on failure. */ }
         summary = SummaryLine.parse(rows.joined(separator: "\n"))
         NotesExport.exportIfEnabled(meeting.url)
     }
@@ -647,6 +751,12 @@ struct EngineBadge: View {
     }
 }
 
+struct ConflictSelection: Identifiable {
+    let directory: URL
+    let conflicts: [SyncConflict]
+    var id: String { directory.path }
+}
+
 struct LibraryView: View {
     @State var selected: String?
     @State var query = ""
@@ -662,6 +772,10 @@ struct LibraryView: View {
     @State private var link = ""
     @State private var dropping = false
     @AppStorage("ai.visible") private var showChat = false
+    @ObservedObject private var cloud = CloudSync.shared
+    @State private var conflicts: [String: [SyncConflict]] = [:]
+    @State private var conflictSelection: ConflictSelection?
+    @State private var deleteCloud: URL?
     @State private var toDelete: [Meeting] = []
     @State private var picking = false               // modalità selezione multipla
     @State private var picked: Set<String> = []
@@ -690,6 +804,11 @@ struct LibraryView: View {
             VStack(alignment: .leading, spacing: 12) {
                 HStack {
                     Text("Riunioni").font(.system(size: 18, weight: .bold))
+                    if let copies = conflicts[cloud.root.path], !copies.isEmpty {
+                        Button { conflictSelection = ConflictSelection(directory: cloud.root, conflicts: copies) } label: {
+                            Image(systemName: "exclamationmark.triangle").foregroundStyle(.orange)
+                        }.help("Controlla le copie create dai servizi di sincronizzazione")
+                    }
                     Spacer()
                     Menu {
                         Button("Importa file audio o video…") { importer.pickFiles() }
@@ -713,6 +832,12 @@ struct LibraryView: View {
                             .background(picking ? Color.orange.opacity(0.3) : Color.white.opacity(0.1), in: Circle())
                     }
                     .buttonStyle(.plain).help("Seleziona più riunioni")
+                    Button { SettingsWindow.show() } label: {
+                        Image(systemName: "gearshape").font(.system(size: 13, weight: .semibold))
+                            .frame(width: 30, height: 30)
+                            .background(Color.white.opacity(0.1), in: Circle())
+                    }
+                    .buttonStyle(.plain).help("Impostazioni (⌘,)")
                 }
                 HStack {
                     Image(systemName: "magnifyingglass").foregroundStyle(.white.opacity(0.5))
@@ -731,6 +856,13 @@ struct LibraryView: View {
                     .background(Color.blue.opacity(0.15), in: RoundedRectangle(cornerRadius: 11, style: .continuous))
                 }
 
+                if let activity = cloud.activity {
+                    CloudActivityRow(text: activity, fraction: cloud.sweepFraction, phase: cloud.syncProgress)
+                        .padding(10)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .background(Color.blue.opacity(0.15), in: RoundedRectangle(cornerRadius: 11, style: .continuous))
+                }
+
                 ScrollView {
                     LazyVStack(alignment: .leading, spacing: 4) {
                         ForEach(days, id: \.0) { day, items in
@@ -745,6 +877,9 @@ struct LibraryView: View {
                     }
                 }
 
+                if cloud.enabled, !cloud.message.isEmpty {
+                    Text(cloud.message).font(.caption2).foregroundStyle(.secondary).textSelection(.enabled)
+                }
                 if picking {
                     HStack {
                         Button(picked.count == filtered.filter { !busy($0) }.count && !picked.isEmpty ? LocalizedStringKey("Deseleziona tutte") : "Seleziona tutte") {
@@ -821,7 +956,19 @@ struct LibraryView: View {
             } else {
                 Text("Audio, transcript e riassunti. Puoi recuperarle dal Cestino.")
             }
+            if ms.contains(where: { CloudSync.manifest($0.url)?.files.isEmpty == false }) {
+                Text("Anche le copie nel cloud vanno nel cestino del servizio: da lì si possono ripristinare. Overheard non lo svuota.")
+            }
         }
+        .sheet(item: $conflictSelection) { selection in
+            ConflictReviewView(directory: selection.directory, conflicts: selection.conflicts)
+        }
+        .confirmationDialog("Rimuovere la copia cloud?", isPresented: Binding(get: { deleteCloud != nil }, set: { if !$0 { deleteCloud = nil } })) {
+            Button("Rimuovi copia cloud", role: .destructive) {
+                if let dir = deleteCloud { Task { await cloud.perform(.deleteRemote, meeting: dir, force: true) } }
+                deleteCloud = nil
+            }
+        } message: { Text("I file locali restano sul Mac. Scarica prima l'audio archiviato. La sincronizzazione di questa riunione resterà sospesa finché scegli Sincronizza ora.") }
         .alert("Importa da link", isPresented: $askLink) {
             TextField("https://…", text: $link)
             Button("Importa") { importer.importLink(link) }
@@ -835,7 +982,7 @@ struct LibraryView: View {
         let isSel = m.id == selected
         let isPicked = picked.contains(m.id)
         let time = m.date?.formatted(date: .omitted, time: .shortened) ?? m.id
-        let missing = texts[m.id] == nil
+        let missing = texts[m.id] == nil && !cloud.remoteTranscriptPaths.contains(m.url.path)
         return Button {
             // ⌘-clic entra in selezione multipla partendo dalla riunione aperta
             if !picking, NSEvent.modifierFlags.contains(.command) {
@@ -857,6 +1004,10 @@ struct LibraryView: View {
                 VStack(alignment: .leading, spacing: 2) {
                     Text(m.app).lineLimit(1)
                     Text(missing ? String(localized: "\(time) · senza transcript") : time).font(.caption).foregroundStyle(.white.opacity(0.5))
+                    if let copies = conflicts[m.url.path], !copies.isEmpty {
+                        Label("Possibile conflitto", systemImage: "exclamationmark.triangle").font(.caption).foregroundStyle(.orange)
+                    }
+                    if let status = cloud.status(m.url) { Text(status).font(.caption2).foregroundStyle(.secondary).lineLimit(2) }
                 }
                 Spacer(minLength: 0)
             }
@@ -867,6 +1018,20 @@ struct LibraryView: View {
         .buttonStyle(.plain)
         .contextMenu {
             Button("Mostra nel Finder") { NSWorkspace.shared.activateFileViewerSelecting([m.url]) }
+            if let copies = conflicts[m.url.path], !copies.isEmpty {
+                Button("Controlla copie in conflitto") { conflictSelection = ConflictSelection(directory: m.url, conflicts: copies) }
+                    .disabled(busy(m))
+            }
+            if cloud.enabled {
+                Button("Sincronizza ora") { Task { await cloud.perform(.sync, meeting: m.url, force: true) } }.disabled(busy(m))
+                if CloudSync.manifest(m.url)?.remoteDeleted?.isEmpty == false {
+                    Button("Carica di nuovo sul cloud") { Task { await cloud.perform(.reupload, meeting: m.url, force: true) } }.disabled(busy(m))
+                }
+                Button("Scarica audio") { Task { await cloud.perform(.restore, meeting: m.url, force: true, restoreOnly: Set(CloudFiles.audio)) } }.disabled(busy(m))
+                Button("Libera spazio audio") { Task { await cloud.perform(.evict, meeting: m.url, force: true) } }.disabled(busy(m))
+                Button(cloud.isPinned(m.url) ? "Non conservare su questo Mac" : "Conserva su questo Mac") { Task { await cloud.perform(.pin, meeting: m.url, force: true) } }.disabled(busy(m))
+                Button("Rimuovi copia cloud…", role: .destructive) { deleteCloud = m.url }.disabled(busy(m))
+            }
             Divider()
             if isPicked && picked.count > 1 {
                 Button("Sposta \(picked.count) riunioni nel Cestino…", role: .destructive) { toDelete = meetings.filter { picked.contains($0.id) } }
@@ -879,12 +1044,20 @@ struct LibraryView: View {
 
     /// In registrazione o in trascrizione: non si può cestinare
     private func busy(_ m: Meeting) -> Bool {
-        Recorder.shared.isRecording(m.url) || FileManager.default.fileExists(atPath: m.url.appendingPathComponent(".transcribing").path)
+        Recorder.shared.isRecording(m.url) || CloudAudioUse.contains(m.url) || cloud.isBusy(m.url) || !CloudFiles.eligible(m.url)
     }
 
     private func trash(_ ms: [Meeting]) {
         for m in ms where !busy(m) {
-            guard (try? FileManager.default.trashItem(at: m.url, resultingItemURL: nil)) != nil else { continue }
+            // The folder (and its manifest) is gone once trashed: queue the cloud copies first.
+            // If the local trash then fails, the queued entry is harmless: it is dropped below.
+            let manifest = CloudSync.manifest(m.url)
+            cloud.queueRemoteTrash(m.url)
+            guard (try? FileManager.default.trashItem(at: m.url, resultingItemURL: nil)) != nil else {
+                if let manifest { CloudTrashQueue.shared.remove(CloudTrashEntry(meeting: manifest.meeting, folder: m.url.lastPathComponent, destination: manifest.destination, queuedAt: Date(), items: [])) }
+                continue
+            }
+            if manifest != nil { Task { await cloud.drainTrashQueue() } }
             picked.remove(m.id)
             if selected == m.id { selected = nil }
         }
@@ -894,6 +1067,20 @@ struct LibraryView: View {
 
     private func load() {
         meetings = Meeting.recent(.max)
+        let root = cloud.root
+        let folders = meetings.map(\.url)
+        Task {
+            let index = await Task.detached {
+                var index: [String: [SyncConflict]] = [root.path: SyncConflicts.scan(root)]
+                for folder in folders { index[folder.path] = SyncConflicts.scan(folder) }
+                return index
+            }.value
+            conflicts = index
+            await cloud.loadStatuses(for: folders)
+            let copies = Set((index[root.path] ?? []).map(\.url))
+            meetings.removeAll { copies.contains($0.url) }
+            if !meetings.contains(where: { $0.id == selected }) { selected = meetings.first?.id }
+        }
         if selected == nil { selected = meetings.first?.id }
         // ponytail: legge tutti i transcript in memoria per la ricerca; ok fino a qualche migliaio di meeting
         DispatchQueue.global().async {
@@ -935,6 +1122,14 @@ enum TranscriptWindow {
 /// Taglia e mixa recording.wav + mic.wav (tracce sovrapposte in una composizione) in un .m4a AAC.
 enum AudioExport {
     static func run(dir: URL, start: Double, end: Double, out: URL) async throws {
+        if await MainActor.run(body: { CloudSync.hasArchivedAudio(dir) }) {
+            await CloudSync.shared.perform(.restore, meeting: dir, force: true, restoreOnly: Set(CloudFiles.audio))
+            guard await MainActor.run(body: { !CloudSync.hasArchivedAudio(dir) }) else {
+                throw TranscriptionError.message(String(localized: "Audio nel cloud. Collega il provider e scarica l'audio dalla libreria prima di esportare."))
+            }
+        }
+        await MainActor.run { CloudAudioUse.begin(dir) }
+        defer { Task { @MainActor in CloudAudioUse.end(dir) } }
         let comp = AVMutableComposition()
         let range = CMTimeRange(start: CMTime(seconds: start, preferredTimescale: 600), end: CMTime(seconds: end, preferredTimescale: 600))
         for name in ["recording.wav", "mic.wav"] {

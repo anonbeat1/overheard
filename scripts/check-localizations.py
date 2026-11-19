@@ -18,17 +18,33 @@ LITERALS = (
 )
 # These translations correctly have the same spelling as English.
 SAME_AS_ENGLISH = {
-    'de': {'Nome'},
+    'bn': {'Dropbox › Applicazioni › Overheard', 'OneDrive › App › Overheard'},
+    'de': {'Nome', '%lld GB', 'Dropbox › Applicazioni › Overheard', 'OneDrive › App › Overheard'},
     'es': {'Errore: %@', 'Errore: ', '%lld min', '%lld s'},
-    'fr': {'Notifiche', 'Trascrizione', '%@ (microfono)', '%lld min', '%lld s'},
-    'pt': {'%lld min', '%lld s'},
+    'fr': {'Notifiche', 'Trascrizione', '%@ (microfono)', '%lld min', '%lld s', 'Europa'},
+    'pt': {'%lld min', '%lld s', '%lld GB'},
 }
-TECHNICAL_KEY = 'ElevenLabs HTTP %lld: %@'
+SHARED_LABELS = {
+    'ElevenLabs HTTP %lld: %@', 'Dropbox', 'Google Drive', 'OneDrive',
+    'iCloud Drive', 'Koofr', 'kDrive (Infomaniak)', 'pCloud',
+    'pCloud, Koofr, kDrive, Nextcloud',
+}
 
 
 
 def load(path):
     return json.loads(subprocess.check_output(['plutil', '-convert', 'json', '-o', '-', str(path)]))
+
+
+def format_arguments(text):
+    arguments = [token for token in FORMAT.findall(text) if token != '%%']
+    positions = [re.match(r'%(\d+)\$', token) for token in arguments]
+    if any(positions) and not all(positions):
+        return None
+    return sorted(
+        (int(position[1]), '%' + token[position.end():]) if position else (index, token)
+        for index, (token, position) in enumerate(zip(arguments, positions), 1)
+    )
 
 
 def main():
@@ -50,13 +66,13 @@ def main():
             for key, value in table.items():
                 if not value.strip():
                     errors.append(f'{locale}: empty translation for {key!r}')
-                expected = FORMAT.findall(key)
-                actual = FORMAT.findall(value)
-                if expected != actual:
+                expected = format_arguments(key)
+                actual = format_arguments(value)
+                if expected is None or expected != actual or key.count('%%') != value.count('%%'):
                     errors.append(f'{locale}: placeholders differ for {key!r}: {expected!r} != {actual!r}')
                 reference = baseline.get(key, key)
                 if locale not in ('en', 'it'):
-                    if (value == reference and key != TECHNICAL_KEY
+                    if (value == reference and key not in SHARED_LABELS
                             and key not in SAME_AS_ENGLISH.get(locale, set())):
                         errors.append(f'{locale}: untranslated English value for {key!r}')
                     for literal in LITERALS:

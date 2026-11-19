@@ -40,12 +40,18 @@ enum MeetingCalendar {
     static func annotate(_ dir: URL, at date: Date) {
         let titleURL = dir.appendingPathComponent("title")
         guard !FileManager.default.fileExists(atPath: titleURL.path), let e = event(at: date), let title = e.title, !title.isEmpty else { return }
-        try? (title + "\n").write(to: titleURL, atomically: true, encoding: .utf8)
+        do {
+            try (title + "\n").write(to: titleURL, atomically: true, encoding: .utf8)
+            try CloudProvenance.record(titleURL)
+        } catch { /* Leave the file untrusted on failure. */ }
         let people = (e.attendees ?? []).filter { !$0.isCurrentUser }.map { p in
             p.name ?? p.url.absoluteString.replacingOccurrences(of: "mailto:", with: "")
         }
         if !people.isEmpty {
-            try? (people.joined(separator: "\n") + "\n").write(to: dir.appendingPathComponent("attendees"), atomically: true, encoding: .utf8)
+            do {
+                try (people.joined(separator: "\n") + "\n").write(to: dir.appendingPathComponent("attendees"), atomically: true, encoding: .utf8)
+                try CloudProvenance.record(dir.appendingPathComponent("attendees"))
+            } catch { /* Leave the file untrusted on failure. */ }
         }
     }
 
@@ -63,8 +69,13 @@ enum Bookmarks {
             h.seekToEndOfFile()
             h.write(Data(line.utf8))
             try? h.close()
+            // The receipt must follow every append, or the file stops matching it and sync blocks the meeting.
+            try? CloudProvenance.record(url)
         } else {
-            try? line.write(to: url, atomically: true, encoding: .utf8)
+            do {
+                try line.write(to: url, atomically: true, encoding: .utf8)
+                try CloudProvenance.record(url)
+            } catch { /* Leave the file untrusted on failure. */ }
         }
     }
 
@@ -160,9 +171,12 @@ enum Summarizer {
         if !naming.isEmpty { applyNames(text, dir: dir, label: speaker) }
         if !titling.isEmpty, let line = text.components(separatedBy: .newlines).first(where: { $0.hasPrefix("TITLE:") }) {
             let title = line.dropFirst(6).trimmingCharacters(in: CharacterSet.whitespaces.union(CharacterSet(charactersIn: "\"*#")))
-            if !title.isEmpty, title.count < 80 { try? (title + "\n").write(to: dir.appendingPathComponent("title"), atomically: true, encoding: .utf8) }
+            if !title.isEmpty, title.count < 80 { try? (title + "\n").write(to: dir.appendingPathComponent("title"), atomically: true, encoding: .utf8); try? CloudProvenance.record(dir.appendingPathComponent("title")) }
         }
-        try? String(text[start.lowerBound...]).write(to: dir.appendingPathComponent("summary.md"), atomically: true, encoding: .utf8)
+        do {
+            try String(text[start.lowerBound...]).write(to: dir.appendingPathComponent("summary.md"), atomically: true, encoding: .utf8)
+            try CloudProvenance.record(dir.appendingPathComponent("summary.md"))
+        } catch { /* Leave the file untrusted on failure. */ }
         NotesExport.exportIfEnabled(dir)
         DispatchQueue.main.async { NotificationCenter.default.post(name: .meetingsChanged, object: nil) }
         return nil

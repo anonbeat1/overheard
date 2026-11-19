@@ -239,6 +239,8 @@ struct SettingsView: View {
                     .font(.caption).foregroundStyle(.white.opacity(0.5)).fixedSize(horizontal: false, vertical: true)
             }
 
+            CloudSettingsView()
+
             Card {
                 Text("La tua voce")
                 TextField("Il tuo nome, es. Mario", text: $myName)

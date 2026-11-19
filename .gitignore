@@ -4,3 +4,5 @@ dist/
 .DS_Store
 *.dmg
 design/mascot/
+# OAuth keys for local and release builds: never commit
+.env.local

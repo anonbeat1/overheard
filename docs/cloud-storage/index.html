@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cloud storage: keep your meetings, free up your Mac — Overheard</title>
+<meta name="description" content="How Overheard backs up your meetings to Dropbox, Google Drive or your own server, frees up space on your Mac only after each upload is verified, and gets the audio back in one click.">
+<meta name="author" content="Gabriele Spilotri Cavaiola">
+<link rel="canonical" href="https://getoverheard.dev/cloud-storage/">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Cloud storage: keep your meetings, free up your Mac", "description": "How Overheard backs up your meetings to Dropbox, Google Drive or your own server, frees up space on your Mac only after each upload is verified, and gets the audio back in one click.", "url": "https://getoverheard.dev/cloud-storage/", "mainEntityOfPage": "https://getoverheard.dev/cloud-storage/", "datePublished": "2026-11-17", "dateModified": "2026-11-17", "image": "https://getoverheard.dev/assets/poster.jpg", "author": {"@type": "Person", "name": "Gabriele Spilotri Cavaiola", "url": "https://github.com/anonbeat1"}, "publisher": {"@type": "Organization", "name": "Overheard", "url": "https://getoverheard.dev/"}}</script>
+<meta property="og:type" content="article">
+<meta property="og:title" content="Cloud storage: keep your meetings, free up your Mac">
+<meta property="og:description" content="Back up meetings to Dropbox, Google Drive or your own server. Audio leaves your Mac only after the upload is verified.">
+<meta property="og:image" content="https://getoverheard.dev/assets/poster.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#0B0B0C">
+<link rel="icon" href="../assets/icon-tile.svg" type="image/svg+xml">
+<link rel="alternate" type="application/rss+xml" title="Overheard blog" href="../blog/feed.xml">
+<link rel="stylesheet" href="../blog/blog.css">
+</head>
+<body>
+
+<header class="nav">
+  <a class="brand" href="../"><img src="../assets/icon-tile.svg" alt="">Overheard</a>
+  <nav>
+    <a href="../blog/">Blog</a>
+    <a href="../compare/">Compare</a>
+    <a class="hide-s" href="https://github.com/anonbeat1/overheard">GitHub</a>
+  </nav>
+  <a class="dl" href="https://github.com/anonbeat1/overheard/releases/latest">Download</a>
+</header>
+
+<main class="wrap">
+<article>
+  <span class="eyebrow">Guide · Cloud storage</span>
+  <h1>Keep your meetings, free up your Mac</h1>
+  <p class="meta">How Overheard's cloud storage works · 4 min read</p>
+
+  <p class="lead">Recordings take up a lot of space. Overheard can keep a copy of your meetings in your own cloud storage and remove the heavy audio from your Mac. Your transcripts, summaries and notes stay on your Mac, so you can still read and search them offline.</p>
+
+  <p>Cloud storage is optional and off by default. If you never turn it on, nothing changes.</p>
+
+  <h2>How it works, in one minute</h2>
+  <ol>
+    <li><strong>You pick a place</strong>: Dropbox, Google Drive, or your own server.</li>
+    <li><strong>Overheard uploads each finished meeting</strong> there: the audio, plus the transcript, summary and notes.</li>
+    <li><strong>It checks every upload.</strong> It asks the cloud service for a fingerprint of the file and compares it with the one on your Mac. A file only counts as safely stored when they match.</li>
+    <li><strong>You can free up space.</strong> Only audio that passed that check can be removed from your Mac. Transcripts and summaries are never removed.</li>
+    <li><strong>You can get the audio back</strong> any time, with one click.</li>
+  </ol>
+  <p>Your files go to <em>your</em> account. Overheard has no server of its own and never sees your files.</p>
+
+  <h2>Set it up in two minutes</h2>
+  <ol>
+    <li>Open <strong>Settings → Cloud storage</strong>.</li>
+    <li>Under <strong>Store in</strong>, pick <strong>Dropbox</strong>, <strong>Google Drive</strong>, <strong>OneDrive</strong> or <strong>iCloud Drive</strong>.</li>
+    <li>Click <strong>Connect</strong> and approve in your browser. iCloud Drive needs nothing: it's ready if iCloud Drive is on.</li>
+    <li>Back in Overheard you'll see <strong>Connected:</strong> followed by your email.</li>
+    <li>Turn on <strong>Sync meetings</strong>.</li>
+  </ol>
+  <p>That's it. Overheard starts uploading, newest meetings first. The first upload can take a while if you have many recordings. You can keep using the app, and click <strong>Stop</strong> at any time.</p>
+  <p><strong>Where are my files?</strong> In Dropbox, under <code>Apps › Overheard</code>. In Google Drive, in an <code>Overheard</code> folder in My Drive. Each meeting has its own folder. Overheard can only see its own folder, never the rest of your Dropbox or Drive.</p>
+
+  <h2>Choose what to upload and when to free space</h2>
+  <div class="tbl"><table>
+    <thead><tr><th>Setting</th><th>What it does</th></tr></thead>
+    <tbody>
+      <tr><th>What to upload</th><td>Turn each kind on or off: <strong>Recording audio</strong>, <strong>Transcript</strong>, <strong>Summary, decisions and action items</strong>, <strong>Bookmarks</strong>. Only files registered when Overheard writes them are eligible. Files added or replaced outside the app are excluded; older unregistered recordings need explicit reimport. Audio is needed to free up space. Turning something off later keeps what's already in the cloud.</td></tr>
+      <tr><th>Audio format in the cloud</th><td><strong>Lossless compressed</strong> (recommended) takes about 4 times less space, and when you download it you get back exactly the original audio. <strong>Maximum savings</strong> takes about 14 times less space, but a download is a close copy, not the original. <strong>Original WAV</strong> uploads the file as it is. A 40-minute call: 509 MB as WAV, 125 MB lossless, 35 MB with maximum savings.</td></tr>
+      <tr><th>Free up local audio after</th><td>Removes uploaded audio from your Mac after 7, 30 or 90 days. <em>Manually only</em> means never automatically.</td></tr>
+      <tr><th>Maximum audio storage on this Mac</th><td>Keeps your Mac's audio under 5–100 GB by freeing the oldest meetings first.</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2>Everyday use</h2>
+  <p>Right-click a meeting in the library:</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Action</th><th>What happens</th></tr></thead>
+    <tbody>
+      <tr><th>Sync now</th><td>Uploads this meeting right away.</td></tr>
+      <tr><th>Free up audio space</th><td>Removes this meeting's audio from your Mac. It stays in the cloud.</td></tr>
+      <tr><th>Download audio</th><td>Brings the audio back to your Mac.</td></tr>
+      <tr><th>Keep on this Mac</th><td>This meeting's audio is never removed automatically.</td></tr>
+      <tr><th>Remove cloud copy…</th><td>Deletes the cloud copy and keeps everything on your Mac.</td></tr>
+    </tbody>
+  </table></div>
+  <p>A meeting whose audio is in the cloud still opens normally: you can read the transcript, search it and ask Claude about it. To listen, click <strong>Download and play</strong>. Exporting a clip or transcribing again downloads the audio for you.</p>
+  <p>Each meeting shows its status, such as <strong>Synced</strong>, <strong>Audio in the cloud</strong> or <strong>Waiting to sync</strong>.</p>
+
+  <h2>Can I switch cloud services?</h2>
+  <p>Yes. Choose the new service in <strong>Settings &gt; Cloud storage</strong> and connect it. Keep the previous account connected until the transfer finishes. Overheard asks how to transfer your meetings:</p>
+  <ul>
+    <li><strong>Copy to new destination</strong> keeps the previous cloud copies.</li>
+    <li><strong>Move to new destination</strong> removes the previous copies only after all tracked files have been verified in the new service.</li>
+    <li><strong>Cancel</strong> leaves the transfer pending. No previous cloud files are removed.</li>
+  </ul>
+  <p>Files already on your Mac are uploaded directly. Files stored only in the previous cloud service are downloaded first. Keep enough free space for these downloads. If a transfer is interrupted, choose Copy or Move again to resume.</p>
+  <p>Overheard also checks for missing cloud files. If the local file is available, it uploads it again. Use <strong>Sync now</strong> for an immediate check. Files edited in the cloud are kept and reported as a conflict.</p>
+  <h2>How do I open the cloud folder?</h2>
+  <p>In a meeting, click the circular folder button, then <strong>Open cloud folder</strong>. <strong>Show in Finder</strong> still opens the local folder. The share menu also offers <strong>Copy cloud folder link</strong>. These folder links support Dropbox and Google Drive, require access to your account, and do not make the meeting public.</p>
+
+  <h2>Is my audio safe?</h2>
+  <p>Overheard follows a few strict rules:</p>
+  <ul>
+    <li><strong>It never deletes the only copy.</strong> Audio leaves your Mac only after the cloud service confirms it holds exactly the same file.</li>
+    <li><strong>It never touches a meeting in use.</strong> Recording, transcribing, playing or exporting blocks cleanup.</li>
+    <li><strong>It never removes the audio of a meeting without a transcript</strong>, so every meeting stays readable on your Mac.</li>
+    <li><strong>Missing files are never mirrored.</strong> A file missing in the cloud never deletes anything on your Mac, and the reverse is also true. Deleting the cloud copy is always a separate step that you confirm.</li>
+    <li><strong>You get the original back.</strong> With the recommended format, Overheard checks before uploading that the compressed copy rebuilds your audio exactly, sample for sample. Only <em>Maximum savings</em> gives back a close copy instead, and the setting says so.</li>
+    <li><strong>Audio you just downloaded stays.</strong> It won't be cleaned up again right away.</li>
+    <li><strong>Your sign-in stays private.</strong> It is kept in the macOS Keychain, and you can disconnect from Settings at any time.</li>
+  </ul>
+
+  <h2>When something goes wrong</h2>
+  <p>Overheard retries by itself. You don't need to do anything when:</p>
+  <ul>
+    <li><strong>You're offline.</strong> Syncing resumes when you're back online.</li>
+    <li><strong>An upload stops halfway</strong>, even if you quit the app. It continues from where it stopped instead of starting over.</li>
+    <li><strong>You're on a phone hotspot or in Low Data Mode.</strong> Automatic syncing pauses to save data. Click <strong>Sync now</strong> if you want it anyway.</li>
+  </ul>
+  <p>These messages need you:</p>
+  <div class="tbl"><table>
+    <thead><tr><th>The message says</th><th>What to do</th></tr></thead>
+    <tbody>
+      <tr><th>Authorization expired</th><td>Settings → Cloud storage → <strong>Disconnect</strong>, then connect again.</td></tr>
+      <tr><th>Cloud storage is full</th><td>Free up space in your Dropbox or Drive, or upgrade your plan. Syncing resumes on its own.</td></tr>
+      <tr><th>Resolve the conflict copies before syncing</th><td>See the next section.</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2>“Possible conflict” copies</h2>
+  <p>If your <code>~/Meetings</code> folder is inside Dropbox, iCloud Drive or Syncthing, those apps sometimes create duplicates when the same file changes on two devices, such as <code>transcript (Mac's conflicted copy).md</code> or <code>transcript 2.md</code>.</p>
+  <p>Overheard marks these as <strong>Possible conflict</strong> instead of showing them as new meetings. Right-click the meeting and choose <strong>Review conflict copies</strong>. For each copy you can:</p>
+  <ul>
+    <li><strong>Use this copy</strong>: it replaces the original, and the original goes to the Trash.</li>
+    <li><strong>Keep both</strong>: the copy is renamed and kept.</li>
+    <li><strong>Move copy to Trash</strong>.</li>
+  </ul>
+  <p>Nothing is decided for you, and anything removed goes to the Trash so you can recover it. Until you choose, that meeting isn't uploaded or cleaned up.</p>
+
+  <h2>Other services</h2>
+  <ul>
+    <li><strong>Custom WebDAV</strong>: enter your server’s HTTPS folder address, username and app password. Overheard checks the connection right away.</li>
+  </ul>
+
+  <h2>Questions</h2>
+  <p><strong>Does Overheard need to stay open?</strong> Uploads happen while the app is running, which it always is if you leave it in the menu bar.</p>
+  <p><strong>How do I get everything back?</strong> In Settings → Cloud storage → <strong>More</strong>: <strong>Download all audio to this Mac</strong> brings back the audio that's only in the cloud, and <strong>Export all meetings to ZIP</strong> writes one file with every meeting, cloud-only audio included, without filling your Mac's meeting folder. Meetings left on an older service have the same options under <strong>Manage</strong>.</p>
+  <p><strong>What if I trash a meeting by mistake, or lose my Mac's disk?</strong> Overheard keeps a map of every recording it sent to the cloud, outside the meetings folder (and in your Time Machine backups): which service, which files, and how to check them. In Settings → Cloud storage → More, <strong>Recover meetings from the cloud</strong> lists the meetings that are no longer on your Mac and rebuilds any of them from the cloud, with the original audio.</p>
+  <p><strong>What if I turn cloud storage off?</strong> Nothing is deleted, on your Mac or in the cloud. Audio already in the cloud stays there; turn cloud storage back on to download it.</p>
+  <p><strong>Can I switch from Dropbox to Google Drive later?</strong> Yes. When you pick a new place, Overheard asks once what to do with the meetings already stored in the old one, naming both: <strong>Copy</strong> them (they're on both, so you have two copies), <strong>Move</strong> them, like cut and paste (each file is removed from the old place, with the meeting's emptied folder, only after it's checked in the new one; if the old service is unreachable at that moment, Overheard finishes the job when it's back), or <strong>Keep</strong> them where they are (only new meetings go to the new place, and you can still download the old ones from where they are). Your choice is remembered, and Settings shows it with a <strong>Change</strong> button. It works one meeting at a time: audio that's only in the cloud is downloaded, copied and freed again, so your Mac never needs room for the whole archive. If you no longer have access to the old service, meetings that are fully on your Mac still move over.</p>
+  <p><strong>Does Overheard send my meetings anywhere else?</strong> No. Only to the place you choose.</p>
+
+  <p class="sources">Developers and self-hosters: the <a href="https://github.com/anonbeat1/overheard/blob/main/docs/cloud-sync.md">technical reference</a> covers verification, retries, resumable uploads and setting up your own OAuth apps.</p>
+
+  <div class="cta">
+    <img src="../assets/icon-tile.svg" alt="">
+    <div>
+      <h3>Overheard</h3>
+      <p>Records Meet, Teams and Slack calls from your menu bar — no bot, no driver — and transcribes them on your Mac. Free and open source.</p>
+    </div>
+    <a class="dl" href="https://getoverheard.dev">Get Overheard</a>
+  </div>
+</article>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 Gabriele Spilotri Cavaiola · MIT</span>
+    <span><a href="../blog/feed.xml">RSS</a> · <a href="https://github.com/anonbeat1/overheard">GitHub</a></span>
+  </div>
+</footer>
+</body>
+</html>

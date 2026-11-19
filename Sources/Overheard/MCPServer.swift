@@ -131,10 +131,25 @@ enum MCPServer {
         let people = Set(transcript(m).map(\.speaker).filter { !$0.isEmpty }).sorted()
         var parts = ["\(m.id)", m.date.map { $0.formatted(date: .abbreviated, time: .shortened) } ?? "", m.app]
         if let d = duration(dir) { parts.append(d) }
+        if let data = try? Data(contentsOf: dir.appendingPathComponent(CloudManifest.filename)),
+           let manifest = try? JSONDecoder().decode(CloudManifest.self, from: data),
+           CloudFiles.audio.contains(where: { manifest.files[$0] != nil && !CloudFiles.exists(dir.appendingPathComponent($0)) }) {
+            parts.append("audio archived in cloud; download in Overheard for playback or audio export")
+        }
         if !people.isEmpty { parts.append("participants: " + people.joined(separator: ", ")) }
         if FileManager.default.fileExists(atPath: dir.appendingPathComponent("summary.md").path) { parts.append("summary ✓") }
-        if !FileManager.default.fileExists(atPath: dir.appendingPathComponent("transcript.md").path) { parts.append("no transcript") }
+        if !FileManager.default.fileExists(atPath: dir.appendingPathComponent("transcript.md").path) {
+            parts.append(textOnlyInCloud(dir) ? "transcript stored in cloud; open the meeting in Overheard to download it" : "no transcript")
+        }
         return "- " + parts.filter { !$0.isEmpty }.joined(separator: " · ")
+    }
+
+    /// The transcript or summary was archived to the cloud and is no longer on this Mac. This process cannot
+    /// download it (it has no cloud session), so say where it is instead of claiming it does not exist.
+    private static func textOnlyInCloud(_ dir: URL) -> Bool {
+        guard let data = try? Data(contentsOf: dir.appendingPathComponent(CloudManifest.filename)),
+              let manifest = try? JSONDecoder().decode(CloudManifest.self, from: data) else { return false }
+        return CloudFiles.text.contains { manifest.files[$0] != nil && !CloudFiles.exists(dir.appendingPathComponent($0)) }
     }
 
     private static func transcript(_ m: Meeting) -> [TranscriptLine] {
@@ -183,7 +198,7 @@ enum MCPServer {
         if let s = try? String(contentsOf: dir.appendingPathComponent("summary.md"), encoding: .utf8) { out += "\n" + s + "\n" }
         if a["include_transcript"] as? Bool ?? true {
             let lines = transcript(m)
-            out += "\n## Transcript\n" + (lines.isEmpty ? "(not available yet)" :
+            out += "\n## Transcript\n" + (lines.isEmpty ? (textOnlyInCloud(dir) ? "(stored in the cloud: open the meeting in Overheard to download it)" : "(not available yet)") :
                 lines.map { $0.speaker.isEmpty ? $0.text : "[\($0.time)] \($0.speaker): \($0.text)" }.joined(separator: "\n"))
         }
         return out
@@ -212,6 +227,7 @@ enum MCPServer {
         guard rows.indices.contains(line), rows[line].contains("- [") else { throw TranscriptionError.message("Line \(line) is not an action item") }
         rows[line] = rows[line].replacingOccurrences(of: done ? "- [ ] " : "- [x] ", with: done ? "- [x] " : "- [ ] ")
         try rows.joined(separator: "\n").write(to: url, atomically: true, encoding: .utf8)
+        try? CloudProvenance.record(url)
         NotesExport.exportIfEnabled(m.url)
         return (done ? "Done: " : "Reopened: ") + rows[line].trimmingCharacters(in: .whitespaces)
     }

@@ -107,7 +107,8 @@ final class Recorder: ObservableObject {
         Timer.scheduledTimer(withTimeInterval: 3600, repeats: true) { _ in
             Task { @MainActor in Recorder.shared.cleanOld() }
         }
-        DispatchQueue.main.async { Recorder.shared.cleanOld() }
+        Transcriber.clearStaleMarkers() // before the first sync and cleanup, which skip marked meetings
+        DispatchQueue.main.async { CloudSync.shared.start(); Recorder.shared.cleanOld() }
         DispatchQueue.main.async { Recorder.shared.recoverInterrupted() }
         Timer.scheduledTimer(withTimeInterval: 3, repeats: true) { _ in
             Task { @MainActor in Recorder.shared.tick() }
@@ -353,6 +354,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
         if urls.contains(where: { $0.host == "toggle" }) { MainActor.assumeIsolated { Recorder.shared.toggle() } }
         if urls.contains(where: { $0.host == "bookmark" }) { MainActor.assumeIsolated { Recorder.shared.bookmark() } }
         if urls.contains(where: { $0.host == "meetings" }) { MainActor.assumeIsolated { TranscriptWindow.show(nil) } }
+        // overheard://settings (the page shown in the browser after connecting a cloud account)
+        if urls.contains(where: { $0.host == "settings" }) { MainActor.assumeIsolated { SettingsWindow.show() } }
         // overheard://import?url=<file o link> (es. da Raycast)
         for u in urls where u.host == "import" {
             guard let v = URLComponents(url: u, resolvingAgainstBaseURL: false)?.queryItems?.first(where: { $0.name == "url" })?.value else { continue }
@@ -376,13 +379,19 @@ struct Meeting: Identifiable {
         func read(_ name: String) -> String? {
             (try? String(contentsOf: d.appendingPathComponent(name), encoding: .utf8))?.trimmingCharacters(in: .whitespacesAndNewlines)
         }
-        return Meeting(url: d, source: read("source") ?? "altro", title: read("title"))
+        let archivedTitle = CloudSync.manifest(d).flatMap { manifest in
+            manifest.archived.contains("title") ? CloudLedger.current.entry(manifest.meeting)?.title : nil
+        }
+        return Meeting(url: d, source: read("source") ?? "altro", title: read("title") ?? archivedTitle)
     }
 
     static func recent(_ n: Int = 4) -> [Meeting] {
         let fm = FileManager.default
         let dirs = (try? fm.contentsOfDirectory(at: URL(fileURLWithPath: "\(home)/Meetings"), includingPropertiesForKeys: nil)) ?? []
-        return dirs.filter { $0.lastPathComponent.hasPrefix("20") }
+        return dirs.filter {
+            let values = try? $0.resourceValues(forKeys: [.isDirectoryKey, .isSymbolicLinkKey])
+            return $0.lastPathComponent.hasPrefix("20") && values?.isDirectory == true && values?.isSymbolicLink != true
+        }
             .sorted { $0.lastPathComponent > $1.lastPathComponent }
             .prefix(n)
             .map(Meeting.at)
@@ -390,8 +399,11 @@ struct Meeting: Identifiable {
 
     var date: Date? {
         let f = DateFormatter()
-        f.dateFormat = id.count > 15 ? "yyyy-MM-dd_HHmmss" : "yyyy-MM-dd_HHmm"
-        return f.date(from: id)
+        guard let range = id.range(of: #"^20[0-9]{2}-[0-9]{2}-[0-9]{2}_[0-9]{4}(?:[0-9]{2})?"#, options: .regularExpression) else { return nil }
+        let timestamp = String(id[range])
+        f.locale = Locale(identifier: "en_US_POSIX")
+        f.dateFormat = timestamp.count > 15 ? "yyyy-MM-dd_HHmmss" : "yyyy-MM-dd_HHmm"
+        return f.date(from: timestamp)
     }
 
     /// "12:20" oggi, "ieri 20:20", altrimenti "10 ott 20:20"
