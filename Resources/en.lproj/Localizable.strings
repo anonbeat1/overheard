@@ -65,6 +65,10 @@
 "Download non riuscito (link non supportato?)" = "Download failed (unsupported link?)";
 "ElevenLabs HTTP %lld: %@" = "ElevenLabs HTTP %lld: %@";
 "Elimina i meeting più vecchi di" = "Delete meetings older than";
+"Vuoi un archivio nel cloud?" = "Want a cloud archive?";
+"Facoltativo: puoi saltare e farlo quando vuoi dalle Impostazioni." = "Optional: you can skip this and do it any time from Settings.";
+"Con il cloud attivo “Solo l'audio” non si applica: l'audio si libera con la regola del cloud, solo dopo la verifica della copia." = "With cloud storage on, “Audio only” does not apply: audio is freed by the cloud rule, only after the copy is verified.";
+"Con il cloud attivo anche le copie nel cloud vanno nel cestino del servizio, che Overheard non svuota mai." = "With cloud storage on, the cloud copies also go to the service's trash, which Overheard never empties.";
 "Elimina l'intera cartella del meeting: audio, transcript e riassunto." = "Deletes the whole meeting folder: audio, transcript and summary.";
 "Elimina le registrazioni audio (~700 MB/ora) e conserva transcript e riassunti." = "Deletes the audio recordings (~700 MB/hour) and keeps transcripts and summaries.";
 "Errore: " = "Error: ";

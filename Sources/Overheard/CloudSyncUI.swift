@@ -1167,6 +1167,58 @@ final class CloudSync: ObservableObject {
     }
 }
 
+/// "Delete meetings older than N days", kept in the same card as the cloud settings: with cloud storage on, the
+/// rule works together with the cloud copy (everything is removed from the Mac and the cloud copy goes to the
+/// service's trash; "audio only" is left to the verified cloud cleanup above).
+struct RetentionRules: View {
+    @ObservedObject private var rec = Recorder.shared
+    @AppStorage("retentionDays") private var days = 0
+    @AppStorage("retentionMode") private var mode = "audio"
+    @AppStorage("cloud.enabled") private var cloudOn = false
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Text("Elimina i meeting più vecchi di")
+                Spacer()
+                Picker("", selection: $days) {
+                    Text("Mai").tag(0)
+                    Text("7 giorni").tag(7)
+                    Text("30 giorni").tag(30)
+                    Text("90 giorni").tag(90)
+                    Text("6 mesi").tag(180)
+                    Text("1 anno").tag(365)
+                }
+                .labelsHidden()
+                .fixedSize()
+                .onChange(of: days) { _, _ in rec.cleanOld() }
+            }
+            if days > 0 {
+                Picker("", selection: $mode) {
+                    Text("Solo l'audio").tag("audio")
+                    Text("Tutto").tag("all")
+                }
+                .pickerStyle(.segmented)
+                .labelsHidden()
+                .onChange(of: mode) { _, _ in rec.cleanOld() }
+                Text(mode == "audio"
+                     ? "Elimina le registrazioni audio (~700 MB/ora) e conserva transcript e riassunti."
+                     : "Elimina l'intera cartella del meeting: audio, transcript e riassunto.")
+                    .font(.caption).foregroundStyle(.secondary)
+                if cloudOn {
+                    Text(mode == "audio"
+                         ? "Con il cloud attivo “Solo l'audio” non si applica: l'audio si libera con la regola del cloud, solo dopo la verifica della copia."
+                         : "Con il cloud attivo anche le copie nel cloud vanno nel cestino del servizio, che Overheard non svuota mai.")
+                        .font(.caption).foregroundStyle(mode == "audio" ? .orange : .secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                Text("I file vanno nel Cestino: si possono recuperare finché non lo svuoti. Controllo all'avvio e ogni ora.")
+                    .font(.caption).foregroundStyle(.secondary)
+            }
+        }
+    }
+}
+
 struct CloudSettingsView: View {
     @ObservedObject private var cloud = CloudSync.shared
     @AppStorage("cloud.enabled") private var enabled = false
@@ -1308,6 +1360,8 @@ struct CloudSettingsView: View {
                     }
                 }
             }.disabled(cloud.running)
+            Divider()
+            RetentionRules()
             if enabled, needsAccount {
                 Text("Nessun account collegato: la sincronizzazione è in pausa. Collega l'account oppure disattiva “Sincronizza le riunioni”.")
                     .font(.caption).foregroundStyle(.orange).fixedSize(horizontal: false, vertical: true)

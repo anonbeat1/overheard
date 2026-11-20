@@ -65,6 +65,10 @@
 "Download non riuscito (link non supportato?)" = "下载失败（链接不受支持？）";
 "ElevenLabs HTTP %lld: %@" = "ElevenLabs HTTP %lld：%@";
 "Elimina i meeting più vecchi di" = "删除早于";
+"Vuoi un archivio nel cloud?" = "需要云端归档吗？";
+"Facoltativo: puoi saltare e farlo quando vuoi dalle Impostazioni." = "可选：可以跳过，之后随时在设置中进行。";
+"Con il cloud attivo “Solo l'audio” non si applica: l'audio si libera con la regola del cloud, solo dopo la verifica della copia." = "启用云端后，“仅音频”不适用：音频由云端规则释放，且仅在副本验证之后。";
+"Con il cloud attivo anche le copie nel cloud vanno nel cestino del servizio, che Overheard non svuota mai." = "启用云端后，云端副本也会进入服务的回收站，Overheard 绝不会清空它。";
 "Elimina l'intera cartella del meeting: audio, transcript e riassunto." = "删除整个会议文件夹：音频、记录和摘要。";
 "Elimina le registrazioni audio (~700 MB/ora) e conserva transcript e riassunti." = "删除录音（约 700 MB/小时）并保留记录和摘要。";
 "Errore: " = "错误： ";

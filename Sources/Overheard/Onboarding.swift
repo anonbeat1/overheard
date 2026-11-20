@@ -14,7 +14,7 @@ struct OnboardingView: View {
     @State private var page = 0
     @State private var forward = true
     @State private var nav = 0 // identità nuova a ogni passaggio: una pagina che rientra mentre esce non sparisce
-    private let pages = 5
+    private let pages = 6
 
     var body: some View {
         ZStack {
@@ -30,6 +30,7 @@ struct OnboardingView: View {
                 case 1: Features()
                 case 2: SetupVoice()
                 case 3: SetupPrefs()
+                case 4: SetupCloud()
                 default: Ready()
                 }
             }
@@ -344,6 +345,20 @@ private struct SetupPrefs: View {
             }
             Spacer()
             Toggle("", isOn: on).labelsHidden().toggleStyle(.switch).controlSize(.small).tint(coral)
+        }
+    }
+}
+
+/// Optional step: the same cloud settings as in Settings (account, what to upload, delete-after rule), so a
+/// first-time user can finish the setup here. Skipping it leaves cloud storage off.
+private struct SetupCloud: View {
+    var body: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            Heading(title: "Vuoi un archivio nel cloud?", subtitle: "Facoltativo: puoi saltare e farlo quando vuoi dalle Impostazioni.")
+            ScrollView {
+                CloudSettingsView().padding(.trailing, 4)
+            }
+            .scrollIndicators(.hidden)
         }
     }
 }

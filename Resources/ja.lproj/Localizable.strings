@@ -65,6 +65,10 @@
 "Download non riuscito (link non supportato?)" = "ダウンロードに失敗しました (サポートされていないリンク?)";
 "ElevenLabs HTTP %lld: %@" = "ElevenLabs HTTP %lld: %@";
 "Elimina i meeting più vecchi di" = "より古い会議を削除します";
+"Vuoi un archivio nel cloud?" = "クラウドにアーカイブしますか？";
+"Facoltativo: puoi saltare e farlo quando vuoi dalle Impostazioni." = "任意です。スキップして、いつでも設定から行えます。";
+"Con il cloud attivo “Solo l'audio” non si applica: l'audio si libera con la regola del cloud, solo dopo la verifica della copia." = "クラウドが有効な間は「音声のみ」は適用されません。音声はクラウドのルールで、コピーを確認した後にのみ解放されます。";
+"Con il cloud attivo anche le copie nel cloud vanno nel cestino del servizio, che Overheard non svuota mai." = "クラウドが有効な間は、クラウド上のコピーもサービスのゴミ箱に移されます。Overheard がゴミ箱を空にすることはありません。";
 "Elimina l'intera cartella del meeting: audio, transcript e riassunto." = "会議フォルダー全体 (音声、トランスクリプト、概要) を削除します。";
 "Elimina le registrazioni audio (~700 MB/ora) e conserva transcript e riassunti." = "音声録音 (約 700 MB/時間) を削除し、トランスクリプトと概要を保存します。";
 "Errore: " = "エラー: ";

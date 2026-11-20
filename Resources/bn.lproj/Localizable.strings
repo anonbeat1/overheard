@@ -65,6 +65,10 @@
 "Download non riuscito (link non supportato?)" = "ডাউনলোড ব্যর্থ হয়েছে (অসমর্থিত লিঙ্ক?)";
 "ElevenLabs HTTP %lld: %@" = "ElevenLabs HTTP %lld: %@";
 "Elimina i meeting più vecchi di" = "এর থেকে পুরানো মিটিং মুছুন";
+"Vuoi un archivio nel cloud?" = "ক্লাউডে আর্কাইভ চান?";
+"Facoltativo: puoi saltare e farlo quando vuoi dalle Impostazioni." = "ঐচ্ছিক: এড়িয়ে যেতে পারেন এবং যেকোনো সময় সেটিংস থেকে করতে পারেন।";
+"Con il cloud attivo “Solo l'audio” non si applica: l'audio si libera con la regola del cloud, solo dopo la verifica della copia." = "ক্লাউড চালু থাকলে “শুধু অডিও” প্রযোজ্য নয়: ক্লাউডের নিয়মে অডিও খালি হয়, কপি যাচাইয়ের পরেই।";
+"Con il cloud attivo anche le copie nel cloud vanno nel cestino del servizio, che Overheard non svuota mai." = "ক্লাউড চালু থাকলে ক্লাউডের কপিও সার্ভিসের ট্র্যাশে যায়, যা Overheard কখনও খালি করে না।";
 "Elimina l'intera cartella del meeting: audio, transcript e riassunto." = "সম্পূর্ণ মিটিং ফোল্ডার মুছে দেয়: অডিও, ট্রান্সক্রিপ্ট এবং সারাংশ।";
 "Elimina le registrazioni audio (~700 MB/ora) e conserva transcript e riassunti." = "অডিও রেকর্ডিং (~700 MB/ঘন্টা) মুছে দেয় এবং প্রতিলিপি এবং সারাংশ রাখে।";
 "Errore: " = "ত্রুটি: ";
