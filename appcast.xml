@@ -3,6 +3,24 @@
     <channel>
         <title>Overheard</title>
         <item>
+            <title>0.4</title>
+            <pubDate>Fri, 20 Nov 2026 10:31:10 +0100</pubDate>
+            <link>https://github.com/anonbeat1/overheard</link>
+            <sparkle:version>9</sparkle:version>
+            <sparkle:shortVersionString>0.4</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>14.2</sparkle:minimumSystemVersion>
+            <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
+            <description sparkle:format="markdown"><![CDATA[- **Cloud storage**, off until you turn it on: keep a copy of every meeting in Google Drive, Dropbox, OneDrive, iCloud Drive, a synced folder, WebDAV (Nextcloud, NAS…) or S3-compatible storage. Each copy is checked before anything is removed from your Mac. Thanks @Til0r!
+- **Free up audio space**: once a meeting is transcribed and safely in the cloud, its audio can leave your Mac and come back with one click when you want to listen again. It can also happen automatically after 7, 30 or 90 days.
+- Nothing is ever deleted for good: removed cloud copies go to the service's trash, and a meeting deleted on the cloud side is not uploaded again unless you choose to.
+- **Sync conflict copies** (Syncthing, Dropbox, iCloud, Drive) show up in the library to review instead of appearing as new meetings.
+- Uploads and downloads show size, speed and time left, with a Stop button. Guide: [getoverheard.dev/cloud-storage](https://getoverheard.dev/cloud-storage/).
+- Overheard now speaks **ten more languages**: Arabic, Bengali, Chinese (Simplified), French, German, Hindi, Japanese, Portuguese, Russian and Spanish. It follows your Mac's language, or pick one in Settings. Thanks again @Til0r!
+- Settings content no longer scrolls under the window buttons.
+]]></description>
+            <enclosure url="https://github.com/anonbeat1/overheard/releases/download/v0.4/Overheard-0.4.dmg" length="53108661" type="application/octet-stream" sparkle:edSignature="JJHYpevl9Eo2k1P+sBXeoFHxz8L4r2XlyLTBfHtmfu/t1wYyyV/2tlMI28kYzzTjPMZOhBkuNb5TrLpM3EJ7CA=="/>
+        </item>
+        <item>
             <title>0.3.2</title>
             <pubDate>Thu, 22 Oct 2026 18:23:14 +0200</pubDate>
             <link>https://github.com/anonbeat1/overheard</link>
@@ -28,22 +46,6 @@
 - Updates now come from getoverheard.dev.
 ]]></description>
             <enclosure url="https://github.com/anonbeat1/overheard/releases/download/v0.3.1/Overheard-0.3.1.dmg" length="51355238" type="application/octet-stream" sparkle:edSignature="pwJQL0iGP/rceu+orOomA8gY997rqd+BRPOfsj8e+6AGl/iNAY2WA9V7WMRz9PLebyl+tOoXvxKrp96B3cc9DQ=="/>
-        </item>
-        <item>
-            <title>0.3</title>
-            <pubDate>Thu, 22 Oct 2026 17:17:23 +0200</pubDate>
-            <link>https://github.com/anonbeat1/overheard</link>
-            <sparkle:version>6</sparkle:version>
-            <sparkle:shortVersionString>0.3</sparkle:shortVersionString>
-            <sparkle:minimumSystemVersion>14.2</sparkle:minimumSystemVersion>
-            <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
-            <description sparkle:format="markdown"><![CDATA[- **Apple Intelligence** for summaries and chat: everything on your Mac, no account and nothing to install (macOS 26, Apple Intelligence turned on).
-- Pick the AI for summaries and chat in **Settings**: Claude Code, Codex or Apple Intelligence.
-- Updates no longer interrupt you: during a call or a transcription Overheard waits, and shows a dot on the menu bar icon instead.
-- New option: **Install updates automatically**.
-- Signed and notarized by Apple: Overheard opens with a double click, no more "Open Anyway". Because the signature changes, macOS asks once more for microphone and system audio access after this update.
-]]></description>
-            <enclosure url="https://github.com/anonbeat1/overheard/releases/download/v0.3/Overheard-0.3.dmg" length="51344957" type="application/octet-stream" sparkle:edSignature="RMz2G4aYNm6TiGPe6eb9mD6j3IQpNjwhECR5T5RuPx5ebAZr4PgxXpv74IFCZVsCcAggwl7mx0LVPlxF6xHYCA=="/>
         </item>
     </channel>
 </rss>
