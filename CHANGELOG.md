@@ -3,6 +3,16 @@
 What's new in each version of Overheard. `release.sh` puts the section of the version it publishes
 in the update window and on the GitHub release, so write it for people who use the app.
 
+## 0.4
+
+- **Cloud storage**, off until you turn it on: keep a copy of every meeting in Google Drive, Dropbox, OneDrive, iCloud Drive, a synced folder, WebDAV (Nextcloud, NAS…) or S3-compatible storage. Each copy is checked before anything is removed from your Mac. Thanks @Til0r!
+- **Free up audio space**: once a meeting is transcribed and safely in the cloud, its audio can leave your Mac and come back with one click when you want to listen again. It can also happen automatically after 7, 30 or 90 days.
+- Nothing is ever deleted for good: removed cloud copies go to the service's trash, and a meeting deleted on the cloud side is not uploaded again unless you choose to.
+- **Sync conflict copies** (Syncthing, Dropbox, iCloud, Drive) show up in the library to review instead of appearing as new meetings.
+- Uploads and downloads show size, speed and time left, with a Stop button. Guide: [getoverheard.dev/cloud-storage](https://getoverheard.dev/cloud-storage/).
+- Overheard now speaks **ten more languages**: Arabic, Bengali, Chinese (Simplified), French, German, Hindi, Japanese, Portuguese, Russian and Spanish. It follows your Mac's language, or pick one in Settings. Thanks again @Til0r!
+- Settings content no longer scrolls under the window buttons.
+
 ## 0.3.2
 
 - Select several meetings in the library (checklist button or ⌘-click) and move them to the Trash with one confirmation. Thanks @VitoSaulle!
