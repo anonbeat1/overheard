@@ -41,7 +41,7 @@ With the project's own OAuth apps in the build, users only click Connect and app
 2. **APIs & Services → Library**: enable **Google Drive API**.
 3. **Google Auth Platform**: Branding (app name, support and developer email); Audience **External**, add yourself under **Test users**; Data access: add the scope `https://www.googleapis.com/auth/drive.file` only.
 4. **Clients → Create client**: type **Desktop app**. Copy the client ID and secret. Desktop clients need no redirect URI: loopback redirects on any port are allowed.
-5. While the app is in **Testing**, refresh tokens expire after 7 days and only test users can connect. Before release, **Publish app**. `drive.file` is non-sensitive, so no security assessment is required, but Google may verify the brand: verified domain (getoverheard.dev), home page and a privacy policy page.
+5. While the app is in **Testing**, refresh tokens expire after 7 days and only test users can connect. Before release, **Publish app**. `drive.file` is non-sensitive, so no security assessment is required, but Google may verify the brand: verified domain (getoverheard.dev), home page (`https://getoverheard.dev/`) and privacy policy (`https://getoverheard.dev/privacy/`).
 
 **OneDrive** → `OVERHEARD_ONEDRIVE_CLIENT_ID`
 
