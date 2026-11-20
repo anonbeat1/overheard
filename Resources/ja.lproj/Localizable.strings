@@ -737,3 +737,7 @@
 "Apri in Google Drive" = "Google ドライブで開く";
 
 "Cartella Google Drive nel Cestino o non accessibile. Ripristinala o scegli un'altra cartella." = "Google ドライブのフォルダはゴミ箱にあるか、アクセスできません。復元するか、別のフォルダを選択してください。";
+
+"Chiamate WhatsApp, Telegram e FaceTime" = "WhatsApp・Telegram・FaceTime の通話";
+
+"Registra anche queste chiamate quando usano il microfono" = "これらの通話がマイクを使用するときも録音します";

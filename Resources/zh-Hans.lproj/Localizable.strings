@@ -737,3 +737,7 @@
 "Apri in Google Drive" = "在 Google 云端硬盘中打开";
 
 "Cartella Google Drive nel Cestino o non accessibile. Ripristinala o scegli un'altra cartella." = "Google 云端硬盘文件夹在回收站中或无法访问。请恢复该文件夹或选择其他文件夹。";
+
+"Chiamate WhatsApp, Telegram e FaceTime" = "WhatsApp、Telegram 和 FaceTime 通话";
+
+"Registra anche queste chiamate quando usano il microfono" = "当这些通话使用麦克风时也自动录制";

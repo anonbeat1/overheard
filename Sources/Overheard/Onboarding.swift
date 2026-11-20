@@ -305,6 +305,7 @@ private struct SetupPrefs: View {
             Heading(title: "Come vuoi usarlo?", subtitle: "Scegli cosa fa da solo.")
             Card {
                 toggle("record.circle", "Registra automaticamente", "Quando Meet, Teams o Slack usano il microfono", $rec.autoDetect)
+                toggle("phone.bubble", "Chiamate WhatsApp, Telegram e FaceTime", "Registra anche queste chiamate quando usano il microfono", $rec.chatCalls)
                 toggle("calendar", "Titoli dal calendario", "Il meeting prende titolo e invitati dall'evento", $calendarOn.onSet { on in
                     guard on, !MeetingCalendar.authorized else { return }
                     Task { @MainActor in calendarOn = await MeetingCalendar.requestAccess() }
