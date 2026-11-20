@@ -86,6 +86,8 @@ struct SettingsView: View {
                 Divider().overlay(Color.white.opacity(0.1))
                 row("Registra automaticamente", "Parte quando Meet o Teams usano il microfono", $rec.autoDetect)
                 Divider().overlay(Color.white.opacity(0.1))
+                row("Chiamate WhatsApp, Telegram e FaceTime", "Registra anche queste chiamate quando usano il microfono", $rec.chatCalls)
+                Divider().overlay(Color.white.opacity(0.1))
                 HStack {
                     VStack(alignment: .leading, spacing: 2) {
                         Text("Ferma dopo la fine della call")

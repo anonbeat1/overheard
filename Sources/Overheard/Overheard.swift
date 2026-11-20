@@ -18,7 +18,9 @@ func prop<T>(_ obj: AudioObjectID, _ sel: AudioObjectPropertySelector, _ initial
     return AudioObjectGetPropertyData(obj, &addr, 0, nil, &size, &value) == noErr ? value : nil
 }
 
-func micUsers() -> [String] {
+/// Bundle ID dei processi con il microfono attivo; `duplex`: solo quelli che in più stanno riproducendo audio.
+/// Una chiamata ha ingresso e uscita insieme, un messaggio vocale registrato o riascoltato ne ha uno solo.
+func micUsers(duplex: Bool = false) -> [String] {
     var addr = AudioObjectPropertyAddress(mSelector: kAudioHardwarePropertyProcessObjectList, mScope: kAudioObjectPropertyScopeGlobal, mElement: kAudioObjectPropertyElementMain)
     var size: UInt32 = 0
     AudioObjectGetPropertyDataSize(AudioObjectID(kAudioObjectSystemObject), &addr, 0, nil, &size)
@@ -26,6 +28,7 @@ func micUsers() -> [String] {
     AudioObjectGetPropertyData(AudioObjectID(kAudioObjectSystemObject), &addr, 0, nil, &size, &ids)
     return ids.compactMap { id in
         guard prop(id, kAudioProcessPropertyIsRunningInput, UInt32(0)) == 1 else { return nil }
+        if duplex, prop(id, kAudioProcessPropertyIsRunningOutput, UInt32(0)) != 1 { return nil }
         return prop(id, kAudioProcessPropertyBundleID, "" as CFString) as String?
     }
 }
@@ -35,6 +38,13 @@ func meetingSource() -> String? {
     let users = micUsers().filter { $0 != "com.apple.replayd" }.joined(separator: "\n").lowercased()
     if users.contains("teams") { return "teams" }
     if users.contains("slack") { return "slack" } // huddle (com.tinyspeck.slackmacgap)
+    // Chiamate di chat (solo con ingresso e uscita audio insieme, così i messaggi vocali non contano):
+    // net.whatsapp.WhatsApp, ru.keepcoder.Telegram / org.telegram.desktop, com.apple.FaceTime (anche le chiamate dell'iPhone).
+    // Si riconoscono sempre (per l'etichetta e lo stop); l'avvio automatico dipende da "chatCalls".
+    let calls = micUsers(duplex: true).filter { $0 != "com.apple.replayd" }.joined(separator: "\n").lowercased()
+    if calls.contains("whatsapp") { return "whatsapp" }
+    if calls.contains("telegram") || calls.contains("keepcoder") { return "telegram" }
+    if calls.contains("com.apple.facetime") || calls.contains("avconferenced") { return "facetime" }
     if ["chrome", "safari", "arc", "brave", "firefox", "edgemac", "vivaldi", "opera"].contains(where: users.contains) { return "meet" }
     return nil
 }
@@ -54,6 +64,11 @@ final class Recorder: ObservableObject {
     @Published var autoDetect = UserDefaults.standard.object(forKey: "autoDetect") as? Bool ?? true {
         didSet { UserDefaults.standard.set(autoDetect, forKey: "autoDetect") }
     }
+    /// Registra in automatico anche le chiamate WhatsApp, Telegram e FaceTime (spenta di default: sono chiamate private)
+    @Published var chatCalls = UserDefaults.standard.bool(forKey: "autoDetect.chatCalls") {
+        didSet { UserDefaults.standard.set(chatCalls, forKey: "autoDetect.chatCalls") }
+    }
+    static let chatSources: Set<String> = ["whatsapp", "telegram", "facetime"]
     /// Motore di trascrizione: "elevenlabs" o "local"
     @Published var engine = Recorder.defaultEngine {
         didSet { UserDefaults.standard.set(engine, forKey: "engine") }
@@ -101,6 +116,7 @@ final class Recorder: ObservableObject {
     private var handled = false // call già gestita (registrata o scartata): non ripartire finché non lascia il mic
     private var sawMeeting = false // la call è stata vista durante la registrazione
     private var goneSince: Date?
+    private var chatStreak = 0
 
     init() {
         // pulizia dei meeting vecchi all'avvio e poi ogni ora
@@ -130,12 +146,16 @@ final class Recorder: ObservableObject {
                 if let g = goneSince, Date().timeIntervalSince(g) >= wait, !busy { toggle(reason: "Riunione terminata") }
             }
         } else if let m = meeting {
-            if !handled && autoDetect {
+            let isChat = Self.chatSources.contains(m)
+            chatStreak = isChat ? chatStreak + 1 : 0
+            // Le chiamate di chat partono solo se confermate da due controlli di fila (~6 s)
+            if !handled && autoDetect && (isChat ? chatCalls && chatStreak >= 2 : true) {
                 handled = true
                 toggle(auto: m)
             }
         } else {
             handled = false
+            chatStreak = 0
         }
     }
 
@@ -422,6 +442,9 @@ struct Meeting: Identifiable {
         case "meet": "Google Meet"
         case "teams": "Microsoft Teams"
         case "slack": "Slack"
+        case "whatsapp": "WhatsApp"
+        case "telegram": "Telegram"
+        case "facetime": "FaceTime"
         default: String(localized: "Altro")
         }
         let label = Prefs.label(source)
@@ -429,7 +452,7 @@ struct Meeting: Identifiable {
     }
 }
 
-/// Icona di Teams o Slack (dall'app installata), altrimenti un simbolo.
+/// Icona di Teams, Slack, WhatsApp, Telegram o FaceTime (dall'app installata), altrimenti un simbolo.
 struct SourceIcon: View {
     let source: String
     var body: some View {
@@ -452,6 +475,13 @@ struct SourceIcon: View {
             return url.map { ws.icon(forFile: $0.path) }
         case "slack":
             return ws.urlForApplication(withBundleIdentifier: "com.tinyspeck.slackmacgap").map { ws.icon(forFile: $0.path) }
+        case "whatsapp":
+            return ws.urlForApplication(withBundleIdentifier: "net.whatsapp.WhatsApp").map { ws.icon(forFile: $0.path) }
+        case "telegram":
+            let url = ["ru.keepcoder.Telegram", "org.telegram.desktop"].lazy.compactMap { ws.urlForApplication(withBundleIdentifier: $0) }.first
+            return url.map { ws.icon(forFile: $0.path) }
+        case "facetime":
+            return ws.urlForApplication(withBundleIdentifier: "com.apple.FaceTime").map { ws.icon(forFile: $0.path) }
         default:
             return nil
         }
@@ -464,6 +494,9 @@ func sourceLabel(_ s: String) -> (String, Color) {
     case "teams": ("Teams", .indigo)
     case "meet": ("Meet", .teal)
     case "slack": ("Slack", .purple)
+    case "whatsapp": ("WhatsApp", .green)
+    case "telegram": ("Telegram", .blue)
+    case "facetime": ("FaceTime", .mint)
     case "import": (String(localized: "Importato"), .blue)
     default: (String(localized: "Altro"), .gray)
     }
