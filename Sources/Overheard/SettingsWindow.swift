@@ -39,7 +39,7 @@ struct SettingsView: View {
         ScrollView {
             content
                 .padding(.horizontal, 22)
-                .padding(.top, 38) // spazio per i pulsanti della finestra (barra del titolo trasparente)
+                .padding(.top, 6)
                 .padding(.bottom, 22)
         }
         .frame(minWidth: 440, idealWidth: 460, minHeight: 360, idealHeight: 640)
@@ -420,7 +420,7 @@ enum SettingsWindow {
     static func show() {
         let w = window ?? {
             let w = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 460, height: 640),
-                             styleMask: [.titled, .closable, .resizable, .fullSizeContentView], backing: .buffered, defer: false)
+                             styleMask: [.titled, .closable, .resizable], backing: .buffered, defer: false)
             w.titlebarAppearsTransparent = true
             w.titleVisibility = .hidden
             w.isMovableByWindowBackground = true
