@@ -14,11 +14,10 @@ struct SettingsView: View {
     @AppStorage("myName") private var myName = ""
     @AppStorage("micDevice") private var micDevice = ""
     @AppStorage("keyterms") private var keyterms = ""
-    @AppStorage("retentionDays") private var retentionDays = 0
-    @AppStorage("retentionMode") private var retentionMode = "audio"
     @AppStorage("echoReduction") private var echoReduction = true
     @AppStorage("language") private var language = ""
     @State private var appLanguage = AppLanguage.selected
+    @State private var restartWhenIdle = AppRestart.waiting
     @AppStorage("calendar.enabled") private var calendarOn = false
     @AppStorage("summary.auto") private var summaryAuto = true
     @AppStorage("SUAutomaticallyUpdate") private var autoUpdate = false // la chiave che legge Sparkle
@@ -66,9 +65,24 @@ struct SettingsView: View {
                     }
                 }
                 .onChange(of: appLanguage) { _, value in AppLanguage.save(value) }
-                Text("La modifica si applica alla prossima apertura dell'app.")
-                    .font(.caption).foregroundStyle(.white.opacity(0.5))
-                    .fixedSize(horizontal: false, vertical: true)
+                if appLanguage != AppLanguage.launched {
+                    HStack {
+                        Text(restartWhenIdle ? "Riavvio al termine della registrazione o trascrizione."
+                                             : "La modifica si applica al riavvio dell'app.")
+                            .font(.caption).foregroundStyle(.white.opacity(0.5))
+                            .fixedSize(horizontal: false, vertical: true)
+                        Spacer()
+                        if restartWhenIdle {
+                            Button("Annulla") { AppRestart.cancelWaiting(); restartWhenIdle = false }
+                        } else {
+                            Button("Applica e riavvia") { AppRestart.requestRelaunch(onWaiting: { restartWhenIdle = true }) }
+                        }
+                    }
+                } else {
+                    Text("La modifica si applica alla prossima apertura dell'app.")
+                        .font(.caption).foregroundStyle(.white.opacity(0.5))
+                        .fixedSize(horizontal: false, vertical: true)
+                }
                 Divider().overlay(Color.white.opacity(0.1))
                 row("Registra automaticamente", "Parte quando Meet o Teams usano il microfono", $rec.autoDetect)
                 Divider().overlay(Color.white.opacity(0.1))
@@ -100,39 +114,6 @@ struct SettingsView: View {
                     Button("Controlla aggiornamenti…") { Updates.check() }
                 }
                 row("Installa gli aggiornamenti automaticamente", "Li scarica in background e li installa alla prossima chiusura di Overheard", $autoUpdate)
-            }
-
-            Card {
-                HStack {
-                    Text("Elimina i meeting più vecchi di")
-                    Spacer()
-                    Picker("", selection: $retentionDays) {
-                        Text("Mai").tag(0)
-                        Text("7 giorni").tag(7)
-                        Text("30 giorni").tag(30)
-                        Text("90 giorni").tag(90)
-                        Text("6 mesi").tag(180)
-                        Text("1 anno").tag(365)
-                    }
-                    .labelsHidden()
-                    .fixedSize()
-                    .onChange(of: retentionDays) { _, _ in rec.cleanOld() }
-                }
-                if retentionDays > 0 {
-                    Picker("", selection: $retentionMode) {
-                        Text("Solo l'audio").tag("audio")
-                        Text("Tutto").tag("all")
-                    }
-                    .pickerStyle(.segmented)
-                    .labelsHidden()
-                    .onChange(of: retentionMode) { _, _ in rec.cleanOld() }
-                    Text(retentionMode == "audio"
-                         ? "Elimina le registrazioni audio (~700 MB/ora) e conserva transcript e riassunti."
-                         : "Elimina l'intera cartella del meeting: audio, transcript e riassunto.")
-                        .font(.caption).foregroundStyle(.white.opacity(0.5))
-                    Text("I file vanno nel Cestino: si possono recuperare finché non lo svuoti. Controllo all'avvio e ogni ora.")
-                        .font(.caption).foregroundStyle(.white.opacity(0.5))
-                }
             }
 
             Card {
@@ -238,6 +219,8 @@ struct SettingsView: View {
                 Text("Ogni meeting diventa una nota markdown con data, partecipanti e transcript. Per Notion: Importa → Markdown.")
                     .font(.caption).foregroundStyle(.white.opacity(0.5)).fixedSize(horizontal: false, vertical: true)
             }
+
+            CloudSettingsView()
 
             Card {
                 Text("La tua voce")

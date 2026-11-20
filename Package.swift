@@ -11,5 +11,5 @@ let package = Package(
         // Sparkle.framework sta in Contents/Frameworks (lo copia build.sh); FoundationModels c'è solo da macOS 26
         linkerSettings: [.unsafeFlags(["-Xlinker", "-rpath", "-Xlinker", "@executable_path/../Frameworks",
                                        "-Xlinker", "-weak_framework", "-Xlinker", "FoundationModels"])]
-    )]
+    ), .testTarget(name: "OverheardTests", dependencies: ["Overheard"])]
 )

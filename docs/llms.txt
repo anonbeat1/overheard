@@ -6,7 +6,7 @@
 - Price: free. No account, no subscription. Cloud transcription is billed by ElevenLabs only if you choose it; summaries use the Claude Code or Codex subscription you already have.
 - Recording: system audio via Core Audio process taps (no virtual audio driver such as BlackHole), microphone on a separate track. Starts automatically when Google Meet, Microsoft Teams or Slack use the microphone; any other app with one click.
 - Transcription: ElevenLabs Scribe (cloud) or Cohere Transcribe running locally on the Mac's GPU with on-device speaker diarization.
-- Storage: plain WAV and Markdown files in ~/Meetings, one folder per meeting.
+- Storage: plain WAV and Markdown files in ~/Meetings, one folder per meeting. Optional cloud backup to Dropbox, Google Drive, OneDrive, iCloud Drive, a synced folder (Aruba Drive, Synology Drive), pCloud, Koofr, kDrive, Nextcloud or S3-compatible storage (Amazon S3, Cloudflare R2, Backblaze B2, Wasabi, MinIO); local audio is removed only after the upload is verified, and transcripts always stay on the Mac.
 - MCP tools: search_meetings, get_meeting, list_meetings, list_action_items, complete_action_item, bookmark, start_recording, stop_recording.
 - Author: Gabriele Spilotri Cavaiola (https://github.com/anonbeat1, https://x.com/Gabbosc). Version 0.3.2, October 2026.
 
@@ -15,6 +15,7 @@
 - [Home](https://getoverheard.dev/): features, setup and FAQ
 - [GitHub repository and README](https://github.com/anonbeat1/overheard): install, build from source, MCP setup
 - [Download the latest release](https://github.com/anonbeat1/overheard/releases/latest)
+- [Cloud storage guide](https://getoverheard.dev/cloud-storage/): back up meetings and free up space on the Mac
 - [Changelog](https://github.com/anonbeat1/overheard/blob/main/CHANGELOG.md)
 
 ## Comparisons

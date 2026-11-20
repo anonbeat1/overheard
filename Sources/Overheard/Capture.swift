@@ -423,7 +423,10 @@ final class MeetingCapture {
         if let h = try? FileHandle(forWritingTo: url) {
             h.seekToEndOfFile(); h.write(Data(line.utf8)); try? h.close()
         } else {
-            try? line.write(to: url, atomically: true, encoding: .utf8)
+            do {
+                try line.write(to: url, atomically: true, encoding: .utf8)
+                try CloudProvenance.record(url)
+            } catch { /* Leave the file untrusted on failure. */ }
         }
     }
 
@@ -433,6 +436,7 @@ final class MeetingCapture {
 
     func setSource(_ s: String) throws {
         try (s + "\n").write(to: dir.appendingPathComponent("source"), atomically: true, encoding: .utf8)
+        try? CloudProvenance.record(dir.appendingPathComponent("source"))
     }
 
     /// Chiude i file e li rinomina (prima il mic, poi recording.wav che segnala la registrazione finita).
@@ -445,6 +449,8 @@ final class MeetingCapture {
             if (try? MicLevel.normalize(micTmp, to: micOut)) != nil { try? fm.removeItem(at: micTmp) }
             else { try? fm.moveItem(at: micTmp, to: micOut) }
             try? fm.moveItem(at: dir.appendingPathComponent("recording.tmp.wav"), to: dir.appendingPathComponent("recording.wav"))
+        try? CloudProvenance.record(dir.appendingPathComponent("recording.wav"))
+        try? CloudProvenance.record(dir.appendingPathComponent("mic.wav"))
             DispatchQueue.main.async(execute: done)
         }
     }
@@ -483,7 +489,10 @@ enum Recovery {
         if fm.fileExists(atPath: mic.path) {
             if (try? MicLevel.normalize(mic, to: micOut)) != nil { try? fm.removeItem(at: mic) } else { try? fm.moveItem(at: mic, to: micOut) }
         }
-        return (try? fm.moveItem(at: rec, to: dir.appendingPathComponent("recording.wav"))) != nil
+        guard (try? fm.moveItem(at: rec, to: dir.appendingPathComponent("recording.wav"))) != nil else { return false }
+        try? CloudProvenance.record(dir.appendingPathComponent("recording.wav"))
+        try? CloudProvenance.record(micOut)
+        return true
     }
 
     /// Dopo un crash le dimensioni nell'header WAV (RIFF e chunk "data") restano quelle iniziali: le ricalcola dalla lunghezza del file

@@ -91,14 +91,21 @@ final class Importer: ObservableObject {
         } while FileManager.default.fileExists(atPath: dir.path)
         try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
         do {
-            try convert(src, to: dir.appendingPathComponent("recording.wav"))
+            try convert(src, to: dir.appendingPathComponent("recording.tmp.wav"))
+            try "import\n".write(to: dir.appendingPathComponent("source"), atomically: true, encoding: .utf8)
+        try? CloudProvenance.record(dir.appendingPathComponent("source"))
+            try (title + "\n").write(to: dir.appendingPathComponent("title"), atomically: true, encoding: .utf8)
+        try? CloudProvenance.record(dir.appendingPathComponent("title"))
+            try "import\n".write(to: dir.appendingPathComponent(".notified"), atomically: true, encoding: .utf8)
+        try? CloudProvenance.record(dir.appendingPathComponent(".notified"))
+            try FileManager.default.moveItem(at: dir.appendingPathComponent("recording.tmp.wav"), to: dir.appendingPathComponent("recording.wav"))
+        try? CloudProvenance.record(dir.appendingPathComponent("recording.wav"))
+        try? CloudProvenance.record(dir.appendingPathComponent("mic.wav"))
         } catch {
+            // A leftover recording.tmp.wav would mark the folder as "in use" forever.
             try? FileManager.default.removeItem(at: dir)
             throw error
         }
-        try "import\n".write(to: dir.appendingPathComponent("source"), atomically: true, encoding: .utf8)
-        try (title + "\n").write(to: dir.appendingPathComponent("title"), atomically: true, encoding: .utf8)
-        try "import\n".write(to: dir.appendingPathComponent(".notified"), atomically: true, encoding: .utf8)
         return dir
     }
 

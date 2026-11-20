@@ -2,6 +2,8 @@
 # Build + installa in ~/Applications/Overheard.app
 set -euo pipefail
 cd "$(dirname "$0")"
+# Chiavi OAuth del progetto in .env.local (ignorato da git, mai nel repository pubblico). Vedi .env.local.example.
+if [[ -f .env.local ]]; then set -a; source .env.local; set +a; fi
 swift build -c release
 APP=build/Overheard.app
 rm -rf "$APP" && mkdir -p "$APP/Contents/MacOS"
@@ -9,6 +11,13 @@ cp .build/release/Overheard "$APP/Contents/MacOS/"
 # Aggiornamenti automatici (Sparkle)
 mkdir -p "$APP/Contents/Frameworks" && cp -R .build/release/Sparkle.framework "$APP/Contents/Frameworks/"
 cp Info.plist "$APP/Contents/"
+# Credenziali OAuth del progetto, facoltative e mai nel repository: con queste "Collega Dropbox" e "Collega Google Drive"
+# sono un clic. Senza, le Impostazioni chiedono le credenziali dell'utente. Vedi docs/cloud-sync.md.
+for pair in "OverheardDropboxAppKey=${OVERHEARD_DROPBOX_APP_KEY:-}" "OverheardGoogleClientID=${OVERHEARD_GOOGLE_CLIENT_ID:-}" \
+            "OverheardGoogleClientSecret=${OVERHEARD_GOOGLE_CLIENT_SECRET:-}" \
+            "OverheardOneDriveClientID=${OVERHEARD_ONEDRIVE_CLIENT_ID:-}"; do
+  if [[ -n "${pair#*=}" ]]; then /usr/libexec/PlistBuddy -c "Add :${pair%%=*} string ${pair#*=}" "$APP/Contents/Info.plist"; fi
+done
 mkdir -p "$APP/Contents/Resources" && cp -R Resources/* "$APP/Contents/Resources/"
 # Icona app da Resources/AppIcon.png (1024x1024), se presente
 if [[ -f Resources/AppIcon.png ]]; then

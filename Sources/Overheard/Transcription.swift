@@ -109,8 +109,26 @@ enum Transcriber {
         return FileManager.default.isExecutableFile(atPath: bundled) ? bundled : "\(home)/.local/bin/meeting-transcriber"
     }
 
+    /// Un .transcribing rimasto da un'app chiusa o andata in crash a metà trascrizione blocca la riunione per
+    /// sempre (cloud, pulizia, aggiornamenti in primo piano). All'avvio nessuna trascrizione di questa app è
+    /// in corso: si tolgono i segni più vecchi di 6 ore (un altro strumento che sta trascrivendo ora resta intatto).
+    static func clearStaleMarkers(now: Date = Date(), root: URL = URL(fileURLWithPath: "\(home)/Meetings")) {
+        let fm = FileManager.default
+        for dir in (try? fm.contentsOfDirectory(at: root, includingPropertiesForKeys: nil)) ?? [] {
+            let marker = dir.appendingPathComponent(".transcribing")
+            guard let modified = (try? marker.resourceValues(forKeys: [.contentModificationDateKey]))?.contentModificationDate,
+                  now.timeIntervalSince(modified) > 6 * 3600 else { continue }
+            try? fm.removeItem(at: marker)
+        }
+    }
+
     /// Trascrive la cartella e scrive transcript.md (o transcript.error). Ritorna l'esito per la notifica.
     static func run(dir: URL, engine: String) async -> Result<Void, Error> {
+        // The audio may have been freed to the cloud after this meeting was queued. Say so, and write no
+        // transcript.error: that file would stop the automatic retry once the audio is back.
+        if CloudSync.hasArchivedAudio(dir) {
+            return .failure(TranscriptionError.message(String(localized: "Audio archiviato nel cloud")))
+        }
         let marker = dir.appendingPathComponent(".transcribing")
         FileManager.default.createFile(atPath: marker.path, contents: nil)
         defer { try? FileManager.default.removeItem(at: marker) }
@@ -140,12 +158,19 @@ enum Transcriber {
             if !marks.isEmpty { head.append(String(localized: "Momenti segnati: ") + marks.map { "[\(Summarizer.stamp($0))]" }.joined(separator: ", ")) }
             let top = head.isEmpty ? "" : head.joined(separator: "\n") + "\n\n"
             try "# Transcript — \(dir.lastPathComponent)\n\n\(top)\(md)".write(to: dir.appendingPathComponent("transcript.md"), atomically: true, encoding: .utf8)
-            try? (used + "\n").write(to: dir.appendingPathComponent("engine"), atomically: true, encoding: .utf8) // per il badge
+        try? CloudProvenance.record(dir.appendingPathComponent("transcript.md"))
+            do {
+                try (used + "\n").write(to: dir.appendingPathComponent("engine"), atomically: true, encoding: .utf8) // per il badge
+                try CloudProvenance.record(dir.appendingPathComponent("engine"))
+            } catch { /* Leave the file untrusted on failure. */ }
             NotesExport.exportIfEnabled(dir)
             Task.detached { await Summarizer.runIfEnabled(dir) } // riassunto e cose da fare, poi riesporta la nota
             return .success(())
         } catch {
-            try? (error.localizedDescription + "\n").write(to: dir.appendingPathComponent("transcript.error"), atomically: true, encoding: .utf8)
+            do {
+                try (error.localizedDescription + "\n").write(to: dir.appendingPathComponent("transcript.error"), atomically: true, encoding: .utf8)
+                try CloudProvenance.record(dir.appendingPathComponent("transcript.error"))
+            } catch { /* Leave the file untrusted on failure. */ }
             return .failure(error)
         }
     }
@@ -162,7 +187,10 @@ enum Transcriber {
                 .map { $0.trimmingCharacters(in: .whitespaces) }
                 .map { $0 == old ? name : $0 }.joined(separator: ", ")
         }.joined(separator: "\n")
-        try? md.write(to: url, atomically: true, encoding: .utf8)
+        do {
+            try md.write(to: url, atomically: true, encoding: .utf8)
+            try CloudProvenance.record(url)
+        } catch { /* Leave the file untrusted on failure. */ }
         NotesExport.exportIfEnabled(dir)
         return md
     }
@@ -182,7 +210,8 @@ enum Transcriber {
         p.executableURL = URL(fileURLWithPath: localTool)
         p.arguments = [dir.path, "--me", Prefs.myName, "--speaker", String(localized: "Parlante"),
                        "--language", Prefs.language.isEmpty ? Prefs.uiLanguage : Prefs.language]
-        let mic = dir.appendingPathComponent("mic.wav"), clean = dir.appendingPathComponent(".mic-clean.wav")
+        let mic = dir.appendingPathComponent("mic.wav")
+        let clean = FileManager.default.temporaryDirectory.appendingPathComponent("overheard-mic-\(UUID().uuidString).wav")
         defer { try? FileManager.default.removeItem(at: clean) }
         if Prefs.echoReduction, FileManager.default.fileExists(atPath: mic.path) {
             let cleaned = EchoGate.clean(mic: try read16kMono(mic), sys: try read16kMono(dir.appendingPathComponent("recording.wav"))).out
@@ -535,6 +564,7 @@ enum NotesExport {
         try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
         let out = folder.appendingPathComponent(name + ".md")
         try note.write(to: out, atomically: true, encoding: .utf8)
+        try? CloudProvenance.record(out)
         return out
     }
 }

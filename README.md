@@ -55,6 +55,23 @@
 - **No extra API keys for the AI.** Summaries and chat use the Claude Code or Codex CLI you already have, with your existing subscription.
 - **Records the call, not the meeting.** System audio is captured with Core Audio process taps (macOS 14.2+), your voice from the microphone on a separate track. Works with Google Meet, Microsoft Teams, Slack huddles, and anything else that plays audio.
 - **Cloud or fully local transcription.** ElevenLabs Scribe for the best accuracy, or Cohere Transcribe running on your Mac's GPU if audio must never leave the machine.
+- **Keep every meeting, free up your Mac.** Optional backup to your own Dropbox or Google Drive in one click. Audio leaves your Mac only after the upload is verified, and comes back with one click. [How it works](https://getoverheard.dev/cloud-storage/).
+
+## Cloud storage
+
+Recordings take up space. Overheard can keep a copy of your meetings in your own cloud storage and remove the audio from your Mac, while transcripts and summaries stay on your Mac for reading and search.
+
+1. **Settings → Cloud storage → Connect Dropbox** (or Google Drive), and approve in the browser.
+2. Turn on **Sync meetings**. Each meeting is uploaded to its own folder and checked against the copy on your Mac.
+3. Free up space by hand, after 7–90 days, or above a storage limit. Only audio verified in the cloud is ever removed, and **Download audio** brings it back.
+
+Nextcloud/WebDAV and S3-compatible storage (Amazon S3, Cloudflare R2, Backblaze B2, Wasabi, MinIO) are available as advanced options. Cloud storage is off by default, and goes only to the account you choose.
+
+If `~/Meetings` lives in Dropbox, iCloud Drive or Syncthing, the library also flags their conflict copies for review instead of showing them as new meetings. You choose which version to keep; nothing is deleted for you.
+
+Deleting a meeting sends its cloud copies to the service's trash (Drive Trash, Dropbox deleted files, OneDrive recycle bin, `.overheard-trash` on WebDAV, `.trash` on S3), where you can restore them; Overheard never empties it. When two Macs change the same file, both versions are kept as a conflict copy. The progress bar counts real bytes, and with iCloud Drive the sync stays in progress until macOS has uploaded every file. The guide lists [what is and isn't included](https://getoverheard.dev/cloud-storage/).
+
+**[Read the guide: how cloud storage works →](https://getoverheard.dev/cloud-storage/)** Developers and self-hosters: [technical reference](docs/cloud-sync.md).
 
 ## Features
 
@@ -78,6 +95,13 @@
 
 **Sharing**
 - PDF export, copy summary/transcript, markdown notes with frontmatter for Obsidian, Logseq or Notion
+
+**Storage**
+- Optional backup to Dropbox, Google Drive or OneDrive in one click, or iCloud Drive with no sign-in; synced folders (Aruba Drive, Synology Drive), pCloud, Koofr, kDrive, Nextcloud and S3-compatible storage too
+- Free up local audio by hand, after 7–90 days or above a storage limit, only once the upload is verified; download it back with one click
+- Audio goes to the cloud compressed without loss, about 4 times smaller, and comes back identical to the original (or about 14 times smaller with the optional maximum-savings format)
+- Interrupted uploads resume where they stopped; sync pauses on hotspots and Low Data Mode
+- Flags Dropbox, iCloud and Syncthing conflict copies for review
 
 The interface is available in English, Italian, Spanish, French, German, Portuguese, Simplified Chinese, Hindi, Arabic, Japanese, Russian, and Bengali.
 
@@ -175,3 +199,5 @@ Not affiliated with Anthropic, OpenAI, Google, Microsoft, Slack or ElevenLabs.
 ## License
 
 [MIT](LICENSE) © 2026 Gabriele Spilotri Cavaiola
+
+Cloud destination changes now offer Copy or Move, recover missing local files from the original provider, and verify the destination before removing any originals. Sync now also repairs missing remote files; see [cloud sync](docs/cloud-sync.md#destination-changes-and-reconciliation). The transcript’s share and folder menus include account-only cloud folder links when enabled.

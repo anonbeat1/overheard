@@ -291,8 +291,16 @@ private struct SetupPrefs: View {
     @State private var mcp: [String] = []
     @State private var mcpBusy = false
     @State private var hasAI = true
+    @State private var showCloud = false
 
     var body: some View {
+        ScrollView {
+            content.padding(.trailing, 2)
+        }
+        .scrollIndicators(.hidden)
+    }
+
+    private var content: some View {
         VStack(alignment: .leading, spacing: 18) {
             Heading(title: "Come vuoi usarlo?", subtitle: "Scegli cosa fa da solo.")
             Card {
@@ -327,6 +335,23 @@ private struct SetupPrefs: View {
                         }
                     }
                     .disabled(mcpBusy || !hasAI)
+                }
+            }
+            // Optional: the full cloud settings (account, what to upload, delete-after rule) open right here.
+            if showCloud {
+                CloudSettingsView()
+            } else {
+                Card {
+                    HStack(spacing: 12) {
+                        Image(systemName: "icloud").foregroundStyle(coral).frame(width: 22)
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Archivio cloud")
+                            Text("Facoltativo: salva le riunioni nel tuo Google Drive, Dropbox, OneDrive o iCloud")
+                                .font(.caption).foregroundStyle(.white.opacity(0.5))
+                        }
+                        Spacer()
+                        Button("Configura…") { withAnimation { showCloud = true } }
+                    }
                 }
             }
         }
