@@ -14,7 +14,7 @@ struct OnboardingView: View {
     @State private var page = 0
     @State private var forward = true
     @State private var nav = 0 // identità nuova a ogni passaggio: una pagina che rientra mentre esce non sparisce
-    private let pages = 6
+    private let pages = 5
 
     var body: some View {
         ZStack {
@@ -30,7 +30,6 @@ struct OnboardingView: View {
                 case 1: Features()
                 case 2: SetupVoice()
                 case 3: SetupPrefs()
-                case 4: SetupCloud()
                 default: Ready()
                 }
             }
@@ -292,8 +291,16 @@ private struct SetupPrefs: View {
     @State private var mcp: [String] = []
     @State private var mcpBusy = false
     @State private var hasAI = true
+    @State private var showCloud = false
 
     var body: some View {
+        ScrollView {
+            content.padding(.trailing, 2)
+        }
+        .scrollIndicators(.hidden)
+    }
+
+    private var content: some View {
         VStack(alignment: .leading, spacing: 18) {
             Heading(title: "Come vuoi usarlo?", subtitle: "Scegli cosa fa da solo.")
             Card {
@@ -330,6 +337,23 @@ private struct SetupPrefs: View {
                     .disabled(mcpBusy || !hasAI)
                 }
             }
+            // Optional: the full cloud settings (account, what to upload, delete-after rule) open right here.
+            if showCloud {
+                CloudSettingsView()
+            } else {
+                Card {
+                    HStack(spacing: 12) {
+                        Image(systemName: "icloud").foregroundStyle(coral).frame(width: 22)
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Archivio cloud")
+                            Text("Facoltativo: salva le riunioni nel tuo Google Drive, Dropbox, OneDrive o iCloud")
+                                .font(.caption).foregroundStyle(.white.opacity(0.5))
+                        }
+                        Spacer()
+                        Button("Configura…") { withAnimation { showCloud = true } }
+                    }
+                }
+            }
         }
         .task {
             hasAI = await Task.detached { !AIChat.installed().isEmpty }.value
@@ -345,20 +369,6 @@ private struct SetupPrefs: View {
             }
             Spacer()
             Toggle("", isOn: on).labelsHidden().toggleStyle(.switch).controlSize(.small).tint(coral)
-        }
-    }
-}
-
-/// Optional step: the same cloud settings as in Settings (account, what to upload, delete-after rule), so a
-/// first-time user can finish the setup here. Skipping it leaves cloud storage off.
-private struct SetupCloud: View {
-    var body: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            Heading(title: "Vuoi un archivio nel cloud?", subtitle: "Facoltativo: puoi saltare e farlo quando vuoi dalle Impostazioni.")
-            ScrollView {
-                CloudSettingsView().padding(.trailing, 4)
-            }
-            .scrollIndicators(.hidden)
         }
     }
 }

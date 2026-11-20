@@ -65,8 +65,15 @@
 "Download non riuscito (link non supportato?)" = "ダウンロードに失敗しました (サポートされていないリンク?)";
 "ElevenLabs HTTP %lld: %@" = "ElevenLabs HTTP %lld: %@";
 "Elimina i meeting più vecchi di" = "より古い会議を削除します";
-"Vuoi un archivio nel cloud?" = "クラウドにアーカイブしますか？";
-"Facoltativo: puoi saltare e farlo quando vuoi dalle Impostazioni." = "任意です。スキップして、いつでも設定から行えます。";
+"Facoltativo: salva le riunioni nel tuo Google Drive, Dropbox, OneDrive o iCloud" = "任意：会議を Google Drive、Dropbox、OneDrive、iCloud に保存";
+"Configura…" = "設定…";
+"Applica e riavvia" = "適用して再起動";
+"La modifica si applica al riavvio dell'app." = "変更はアプリの再起動後に反映されます。";
+"Riavvio al termine della registrazione o trascrizione." = "録音または文字起こしの終了後に再起動します。";
+"Riavviare Overheard per cambiare lingua?" = "言語を変更するために Overheard を再起動しますか？";
+"Sta registrando o trascrivendo. Riavviando ora la registrazione si chiude e la trascrizione riprende al prossimo avvio." = "録音または文字起こし中です。今すぐ再起動すると録音は終了し、文字起こしは次回の起動時に再開されます。";
+"Riavvia a fine lavoro" = "終了後に再起動";
+"Riavvia ora" = "今すぐ再起動";
 "Con il cloud attivo “Solo l'audio” non si applica: l'audio si libera con la regola del cloud, solo dopo la verifica della copia." = "クラウドが有効な間は「音声のみ」は適用されません。音声はクラウドのルールで、コピーを確認した後にのみ解放されます。";
 "Con il cloud attivo anche le copie nel cloud vanno nel cestino del servizio, che Overheard non svuota mai." = "クラウドが有効な間は、クラウド上のコピーもサービスのゴミ箱に移されます。Overheard がゴミ箱を空にすることはありません。";
 "Elimina l'intera cartella del meeting: audio, transcript e riassunto." = "会議フォルダー全体 (音声、トランスクリプト、概要) を削除します。";

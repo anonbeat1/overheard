@@ -65,8 +65,15 @@
 "Download non riuscito (link non supportato?)" = "فشل التنزيل (رابط غير مدعوم؟)";
 "ElevenLabs HTTP %lld: %@" = "ElevenLabs HTTP %lld: %@";
 "Elimina i meeting più vecchi di" = "حذف الاجتماعات الأقدم من";
-"Vuoi un archivio nel cloud?" = "هل تريد أرشيفًا في السحابة؟";
-"Facoltativo: puoi saltare e farlo quando vuoi dalle Impostazioni." = "اختياري: يمكنك التخطي وإجراؤه في أي وقت من الإعدادات.";
+"Facoltativo: salva le riunioni nel tuo Google Drive, Dropbox, OneDrive o iCloud" = "اختياري: احفظ الاجتماعات في Google Drive أو Dropbox أو OneDrive أو iCloud";
+"Configura…" = "إعداد…";
+"Applica e riavvia" = "تطبيق وإعادة التشغيل";
+"La modifica si applica al riavvio dell'app." = "يسري التغيير عند إعادة تشغيل التطبيق.";
+"Riavvio al termine della registrazione o trascrizione." = "ستتم إعادة التشغيل عند انتهاء التسجيل أو النسخ.";
+"Riavviare Overheard per cambiare lingua?" = "إعادة تشغيل Overheard لتغيير اللغة؟";
+"Sta registrando o trascrivendo. Riavviando ora la registrazione si chiude e la trascrizione riprende al prossimo avvio." = "هناك تسجيل أو نسخ جارٍ. إعادة التشغيل الآن تُنهي التسجيل ويُستأنف النسخ عند التشغيل التالي.";
+"Riavvia a fine lavoro" = "إعادة التشغيل عند الانتهاء";
+"Riavvia ora" = "إعادة التشغيل الآن";
 "Con il cloud attivo “Solo l'audio” non si applica: l'audio si libera con la regola del cloud, solo dopo la verifica della copia." = "عند تفعيل السحابة لا ينطبق «الصوت فقط»: يُفرَّغ الصوت بقاعدة السحابة، وبعد التحقق من النسخة فقط.";
 "Con il cloud attivo anche le copie nel cloud vanno nel cestino del servizio, che Overheard non svuota mai." = "عند تفعيل السحابة تنتقل النسخ السحابية أيضًا إلى سلة مهملات الخدمة، ولا يفرغها Overheard أبدًا.";
 "Elimina l'intera cartella del meeting: audio, transcript e riassunto." = "يحذف مجلد الاجتماع بالكامل: الصوت والنص والملخص.";

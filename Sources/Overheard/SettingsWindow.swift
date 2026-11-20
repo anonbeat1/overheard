@@ -17,6 +17,7 @@ struct SettingsView: View {
     @AppStorage("echoReduction") private var echoReduction = true
     @AppStorage("language") private var language = ""
     @State private var appLanguage = AppLanguage.selected
+    @State private var restartWhenIdle = AppRestart.waiting
     @AppStorage("calendar.enabled") private var calendarOn = false
     @AppStorage("summary.auto") private var summaryAuto = true
     @AppStorage("SUAutomaticallyUpdate") private var autoUpdate = false // la chiave che legge Sparkle
@@ -64,9 +65,24 @@ struct SettingsView: View {
                     }
                 }
                 .onChange(of: appLanguage) { _, value in AppLanguage.save(value) }
-                Text("La modifica si applica alla prossima apertura dell'app.")
-                    .font(.caption).foregroundStyle(.white.opacity(0.5))
-                    .fixedSize(horizontal: false, vertical: true)
+                if appLanguage != AppLanguage.launched {
+                    HStack {
+                        Text(restartWhenIdle ? "Riavvio al termine della registrazione o trascrizione."
+                                             : "La modifica si applica al riavvio dell'app.")
+                            .font(.caption).foregroundStyle(.white.opacity(0.5))
+                            .fixedSize(horizontal: false, vertical: true)
+                        Spacer()
+                        if restartWhenIdle {
+                            Button("Annulla") { AppRestart.cancelWaiting(); restartWhenIdle = false }
+                        } else {
+                            Button("Applica e riavvia") { AppRestart.requestRelaunch(onWaiting: { restartWhenIdle = true }) }
+                        }
+                    }
+                } else {
+                    Text("La modifica si applica alla prossima apertura dell'app.")
+                        .font(.caption).foregroundStyle(.white.opacity(0.5))
+                        .fixedSize(horizontal: false, vertical: true)
+                }
                 Divider().overlay(Color.white.opacity(0.1))
                 row("Registra automaticamente", "Parte quando Meet o Teams usano il microfono", $rec.autoDetect)
                 Divider().overlay(Color.white.opacity(0.1))

@@ -65,8 +65,15 @@
 "Download non riuscito (link non supportato?)" = "下载失败（链接不受支持？）";
 "ElevenLabs HTTP %lld: %@" = "ElevenLabs HTTP %lld：%@";
 "Elimina i meeting più vecchi di" = "删除早于";
-"Vuoi un archivio nel cloud?" = "需要云端归档吗？";
-"Facoltativo: puoi saltare e farlo quando vuoi dalle Impostazioni." = "可选：可以跳过，之后随时在设置中进行。";
+"Facoltativo: salva le riunioni nel tuo Google Drive, Dropbox, OneDrive o iCloud" = "可选：将会议保存到你的 Google Drive、Dropbox、OneDrive 或 iCloud";
+"Configura…" = "设置…";
+"Applica e riavvia" = "应用并重启";
+"La modifica si applica al riavvio dell'app." = "更改将在应用重启后生效。";
+"Riavvio al termine della registrazione o trascrizione." = "将在录音或转录结束后重启。";
+"Riavviare Overheard per cambiare lingua?" = "重启 Overheard 以更改语言？";
+"Sta registrando o trascrivendo. Riavviando ora la registrazione si chiude e la trascrizione riprende al prossimo avvio." = "正在录音或转录。现在重启会结束录音，转录将在下次启动时继续。";
+"Riavvia a fine lavoro" = "完成后重启";
+"Riavvia ora" = "立即重启";
 "Con il cloud attivo “Solo l'audio” non si applica: l'audio si libera con la regola del cloud, solo dopo la verifica della copia." = "启用云端后，“仅音频”不适用：音频由云端规则释放，且仅在副本验证之后。";
 "Con il cloud attivo anche le copie nel cloud vanno nel cestino del servizio, che Overheard non svuota mai." = "启用云端后，云端副本也会进入服务的回收站，Overheard 绝不会清空它。";
 "Elimina l'intera cartella del meeting: audio, transcript e riassunto." = "删除整个会议文件夹：音频、记录和摘要。";

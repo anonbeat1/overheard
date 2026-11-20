@@ -65,8 +65,15 @@
 "Download non riuscito (link non supportato?)" = "Download fehlgeschlagen (nicht unterstützter Link?)";
 "ElevenLabs HTTP %lld: %@" = "ElevenLabs HTTP %lld: %@";
 "Elimina i meeting più vecchi di" = "Meetings löschen, die älter sind als";
-"Vuoi un archivio nel cloud?" = "Cloud-Archiv gewünscht?";
-"Facoltativo: puoi saltare e farlo quando vuoi dalle Impostazioni." = "Optional: Sie können das überspringen und jederzeit in den Einstellungen nachholen.";
+"Facoltativo: salva le riunioni nel tuo Google Drive, Dropbox, OneDrive o iCloud" = "Optional: Meetings in Ihrem Google Drive, Dropbox, OneDrive oder iCloud speichern";
+"Configura…" = "Einrichten…";
+"Applica e riavvia" = "Anwenden und neu starten";
+"La modifica si applica al riavvio dell'app." = "Die Änderung gilt nach dem Neustart der App.";
+"Riavvio al termine della registrazione o trascrizione." = "Neustart, sobald Aufnahme oder Transkription beendet ist.";
+"Riavviare Overheard per cambiare lingua?" = "Overheard neu starten, um die Sprache zu ändern?";
+"Sta registrando o trascrivendo. Riavviando ora la registrazione si chiude e la trascrizione riprende al prossimo avvio." = "Es läuft eine Aufnahme oder Transkription. Ein Neustart jetzt beendet die Aufnahme, die Transkription wird beim nächsten Start fortgesetzt.";
+"Riavvia a fine lavoro" = "Nach Abschluss neu starten";
+"Riavvia ora" = "Jetzt neu starten";
 "Con il cloud attivo “Solo l'audio” non si applica: l'audio si libera con la regola del cloud, solo dopo la verifica della copia." = "Bei aktivem Cloud gilt „Nur Audio“ nicht: Audio wird über die Cloud-Regel freigegeben, erst nach Prüfung der Kopie.";
 "Con il cloud attivo anche le copie nel cloud vanno nel cestino del servizio, che Overheard non svuota mai." = "Bei aktivem Cloud landen auch die Cloud-Kopien im Papierkorb des Dienstes, den Overheard nie leert.";
 "Elimina l'intera cartella del meeting: audio, transcript e riassunto." = "Löscht den gesamten Besprechungsordner: Audio, Transkript und Zusammenfassung.";

@@ -65,8 +65,15 @@
 "Download non riuscito (link non supportato?)" = "डाउनलोड विफल (असमर्थित लिंक?)";
 "ElevenLabs HTTP %lld: %@" = "ElevenLabs HTTP %lld: %@";
 "Elimina i meeting più vecchi di" = "इससे पुरानी मीटिंग हटाएं";
-"Vuoi un archivio nel cloud?" = "क्या आप क्लाउड आर्काइव चाहते हैं?";
-"Facoltativo: puoi saltare e farlo quando vuoi dalle Impostazioni." = "वैकल्पिक: आप इसे छोड़ सकते हैं और कभी भी सेटिंग्स से कर सकते हैं।";
+"Facoltativo: salva le riunioni nel tuo Google Drive, Dropbox, OneDrive o iCloud" = "वैकल्पिक: मीटिंग अपने Google Drive, Dropbox, OneDrive या iCloud में सहेजें";
+"Configura…" = "सेट अप करें…";
+"Applica e riavvia" = "लागू करें और रीस्टार्ट करें";
+"La modifica si applica al riavvio dell'app." = "बदलाव ऐप रीस्टार्ट होने पर लागू होगा।";
+"Riavvio al termine della registrazione o trascrizione." = "रिकॉर्डिंग या ट्रांसक्रिप्शन खत्म होने पर रीस्टार्ट होगा।";
+"Riavviare Overheard per cambiare lingua?" = "भाषा बदलने के लिए Overheard रीस्टार्ट करें?";
+"Sta registrando o trascrivendo. Riavviando ora la registrazione si chiude e la trascrizione riprende al prossimo avvio." = "रिकॉर्डिंग या ट्रांसक्रिप्शन चल रहा है। अभी रीस्टार्ट करने पर रिकॉर्डिंग बंद हो जाएगी और ट्रांसक्रिप्शन अगली बार शुरू होने पर जारी रहेगा।";
+"Riavvia a fine lavoro" = "खत्म होने पर रीस्टार्ट करें";
+"Riavvia ora" = "अभी रीस्टार्ट करें";
 "Con il cloud attivo “Solo l'audio” non si applica: l'audio si libera con la regola del cloud, solo dopo la verifica della copia." = "क्लाउड चालू होने पर “केवल ऑडियो” लागू नहीं होता: ऑडियो क्लाउड नियम से खाली होता है, केवल प्रति सत्यापित होने के बाद।";
 "Con il cloud attivo anche le copie nel cloud vanno nel cestino del servizio, che Overheard non svuota mai." = "क्लाउड चालू होने पर क्लाउड प्रतियाँ भी सेवा के ट्रैश में जाती हैं, जिसे Overheard कभी खाली नहीं करता।";
 "Elimina l'intera cartella del meeting: audio, transcript e riassunto." = "संपूर्ण मीटिंग फ़ोल्डर हटा देता है: ऑडियो, प्रतिलेख और सारांश।";

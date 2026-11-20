@@ -65,8 +65,15 @@
 "Download non riuscito (link non supportato?)" = "Échec du téléchargement (lien non pris en charge ?)";
 "ElevenLabs HTTP %lld: %@" = "ElevenLabs HTTP %lld : %@";
 "Elimina i meeting più vecchi di" = "Supprimer les réunions plus anciennes que";
-"Vuoi un archivio nel cloud?" = "Un archivage dans le cloud ?";
-"Facoltativo: puoi saltare e farlo quando vuoi dalle Impostazioni." = "Facultatif : vous pouvez passer et le faire plus tard dans les Réglages.";
+"Facoltativo: salva le riunioni nel tuo Google Drive, Dropbox, OneDrive o iCloud" = "Facultatif : enregistrez les réunions dans votre Google Drive, Dropbox, OneDrive ou iCloud";
+"Configura…" = "Configurer…";
+"Applica e riavvia" = "Appliquer et redémarrer";
+"La modifica si applica al riavvio dell'app." = "La modification s'applique au redémarrage de l'app.";
+"Riavvio al termine della registrazione o trascrizione." = "Redémarrage à la fin de l'enregistrement ou de la transcription.";
+"Riavviare Overheard per cambiare lingua?" = "Redémarrer Overheard pour changer de langue ?";
+"Sta registrando o trascrivendo. Riavviando ora la registrazione si chiude e la trascrizione riprende al prossimo avvio." = "Un enregistrement ou une transcription est en cours. Redémarrer maintenant clôt l'enregistrement et la transcription reprend au prochain lancement.";
+"Riavvia a fine lavoro" = "Redémarrer à la fin";
+"Riavvia ora" = "Redémarrer maintenant";
 "Con il cloud attivo “Solo l'audio” non si applica: l'audio si libera con la regola del cloud, solo dopo la verifica della copia." = "Avec le cloud activé, « Audio uniquement » ne s'applique pas : l'audio est libéré par la règle du cloud, après vérification de la copie.";
 "Con il cloud attivo anche le copie nel cloud vanno nel cestino del servizio, che Overheard non svuota mai." = "Avec le cloud activé, les copies cloud vont aussi dans la corbeille du service, qu'Overheard ne vide jamais.";
 "Elimina l'intera cartella del meeting: audio, transcript e riassunto." = "Supprime tout le dossier de la réunion : audio, transcription et résumé.";
