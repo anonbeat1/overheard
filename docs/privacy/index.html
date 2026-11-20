@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Overheard Privacy Policy | Google Drive and Meeting Data</title>
+<meta name="description" content="See what Overheard accesses in Google Drive, where it stores meeting files and OAuth tokens, and how to delete copies or revoke access.">
+<link rel="canonical" href="https://getoverheard.dev/privacy/">
+<link rel="icon" href="../assets/icon-tile.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../blog/blog.css">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://getoverheard.dev/privacy/">
+<meta property="og:site_name" content="Overheard">
+<meta property="og:title" content="Overheard Privacy Policy | Google Drive and Meeting Data">
+<meta property="og:description" content="See what Overheard accesses in Google Drive, where it stores meeting files and OAuth tokens, and how to delete copies or revoke access.">
+</head>
+<body>
+<header class="nav">
+  <a class="brand" href="../"><img src="../assets/icon-tile.svg" alt="">Overheard</a>
+</header>
+<main class="wrap">
+<article>
+  <h1>Overheard Privacy Policy</h1>
+  <p>Overheard is a macOS app for recording, transcribing and reviewing meetings. Gabriele Spilotri Cavaiola maintains Overheard. The app stores meeting files on your Mac. It connects to external services when you turn on cloud storage or use an external transcription or AI tool.</p>
+
+  <h2>Meeting data on your Mac</h2>
+  <p>Overheard records call audio and your microphone during a recording. It saves recordings, transcripts, summaries, bookmarks and meeting details such as the title and date in your local Meetings folder. If you enable calendar access in Settings, Overheard can read the title and invitees of the current event from the macOS calendar to label the meeting.</p>
+
+  <h2>Google Drive access</h2>
+  <p>Cloud storage is optional and off by default. If you connect Google Drive, you sign in and authorize Overheard in your browser. Overheard requests the <code>drive.file</code> permission to work with individual files and folders used for the meeting archive. By default, the app puts the archive in an Overheard folder in My Drive. It does not request access to your entire Drive, Gmail, Google Contacts or Google Calendar.</p>
+  <p>When you enable sync, Overheard sends meeting files directly from your Mac to your Google Drive account. Depending on your settings and the files available for each meeting, these can include audio, transcripts, summaries, bookmarks and meeting metadata. Overheard reads archive file and folder metadata such as IDs, names, sizes and checksums to locate files and verify uploads. It downloads archive contents when you restore a meeting and can move archive files to Drive Trash when you delete them through the app.</p>
+  <p>Google issues OAuth access and refresh tokens so Overheard can authenticate Drive requests and continue syncing while the app is open. Overheard stores the credentials in your Mac’s Keychain. It keeps a local record of archive files and their sync status so it can find and verify them later. Google hosts the cloud copies in your account. The developer does not receive your Google tokens or Drive files through the integration.</p>
+  <p>Overheard uses data from Google APIs to sync, verify, restore and remove archive files. It does not sell that data or use it for advertising or for developing, improving or training generalized AI or machine-learning models. The Drive integration does not send archive contents to AI providers. If you explicitly copy or move your archive to another storage provider, Overheard transfers the selected files to that destination. If you restore a meeting and use a separate transcription or AI feature on it, the processing described below applies.</p>
+  <p>Overheard’s use and transfer of information received from Google APIs adheres to the <a href="https://developers.google.com/terms/api-services-user-data-policy">Google API Services User Data Policy</a>, including its Limited Use requirements.</p>
+
+  <h2>Other services you choose</h2>
+  <ul>
+    <li>Overheard sends meeting files to the cloud storage provider you choose. Your provider handles those copies under its own terms and privacy policy. Overheard stores supported OAuth credentials and cloud passwords in the Mac’s Keychain.</li>
+    <li>On-device transcription processes audio on your Mac. If you select ElevenLabs, Overheard sends audio to ElevenLabs using the API key you supply. The app stores that key in Keychain.</li>
+    <li>If you use Claude Code or Codex for summaries or chat, Overheard supplies relevant transcript text and prompts to the selected tool, which can send them to its provider. The Apple Intelligence option uses on-device processing. If you connect an external assistant through MCP, it can request meeting data from Overheard and handle it according to its own settings and terms.</li>
+  </ul>
+
+  <h2>Retention, deletion and revoking access</h2>
+  <p>Meeting files stay on your Mac until you delete them, a retention rule you enable removes them, or cloud storage frees local space after verifying the cloud copy. The app keeps a local library entry for meetings whose files are stored remotely.</p>
+  <p>Drive copies remain in your account until removed. Deleting a meeting through Overheard, including through a whole-meeting retention rule, moves the local folder to the Mac’s Trash and queues matching cloud copies for Drive Trash. The app can retry the cloud removal when it reconnects. You can also remove files directly in Drive and manage permanent deletion in Drive Trash.</p>
+  <p>Turning off sync pauses automatic transfers. Disconnecting Google Drive in Overheard removes its saved credentials from your Mac. You can also revoke permission in your <a href="https://myaccount.google.com/connections">Google Account connections</a>. Existing cloud files stay in Drive after you disconnect or revoke access and can be deleted there.</p>
+
+  <h2>Contact and updates</h2>
+  <p>For privacy questions or help deleting data, contact the maintainer through the <a href="https://github.com/anonbeat1/overheard/issues">Overheard support tracker</a>. Keep meeting contents and credentials out of public posts. If Overheard changes how it uses Google user data, the maintainer will update this page and the disclosure in the app.</p>
+</article>
+</main>
+</body>
+</html>

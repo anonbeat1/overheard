@@ -1390,6 +1390,8 @@ struct CloudSettingsView: View {
                 Link("Come funziona", destination: URL(string: "https://getoverheard.dev/cloud-storage/")!)
                     .font(.caption)
             }
+            Link("Informativa sulla privacy", destination: URL(string: "https://getoverheard.dev/privacy/")!)
+                .font(.caption)
             if let activity = cloud.activity {
                 CloudActivityRow(text: activity, fraction: cloud.activityFraction, phase: cloud.syncProgress, rate: cloud.transferRate,
                                  onStop: cloud.running ? { cloud.cancelAllTransfers() } : nil)
