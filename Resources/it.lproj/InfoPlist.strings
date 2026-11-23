@@ -2,3 +2,4 @@
 "NSCalendarsFullAccessUsageDescription" = "Dà ai meeting registrati il titolo e gli invitati dell'evento in calendario.";
 "NSCalendarsUsageDescription" = "Dà ai meeting registrati il titolo e gli invitati dell'evento in calendario.";
 "NSMicrophoneUsageDescription" = "Registra la tua voce durante le riunioni.";
+"NSRemindersFullAccessUsageDescription" = "Aggiunge a Promemoria le cose da fare del riassunto di una riunione, quando lo chiedi.";

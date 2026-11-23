@@ -737,3 +737,7 @@
 "Apri in Google Drive" = "فتح في Google Drive";
 
 "Cartella Google Drive nel Cestino o non accessibile. Ripristinala o scegli un'altra cartella." = "مجلد Google Drive في المهملات أو يتعذّر الوصول إليه. استعده أو اختر مجلدًا آخر.";
+"Aggiungi ai Promemoria" = "إضافة إلى التذكيرات";
+"%lld aggiunte a Promemoria" = "تمت إضافة %lld إلى التذكيرات";
+"Accesso negato: Impostazioni di Sistema → Privacy e sicurezza → Promemoria → Overheard" = "تم رفض الوصول: إعدادات النظام ← الخصوصية والأمن ← التذكيرات ← Overheard";
+"Nessun account Promemoria su questo Mac" = "لا يوجد حساب تذكيرات على هذا الـ Mac";

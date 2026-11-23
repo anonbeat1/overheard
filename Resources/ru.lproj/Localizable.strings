@@ -737,3 +737,7 @@
 "Apri in Google Drive" = "Открыть в Google Диске";
 
 "Cartella Google Drive nel Cestino o non accessibile. Ripristinala o scegli un'altra cartella." = "Папка Google Диска находится в корзине или недоступна. Восстановите её или выберите другую папку.";
+"Aggiungi ai Promemoria" = "Добавить в Напоминания";
+"%lld aggiunte a Promemoria" = "Добавлено в Напоминания: %lld";
+"Accesso negato: Impostazioni di Sistema → Privacy e sicurezza → Promemoria → Overheard" = "Нет доступа: Системные настройки → Конфиденциальность и безопасность → Напоминания → Overheard";
+"Nessun account Promemoria su questo Mac" = "На этом Mac нет учётной записи Напоминаний";

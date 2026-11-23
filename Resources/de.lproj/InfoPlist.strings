@@ -3,3 +3,4 @@
 "NSCalendarsFullAccessUsageDescription" = "Übernimmt Titel und Teilnehmer des Kalenderereignisses für aufgezeichnete Besprechungen.";
 "NSCalendarsUsageDescription" = "Übernimmt Titel und Teilnehmer des Kalenderereignisses für aufgezeichnete Besprechungen.";
 "NSMicrophoneUsageDescription" = "Zeichnet Ihre Stimme während Besprechungen auf.";
+"NSRemindersFullAccessUsageDescription" = "Fügt die Aufgaben einer Besprechungszusammenfassung zu Erinnerungen hinzu, wenn du es möchtest.";

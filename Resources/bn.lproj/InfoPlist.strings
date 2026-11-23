@@ -3,3 +3,4 @@
 "NSCalendarsFullAccessUsageDescription" = "রেকর্ড করা বৈঠকের জন্য ক্যালেন্ডার ইভেন্ট থেকে শিরোনাম ও আমন্ত্রিতদের নাম নেয়।";
 "NSCalendarsUsageDescription" = "রেকর্ড করা বৈঠকের জন্য ক্যালেন্ডার ইভেন্ট থেকে শিরোনাম ও আমন্ত্রিতদের নাম নেয়।";
 "NSMicrophoneUsageDescription" = "বৈঠকের সময় আপনার কণ্ঠ রেকর্ড করে।";
+"NSRemindersFullAccessUsageDescription" = "আপনি চাইলে মিটিংয়ের সারাংশের করণীয়গুলো রিমাইন্ডারে যোগ করে।";

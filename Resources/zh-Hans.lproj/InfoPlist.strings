@@ -3,3 +3,4 @@
 "NSCalendarsFullAccessUsageDescription" = "为录制的会议获取日历日程的标题和受邀者。";
 "NSCalendarsUsageDescription" = "为录制的会议获取日历日程的标题和受邀者。";
 "NSMicrophoneUsageDescription" = "在会议期间录制你的声音。";
+"NSRemindersFullAccessUsageDescription" = "在你要求时，将会议摘要中的待办事项添加到提醒事项。";

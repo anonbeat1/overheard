@@ -737,3 +737,7 @@
 "Apri in Google Drive" = "Google Drive-এ খুলুন";
 
 "Cartella Google Drive nel Cestino o non accessibile. Ripristinala o scegli un'altra cartella." = "Google Drive-এর ফোল্ডারটি ট্র্যাশে আছে বা খোলা যাচ্ছে না। ফোল্ডারটি ফিরিয়ে আনুন অথবা অন্য একটি ফোল্ডার বেছে নিন।";
+"Aggiungi ai Promemoria" = "রিমাইন্ডারে যোগ করুন";
+"%lld aggiunte a Promemoria" = "%lldটি রিমাইন্ডারে যোগ হয়েছে";
+"Accesso negato: Impostazioni di Sistema → Privacy e sicurezza → Promemoria → Overheard" = "অ্যাক্সেস নেই: সিস্টেম সেটিংস → গোপনীয়তা ও নিরাপত্তা → রিমাইন্ডার → Overheard";
+"Nessun account Promemoria su questo Mac" = "এই Mac-এ কোনো রিমাইন্ডার অ্যাকাউন্ট নেই";

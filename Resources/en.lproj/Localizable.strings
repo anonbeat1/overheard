@@ -744,3 +744,7 @@
 "Apri in Google Drive" = "Open in Google Drive";
 
 "Cartella Google Drive nel Cestino o non accessibile. Ripristinala o scegli un'altra cartella." = "The Google Drive folder is in the trash or unavailable. Restore it or choose another folder.";
+"Aggiungi ai Promemoria" = "Add to Reminders";
+"%lld aggiunte a Promemoria" = "%lld added to Reminders";
+"Accesso negato: Impostazioni di Sistema → Privacy e sicurezza → Promemoria → Overheard" = "Access denied: System Settings → Privacy & Security → Reminders → Overheard";
+"Nessun account Promemoria su questo Mac" = "No Reminders account on this Mac";

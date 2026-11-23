@@ -3,3 +3,4 @@
 "NSCalendarsFullAccessUsageDescription" = "يستخدم عنوان حدث التقويم والمدعوين إليه للاجتماعات المسجلة.";
 "NSCalendarsUsageDescription" = "يستخدم عنوان حدث التقويم والمدعوين إليه للاجتماعات المسجلة.";
 "NSMicrophoneUsageDescription" = "يسجل صوتك أثناء الاجتماعات.";
+"NSRemindersFullAccessUsageDescription" = "يضيف مهام ملخص الاجتماع إلى التذكيرات عندما تطلب ذلك.";
