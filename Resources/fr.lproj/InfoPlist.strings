@@ -3,3 +3,4 @@
 "NSCalendarsFullAccessUsageDescription" = "Associe le titre et les invités de l’évènement du calendrier aux réunions enregistrées.";
 "NSCalendarsUsageDescription" = "Associe le titre et les invités de l’évènement du calendrier aux réunions enregistrées.";
 "NSMicrophoneUsageDescription" = "Enregistre votre voix pendant les réunions.";
+"NSSpeechRecognitionUsageDescription" = "Pendant un appel, écoute sur votre Mac les mots que vous avez choisis pour vous avertir. Ce qui est entendu n'est pas enregistré.";

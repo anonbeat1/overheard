@@ -3,3 +3,4 @@
 "NSCalendarsFullAccessUsageDescription" = "Usa o título e os convidados do evento do calendário nas reuniões gravadas.";
 "NSCalendarsUsageDescription" = "Usa o título e os convidados do evento do calendário nas reuniões gravadas.";
 "NSMicrophoneUsageDescription" = "Grava sua voz durante as reuniões.";
+"NSSpeechRecognitionUsageDescription" = "Durante a chamada ouve no seu Mac as palavras que escolheu para o avisar. O que ouve não é guardado.";

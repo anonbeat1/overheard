@@ -3,3 +3,4 @@
 "NSCalendarsFullAccessUsageDescription" = "Добавляет к записанным встречам название и участников события из календаря.";
 "NSCalendarsUsageDescription" = "Добавляет к записанным встречам название и участников события из календаря.";
 "NSMicrophoneUsageDescription" = "Записывает Ваш голос во время встреч.";
+"NSSpeechRecognitionUsageDescription" = "Во время звонка слушает на вашем Mac выбранные вами слова, чтобы предупредить вас. Услышанное не сохраняется.";

@@ -105,6 +105,7 @@ final class SystemAudioCapture {
     // la callback in corso che a sua volta aspetta `queue` → deadlock, app bloccata su "Salvataggio…"
     private let ioQueue = DispatchQueue(label: "system-audio-io")
     private var writer: PaddedWriter? // usato solo da ioQueue
+    var onBuffer: ((AVAudioPCMBuffer) -> Void)? // parole chiave dal vivo (KeywordSpotter), su ioQueue
     private var log: (String) -> Void = { _ in }
     private var lastCallback = Date()
     private var timer: DispatchSourceTimer?
@@ -177,7 +178,7 @@ final class SystemAudioCapture {
         try check("IOProc", AudioDeviceCreateIOProcIDWithBlock(&procID, aggregateID, ioQueue) { [weak self] _, input, _, _, _ in
             guard let self else { return }
             self.lastCallback = Date()
-            if let buf = AVAudioPCMBuffer(pcmFormat: format, bufferListNoCopy: input, deallocator: nil) { self.writer?.write(buf) }
+            if let buf = AVAudioPCMBuffer(pcmFormat: format, bufferListNoCopy: input, deallocator: nil) { self.writer?.write(buf); self.onBuffer?(buf) }
         })
         try check("Avvio", AudioDeviceStart(aggregateID, procID))
 
@@ -391,6 +392,7 @@ final class MeetingCapture {
     let started = Date()
     private let system = SystemAudioCapture()
     private let mic = MicCapture()
+    private var spotter: KeywordSpotter?
     private(set) var micOK = true
 
     /// Microfono scelto nelle Impostazioni, altrimenti quello integrato: le cuffie Bluetooth come mic degradano l'audio (HFP)
@@ -406,9 +408,16 @@ final class MeetingCapture {
         try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
         try setSource(source)
         do {
+            if KeywordAlerts.enabled, let s = KeywordSpotter(words: KeywordAlerts.words, onHit: { w in
+                DispatchQueue.main.async { MainActor.assumeIsolated { Recorder.shared.bookmark(keyword: w) } }
+            }) {
+                spotter = s
+                system.onBuffer = s.append
+            }
             try system.start(to: dir.appendingPathComponent("recording.tmp.wav"), log: log)
         } catch {
             system.stop()
+            spotter?.stop()
             try? FileManager.default.removeItem(at: dir)
             throw error
         }
@@ -443,6 +452,7 @@ final class MeetingCapture {
     func stop(_ done: @escaping () -> Void) {
         DispatchQueue.global().async { [self] in
             system.stop()
+            spotter?.stop()
             mic.stop()
             let fm = FileManager.default
             let micTmp = dir.appendingPathComponent("mic.tmp.wav"), micOut = dir.appendingPathComponent("mic.wav")

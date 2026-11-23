@@ -3,3 +3,4 @@
 "NSCalendarsFullAccessUsageDescription" = "録音したミーティングにカレンダーの予定のタイトルと出席者を設定します。";
 "NSCalendarsUsageDescription" = "録音したミーティングにカレンダーの予定のタイトルと出席者を設定します。";
 "NSMicrophoneUsageDescription" = "ミーティング中のあなたの声を録音します。";
+"NSSpeechRecognitionUsageDescription" = "通話中、選んだ言葉をMac上で聞き取って通知します。聞き取った内容は保存されません。";

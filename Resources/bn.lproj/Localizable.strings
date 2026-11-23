@@ -737,3 +737,11 @@
 "Apri in Google Drive" = "Google Drive-এ খুলুন";
 
 "Cartella Google Drive nel Cestino o non accessibile. Ripristinala o scegli un'altra cartella." = "Google Drive-এর ফোল্ডারটি ট্র্যাশে আছে বা খোলা যাচ্ছে না। ফোল্ডারটি ফিরিয়ে আনুন অথবা অন্য একটি ফোল্ডার বেছে নিন।";
+"🔔 Hanno detto «%@»" = "🔔 কেউ বলেছেন «%@»";
+"al minuto %@ · segnato nel transcript e nel riassunto" = "%@ মিনিটে · ট্রান্সক্রিপ্ট ও সারাংশে চিহ্নিত";
+"Avvisami quando qualcuno dice…" = "কেউ বললে আমাকে জানান…";
+"Durante la call ascolta gli altri sul Mac e, quando dicono una di queste parole, manda una notifica e segna il momento. Il testo ascoltato non viene salvato." = "কলের সময় এটি আপনার Mac-এ অন্যদের কথা শোনে এবং তাঁরা এই শব্দগুলোর কোনোটি বললে একটি বিজ্ঞপ্তি পাঠায় ও মুহূর্তটি চিহ্নিত করে। শোনা লেখা সংরক্ষণ করা হয় না।";
+"il tuo nome, scadenza, budget" = "আপনার নাম, ডেডলাইন, বাজেট";
+"Separate da virgola. Vale dalla prossima registrazione." = "কমা দিয়ে আলাদা করুন। পরের রেকর্ডিং থেকে প্রযোজ্য।";
+"Accesso negato: Impostazioni di Sistema → Privacy e sicurezza → Riconoscimento vocale → Overheard" = "অ্যাক্সেস নেই: সিস্টেম সেটিংস → গোপনীয়তা ও নিরাপত্তা → স্পিচ রিকগনিশন → Overheard";
+"La lingua delle riunioni non si può ascoltare sul Mac: scegline un'altra in Trascrizione, o aggiungila in Impostazioni di Sistema → Tastiera → Dettatura." = "মিটিংয়ের ভাষা এই Mac-এ শোনা যায় না: ট্রান্সক্রিপশনে অন্য একটি বেছে নিন, অথবা সিস্টেম সেটিংস → কীবোর্ড → ডিক্টেশনে এটি যোগ করুন।";

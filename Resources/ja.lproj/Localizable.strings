@@ -737,3 +737,11 @@
 "Apri in Google Drive" = "Google ドライブで開く";
 
 "Cartella Google Drive nel Cestino o non accessibile. Ripristinala o scegli un'altra cartella." = "Google ドライブのフォルダはゴミ箱にあるか、アクセスできません。復元するか、別のフォルダを選択してください。";
+"🔔 Hanno detto «%@»" = "🔔 「%@」と言われました";
+"al minuto %@ · segnato nel transcript e nel riassunto" = "%@ の時点 · 文字起こしと要約にマークしました";
+"Avvisami quando qualcuno dice…" = "誰かが次の言葉を言ったら通知…";
+"Durante la call ascolta gli altri sul Mac e, quando dicono una di queste parole, manda una notifica e segna il momento. Il testo ascoltato non viene salvato." = "通話中にMac上でほかの参加者の声を聞き、これらの言葉が出たら通知してその瞬間をマークします。聞き取った内容は保存されません。";
+"il tuo nome, scadenza, budget" = "あなたの名前, 締め切り, 予算";
+"Separate da virgola. Vale dalla prossima registrazione." = "カンマで区切ります。次の録音から有効です。";
+"Accesso negato: Impostazioni di Sistema → Privacy e sicurezza → Riconoscimento vocale → Overheard" = "アクセスが拒否されました：システム設定 → プライバシーとセキュリティ → 音声認識 → Overheard";
+"La lingua delle riunioni non si può ascoltare sul Mac: scegline un'altra in Trascrizione, o aggiungila in Impostazioni di Sistema → Tastiera → Dettatura." = "会議の言語はこのMacで認識できません：文字起こしで別の言語を選ぶか、システム設定 → キーボード → 音声入力で追加してください。";

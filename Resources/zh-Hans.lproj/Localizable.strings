@@ -737,3 +737,11 @@
 "Apri in Google Drive" = "在 Google 云端硬盘中打开";
 
 "Cartella Google Drive nel Cestino o non accessibile. Ripristinala o scegli un'altra cartella." = "Google 云端硬盘文件夹在回收站中或无法访问。请恢复该文件夹或选择其他文件夹。";
+"🔔 Hanno detto «%@»" = "🔔 有人说了“%@”";
+"al minuto %@ · segnato nel transcript e nel riassunto" = "第 %@ 分钟 · 已在转录和摘要中标记";
+"Avvisami quando qualcuno dice…" = "有人说到以下内容时提醒我…";
+"Durante la call ascolta gli altri sul Mac e, quando dicono una di queste parole, manda una notifica e segna il momento. Il testo ascoltato non viene salvato." = "通话期间在你的 Mac 上聆听其他人，当他们说到其中一个词时发送通知并标记该时刻。听到的内容不会保存。";
+"il tuo nome, scadenza, budget" = "你的名字, 截止日期, 预算";
+"Separate da virgola. Vale dalla prossima registrazione." = "用逗号分隔。从下一次录制开始生效。";
+"Accesso negato: Impostazioni di Sistema → Privacy e sicurezza → Riconoscimento vocale → Overheard" = "访问被拒绝：系统设置 → 隐私与安全性 → 语音识别 → Overheard";
+"La lingua delle riunioni non si può ascoltare sul Mac: scegline un'altra in Trascrizione, o aggiungila in Impostazioni di Sistema → Tastiera → Dettatura." = "这台 Mac 无法识别会议语言：请在“转录”中选择其他语言，或在系统设置 → 键盘 → 听写中添加该语言。";

@@ -14,6 +14,9 @@ struct SettingsView: View {
     @AppStorage("myName") private var myName = ""
     @AppStorage("micDevice") private var micDevice = ""
     @AppStorage("keyterms") private var keyterms = ""
+    @AppStorage("keywords.enabled") private var keywordsOn = false
+    @AppStorage("keywords.list") private var keywordList = ""
+    @State private var keywordsDenied = false
     @AppStorage("echoReduction") private var echoReduction = true
     @AppStorage("language") private var language = ""
     @State private var appLanguage = AppLanguage.selected
@@ -177,6 +180,31 @@ struct SettingsView: View {
                     Spacer()
                     Text("⌃⌥M").font(.callout.monospaced()).padding(.horizontal, 8).padding(.vertical, 3)
                         .background(Color.white.opacity(0.1), in: RoundedRectangle(cornerRadius: 6))
+                }
+                Divider().overlay(Color.white.opacity(0.1))
+                row("Avvisami quando qualcuno dice…", "Durante la call ascolta gli altri sul Mac e, quando dicono una di queste parole, manda una notifica e segna il momento. Il testo ascoltato non viene salvato.", $keywordsOn.onSet { on in
+                    keywordsDenied = false
+                    guard on, !KeywordAlerts.authorized else { return }
+                    Task { @MainActor in
+                        let ok = await KeywordAlerts.requestAccess()
+                        keywordsOn = ok
+                        keywordsDenied = !ok
+                    }
+                })
+                if keywordsOn {
+                    TextField("il tuo nome, scadenza, budget", text: $keywordList)
+                        .textFieldStyle(.plain).padding(8)
+                        .background(Color.white.opacity(0.07), in: RoundedRectangle(cornerRadius: 8))
+                    Text("Separate da virgola. Vale dalla prossima registrazione.")
+                        .font(.caption).foregroundStyle(.white.opacity(0.5))
+                    if !KeywordAlerts.languageSupported {
+                        Text("La lingua delle riunioni non si può ascoltare sul Mac: scegline un'altra in Trascrizione, o aggiungila in Impostazioni di Sistema → Tastiera → Dettatura.")
+                            .font(.caption).foregroundStyle(.orange).fixedSize(horizontal: false, vertical: true)
+                    }
+                }
+                if keywordsDenied {
+                    Text("Accesso negato: Impostazioni di Sistema → Privacy e sicurezza → Riconoscimento vocale → Overheard")
+                        .font(.caption).foregroundStyle(.orange).fixedSize(horizontal: false, vertical: true)
                 }
             }
 
