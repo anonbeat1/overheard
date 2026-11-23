@@ -737,3 +737,13 @@
 "Apri in Google Drive" = "In Google Drive öffnen";
 
 "Cartella Google Drive nel Cestino o non accessibile. Ripristinala o scegli un'altra cartella." = "Der Google-Drive-Ordner liegt im Papierkorb oder ist nicht verfügbar. Stelle ihn wieder her oder wähle einen anderen Ordner.";
+"Serie · %lld riunioni" = "Serie · %lld Besprechungen";
+"Le altre riunioni di questa serie e le cose da fare ancora aperte" = "Die anderen Besprechungen dieser Serie und die noch offenen Aufgaben";
+"%lld riunioni" = "%lld Besprechungen";
+"aperta ora" = "gerade geöffnet";
+"senza riassunto" = "ohne Zusammenfassung";
+"Cose da fare ancora aperte" = "Noch offene Aufgaben";
+"Nessuna: tutto spuntato." = "Keine: alles erledigt.";
+"Apri la riunione" = "Besprechung öffnen";
+"Confronta le riunioni della serie «%@» (cartelle: %@): cosa è cambiato da una all'altra, quali temi tornano e quali cose da fare restano aperte?" = "Vergleiche die Besprechungen der Serie „%@“ (Ordner: %@): Was hat sich von einer zur nächsten geändert, welche Themen kehren wieder und welche Aufgaben sind noch offen?";
+"Cosa è cambiato?" = "Was hat sich geändert?";

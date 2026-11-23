@@ -737,3 +737,13 @@
 "Apri in Google Drive" = "Google Drive-এ খুলুন";
 
 "Cartella Google Drive nel Cestino o non accessibile. Ripristinala o scegli un'altra cartella." = "Google Drive-এর ফোল্ডারটি ট্র্যাশে আছে বা খোলা যাচ্ছে না। ফোল্ডারটি ফিরিয়ে আনুন অথবা অন্য একটি ফোল্ডার বেছে নিন।";
+"Serie · %lld riunioni" = "সিরিজ · %lldটি মিটিং";
+"Le altre riunioni di questa serie e le cose da fare ancora aperte" = "এই সিরিজের অন্য মিটিং এবং এখনও খোলা করণীয়";
+"%lld riunioni" = "%lldটি মিটিং";
+"aperta ora" = "এখন খোলা";
+"senza riassunto" = "সারাংশ নেই";
+"Cose da fare ancora aperte" = "এখনও খোলা করণীয়";
+"Nessuna: tutto spuntato." = "কিছু নেই: সব টিক দেওয়া হয়েছে।";
+"Apri la riunione" = "মিটিং খুলুন";
+"Confronta le riunioni della serie «%@» (cartelle: %@): cosa è cambiato da una all'altra, quali temi tornano e quali cose da fare restano aperte?" = "«%@» সিরিজের মিটিংগুলো তুলনা করুন (ফোল্ডার: %@): একটি থেকে অন্যটিতে কী বদলেছে, কোন বিষয় বারবার আসে এবং কোন করণীয় এখনও খোলা?";
+"Cosa è cambiato?" = "কী বদলেছে?";

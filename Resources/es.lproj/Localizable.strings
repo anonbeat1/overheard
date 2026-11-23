@@ -737,3 +737,13 @@
 "Apri in Google Drive" = "Abrir en Google Drive";
 
 "Cartella Google Drive nel Cestino o non accessibile. Ripristinala o scegli un'altra cartella." = "La carpeta de Google Drive está en la papelera o no está disponible. Restáurala o elige otra.";
+"Serie · %lld riunioni" = "Serie · %lld reuniones";
+"Le altre riunioni di questa serie e le cose da fare ancora aperte" = "Las otras reuniones de esta serie y las tareas aún pendientes";
+"%lld riunioni" = "%lld reuniones";
+"aperta ora" = "abierta ahora";
+"senza riassunto" = "sin resumen";
+"Cose da fare ancora aperte" = "Tareas aún pendientes";
+"Nessuna: tutto spuntato." = "Ninguna: todo está marcado.";
+"Apri la riunione" = "Abrir la reunión";
+"Confronta le riunioni della serie «%@» (cartelle: %@): cosa è cambiato da una all'altra, quali temi tornano e quali cose da fare restano aperte?" = "Compara las reuniones de la serie «%@» (carpetas: %@): qué cambió de una a otra, qué temas se repiten y qué tareas siguen pendientes.";
+"Cosa è cambiato?" = "¿Qué ha cambiado?";

@@ -737,3 +737,13 @@
 "Apri in Google Drive" = "在 Google 云端硬盘中打开";
 
 "Cartella Google Drive nel Cestino o non accessibile. Ripristinala o scegli un'altra cartella." = "Google 云端硬盘文件夹在回收站中或无法访问。请恢复该文件夹或选择其他文件夹。";
+"Serie · %lld riunioni" = "系列 · %lld 场会议";
+"Le altre riunioni di questa serie e le cose da fare ancora aperte" = "本系列的其他会议和仍未完成的待办事项";
+"%lld riunioni" = "%lld 场会议";
+"aperta ora" = "当前打开";
+"senza riassunto" = "无摘要";
+"Cose da fare ancora aperte" = "仍未完成的待办事项";
+"Nessuna: tutto spuntato." = "没有：全部已完成。";
+"Apri la riunione" = "打开会议";
+"Confronta le riunioni della serie «%@» (cartelle: %@): cosa è cambiato da una all'altra, quali temi tornano e quali cose da fare restano aperte?" = "比较系列“%@”的会议（文件夹：%@）：每次会议之间有什么变化，哪些话题反复出现，哪些待办事项仍未完成？";
+"Cosa è cambiato?" = "有什么变化？";

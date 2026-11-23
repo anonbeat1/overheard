@@ -737,3 +737,13 @@
 "Apri in Google Drive" = "Открыть в Google Диске";
 
 "Cartella Google Drive nel Cestino o non accessibile. Ripristinala o scegli un'altra cartella." = "Папка Google Диска находится в корзине или недоступна. Восстановите её или выберите другую папку.";
+"Serie · %lld riunioni" = "Серия · встреч: %lld";
+"Le altre riunioni di questa serie e le cose da fare ancora aperte" = "Другие встречи этой серии и ещё открытые задачи";
+"%lld riunioni" = "Встреч: %lld";
+"aperta ora" = "открыта сейчас";
+"senza riassunto" = "без сводки";
+"Cose da fare ancora aperte" = "Ещё открытые задачи";
+"Nessuna: tutto spuntato." = "Нет: всё отмечено.";
+"Apri la riunione" = "Открыть встречу";
+"Confronta le riunioni della serie «%@» (cartelle: %@): cosa è cambiato da una all'altra, quali temi tornano e quali cose da fare restano aperte?" = "Сравни встречи серии «%@» (папки: %@): что изменилось от встречи к встрече, какие темы повторяются и какие задачи ещё открыты?";
+"Cosa è cambiato?" = "Что изменилось?";

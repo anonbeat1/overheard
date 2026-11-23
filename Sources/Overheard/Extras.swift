@@ -40,6 +40,10 @@ enum MeetingCalendar {
     static func annotate(_ dir: URL, at date: Date) {
         let titleURL = dir.appendingPathComponent("title")
         guard !FileManager.default.fileExists(atPath: titleURL.path), let e = event(at: date), let title = e.title, !title.isEmpty else { return }
+        // evento ricorrente: tutte le occorrenze hanno lo stesso identificativo → MeetingSeries
+        if e.hasRecurrenceRules, let id = e.calendarItemExternalIdentifier, !id.isEmpty {
+            try? (id + "\n").write(to: dir.appendingPathComponent("series"), atomically: true, encoding: .utf8)
+        }
         do {
             try (title + "\n").write(to: titleURL, atomically: true, encoding: .utf8)
             try CloudProvenance.record(titleURL)
