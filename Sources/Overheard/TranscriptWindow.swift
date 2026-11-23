@@ -150,11 +150,19 @@ struct TranscriptView: View {
     @State private var attendees: [String] = []
 
     var startAt: Double?
+    var series: [Meeting] = []              // riunioni della stessa serie (MeetingSeries), lei compresa
+    var onOpen: (String) -> Void = { _ in }  // apre un'altra riunione nell'archivio
+    var onAsk: (String) -> Void = { _ in }   // domanda alla chat su tutti i meeting
+    @State private var showSeries = false
 
-    init(meeting: Meeting, highlight: String = "", startAt: Double? = nil) {
+    init(meeting: Meeting, highlight: String = "", startAt: Double? = nil, series: [Meeting] = [],
+         onOpen: @escaping (String) -> Void = { _ in }, onAsk: @escaping (String) -> Void = { _ in }) {
         self.startAt = startAt
         self.meeting = meeting
         self.highlight = highlight
+        self.series = series
+        self.onOpen = onOpen
+        self.onAsk = onAsk
         _player = StateObject(wrappedValue: MeetingPlayer(dir: meeting.url))
     }
 
@@ -186,6 +194,14 @@ struct TranscriptView: View {
                     HStack(spacing: 8) {
                         Text(meeting.when).font(.callout).foregroundStyle(.white.opacity(0.5))
                         EngineBadge(meeting: meeting)
+                        if !series.isEmpty {
+                            Button { showSeries = true } label: {
+                                Label("Serie · \(series.count) riunioni", systemImage: "repeat").font(.caption.weight(.semibold))
+                                    .padding(.horizontal, 8).padding(.vertical, 3)
+                                    .background(Color.orange.opacity(0.2), in: Capsule())
+                            }
+                            .buttonStyle(.plain).help("Le altre riunioni di questa serie e le cose da fare ancora aperte")
+                        }
                     }
                 }
                 Spacer()
@@ -302,6 +318,11 @@ struct TranscriptView: View {
         .task(id: cloud.enabled) { await loadCloudText() }
         .onReceive(NotificationCenter.default.publisher(for: .meetingsChanged)) { _ in load() }
         .onDisappear { player.pause() }
+        .sheet(isPresented: $showSeries) {
+            SeriesView(title: meeting.app, members: series, current: meeting.id,
+                       onOpen: { id in showSeries = false; onOpen(id) },
+                       onAsk: { q in showSeries = false; onAsk(q) })
+        }
         .alert("Rinomina \(renaming ?? "")", isPresented: Binding(get: { renaming != nil }, set: { if !$0 { renaming = nil } })) {
             TextField("Nome", text: $newName)
             Button("Rinomina") { rename() }
@@ -914,7 +935,8 @@ struct LibraryView: View {
             .background(Color.white.opacity(0.04))
 
             if let m = meetings.first(where: { $0.id == selected }) {
-                TranscriptView(meeting: m, highlight: query, startAt: startAt).id(m.id)
+                TranscriptView(meeting: m, highlight: query, startAt: startAt, series: MeetingSeries.members(of: m, in: meetings),
+                               onOpen: { selected = $0 }, onAsk: { showChat = true; chat.ask($0, meeting: nil) }).id(m.id)
             } else {
                 Text("Seleziona una riunione").foregroundStyle(.white.opacity(0.5)).frame(maxWidth: .infinity, maxHeight: .infinity)
             }

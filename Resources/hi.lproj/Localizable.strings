@@ -737,3 +737,13 @@
 "Apri in Google Drive" = "Google Drive में खोलें";
 
 "Cartella Google Drive nel Cestino o non accessibile. Ripristinala o scegli un'altra cartella." = "Google Drive का फ़ोल्डर ट्रैश में है या उपलब्ध नहीं है। उसे वापस लाएँ या कोई दूसरा फ़ोल्डर चुनें।";
+"Serie · %lld riunioni" = "सीरीज़ · %lld मीटिंग";
+"Le altre riunioni di questa serie e le cose da fare ancora aperte" = "इस सीरीज़ की बाकी मीटिंग और अभी खुले काम";
+"%lld riunioni" = "%lld मीटिंग";
+"aperta ora" = "अभी खुली है";
+"senza riassunto" = "सारांश नहीं";
+"Cose da fare ancora aperte" = "अभी खुले काम";
+"Nessuna: tutto spuntato." = "कोई नहीं: सब पूरा हो गया।";
+"Apri la riunione" = "मीटिंग खोलें";
+"Confronta le riunioni della serie «%@» (cartelle: %@): cosa è cambiato da una all'altra, quali temi tornano e quali cose da fare restano aperte?" = "«%@» सीरीज़ की मीटिंग की तुलना करें (फ़ोल्डर: %@): एक से दूसरी तक क्या बदला, कौन से विषय बार-बार आते हैं और कौन से काम अभी खुले हैं?";
+"Cosa è cambiato?" = "क्या बदला?";

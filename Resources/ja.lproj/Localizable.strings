@@ -737,3 +737,13 @@
 "Apri in Google Drive" = "Google ドライブで開く";
 
 "Cartella Google Drive nel Cestino o non accessibile. Ripristinala o scegli un'altra cartella." = "Google ドライブのフォルダはゴミ箱にあるか、アクセスできません。復元するか、別のフォルダを選択してください。";
+"Serie · %lld riunioni" = "シリーズ · %lld件の会議";
+"Le altre riunioni di questa serie e le cose da fare ancora aperte" = "このシリーズのほかの会議と、まだ完了していないToDo";
+"%lld riunioni" = "%lld件の会議";
+"aperta ora" = "表示中";
+"senza riassunto" = "要約なし";
+"Cose da fare ancora aperte" = "未完了のToDo";
+"Nessuna: tutto spuntato." = "なし：すべて完了しています。";
+"Apri la riunione" = "会議を開く";
+"Confronta le riunioni della serie «%@» (cartelle: %@): cosa è cambiato da una all'altra, quali temi tornano e quali cose da fare restano aperte?" = "シリーズ「%@」の会議を比較してください（フォルダ：%@）。回ごとに何が変わったか、繰り返し出てくる話題、まだ完了していないToDoは？";
+"Cosa è cambiato?" = "何が変わった？";

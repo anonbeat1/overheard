@@ -737,3 +737,13 @@
 "Apri in Google Drive" = "فتح في Google Drive";
 
 "Cartella Google Drive nel Cestino o non accessibile. Ripristinala o scegli un'altra cartella." = "مجلد Google Drive في المهملات أو يتعذّر الوصول إليه. استعده أو اختر مجلدًا آخر.";
+"Serie · %lld riunioni" = "سلسلة · %lld اجتماعات";
+"Le altre riunioni di questa serie e le cose da fare ancora aperte" = "الاجتماعات الأخرى في هذه السلسلة والمهام التي لا تزال مفتوحة";
+"%lld riunioni" = "%lld اجتماعات";
+"aperta ora" = "مفتوح الآن";
+"senza riassunto" = "بلا ملخص";
+"Cose da fare ancora aperte" = "مهام لا تزال مفتوحة";
+"Nessuna: tutto spuntato." = "لا شيء: تم إنجاز كل شيء.";
+"Apri la riunione" = "فتح الاجتماع";
+"Confronta le riunioni della serie «%@» (cartelle: %@): cosa è cambiato da una all'altra, quali temi tornano e quali cose da fare restano aperte?" = "قارن اجتماعات السلسلة «%@» (المجلدات: %@): ما الذي تغيّر من اجتماع لآخر، وما المواضيع التي تتكرر، وما المهام التي لا تزال مفتوحة؟";
+"Cosa è cambiato?" = "ما الذي تغيّر؟";

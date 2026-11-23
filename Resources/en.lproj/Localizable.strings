@@ -744,3 +744,13 @@
 "Apri in Google Drive" = "Open in Google Drive";
 
 "Cartella Google Drive nel Cestino o non accessibile. Ripristinala o scegli un'altra cartella." = "The Google Drive folder is in the trash or unavailable. Restore it or choose another folder.";
+"Serie · %lld riunioni" = "Series · %lld meetings";
+"Le altre riunioni di questa serie e le cose da fare ancora aperte" = "The other meetings in this series and the action items still open";
+"%lld riunioni" = "%lld meetings";
+"aperta ora" = "open now";
+"senza riassunto" = "no summary";
+"Cose da fare ancora aperte" = "Action items still open";
+"Nessuna: tutto spuntato." = "None: everything is checked off.";
+"Apri la riunione" = "Open the meeting";
+"Confronta le riunioni della serie «%@» (cartelle: %@): cosa è cambiato da una all'altra, quali temi tornano e quali cose da fare restano aperte?" = "Compare the meetings of the series “%@” (folders: %@): what changed from one to the next, which topics keep coming back and which action items are still open?";
+"Cosa è cambiato?" = "What changed?";
