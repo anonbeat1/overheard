@@ -3,3 +3,4 @@
 "NSCalendarsFullAccessUsageDescription" = "为录制的会议获取日历日程的标题和受邀者。";
 "NSCalendarsUsageDescription" = "为录制的会议获取日历日程的标题和受邀者。";
 "NSMicrophoneUsageDescription" = "在会议期间录制你的声音。";
+"NSSpeechRecognitionUsageDescription" = "通话期间在你的 Mac 上聆听你选择的词语以提醒你。听到的内容不会保存。";

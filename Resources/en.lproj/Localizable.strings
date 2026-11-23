@@ -744,3 +744,11 @@
 "Apri in Google Drive" = "Open in Google Drive";
 
 "Cartella Google Drive nel Cestino o non accessibile. Ripristinala o scegli un'altra cartella." = "The Google Drive folder is in the trash or unavailable. Restore it or choose another folder.";
+"🔔 Hanno detto «%@»" = "🔔 Someone said “%@”";
+"al minuto %@ · segnato nel transcript e nel riassunto" = "at minute %@ · marked in the transcript and the summary";
+"Avvisami quando qualcuno dice…" = "Alert me when someone says…";
+"Durante la call ascolta gli altri sul Mac e, quando dicono una di queste parole, manda una notifica e segna il momento. Il testo ascoltato non viene salvato." = "During the call it listens to the others on your Mac and, when they say one of these words, sends a notification and marks the moment. What it hears is not saved.";
+"il tuo nome, scadenza, budget" = "your name, deadline, budget";
+"Separate da virgola. Vale dalla prossima registrazione." = "Separated by commas. Applies from the next recording.";
+"Accesso negato: Impostazioni di Sistema → Privacy e sicurezza → Riconoscimento vocale → Overheard" = "Access denied: System Settings → Privacy & Security → Speech Recognition → Overheard";
+"La lingua delle riunioni non si può ascoltare sul Mac: scegline un'altra in Trascrizione, o aggiungila in Impostazioni di Sistema → Tastiera → Dettatura." = "The meeting language cannot be recognised on this Mac: choose another one under Transcription, or add it in System Settings → Keyboard → Dictation.";

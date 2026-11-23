@@ -78,6 +78,7 @@ Deleting a meeting sends its cloud copies to the service's trash (Drive Trash, D
 **Recording**
 - Starts automatically when Meet, Teams or Slack start using the microphone (or with one click, or `overheard://toggle`)
 - Bookmark important moments while recording with **⌃⌥M** from any app
+- Optional keyword alerts: when someone in the call says a word you chose (your name, "deadline"…), you get a notification and the moment is bookmarked. Off by default, recognised on your Mac, nothing saved
 - Your microphone is leveled to match the call, with optional echo reduction for people who use speakers
 - Calendar integration: meetings get the event title and attendees
 - Survives device changes (AirPods connecting mid-call, sample rate switches)

@@ -737,3 +737,11 @@
 "Apri in Google Drive" = "Открыть в Google Диске";
 
 "Cartella Google Drive nel Cestino o non accessibile. Ripristinala o scegli un'altra cartella." = "Папка Google Диска находится в корзине или недоступна. Восстановите её или выберите другую папку.";
+"🔔 Hanno detto «%@»" = "🔔 Кто-то сказал «%@»";
+"al minuto %@ · segnato nel transcript e nel riassunto" = "на минуте %@ · отмечено в расшифровке и сводке";
+"Avvisami quando qualcuno dice…" = "Сообщать, когда кто-то говорит…";
+"Durante la call ascolta gli altri sul Mac e, quando dicono una di queste parole, manda una notifica e segna il momento. Il testo ascoltato non viene salvato." = "Во время звонка слушает других участников на вашем Mac и, когда они произносят одно из этих слов, присылает уведомление и отмечает момент. Услышанное не сохраняется.";
+"il tuo nome, scadenza, budget" = "ваше имя, срок, бюджет";
+"Separate da virgola. Vale dalla prossima registrazione." = "Через запятую. Действует со следующей записи.";
+"Accesso negato: Impostazioni di Sistema → Privacy e sicurezza → Riconoscimento vocale → Overheard" = "Нет доступа: Системные настройки → Конфиденциальность и безопасность → Распознавание речи → Overheard";
+"La lingua delle riunioni non si può ascoltare sul Mac: scegline un'altra in Trascrizione, o aggiungila in Impostazioni di Sistema → Tastiera → Dettatura." = "Язык встреч нельзя распознавать на этом Mac: выберите другой в разделе «Расшифровка» или добавьте его в Системных настройках → Клавиатура → Диктовка.";

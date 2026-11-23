@@ -3,3 +3,4 @@
 "NSCalendarsFullAccessUsageDescription" = "Übernimmt Titel und Teilnehmer des Kalenderereignisses für aufgezeichnete Besprechungen.";
 "NSCalendarsUsageDescription" = "Übernimmt Titel und Teilnehmer des Kalenderereignisses für aufgezeichnete Besprechungen.";
 "NSMicrophoneUsageDescription" = "Zeichnet Ihre Stimme während Besprechungen auf.";
+"NSSpeechRecognitionUsageDescription" = "Hört während eines Anrufs auf deinem Mac auf die gewählten Wörter, um dich zu benachrichtigen. Das Gehörte wird nicht gespeichert.";

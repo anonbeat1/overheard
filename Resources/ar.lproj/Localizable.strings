@@ -737,3 +737,11 @@
 "Apri in Google Drive" = "فتح في Google Drive";
 
 "Cartella Google Drive nel Cestino o non accessibile. Ripristinala o scegli un'altra cartella." = "مجلد Google Drive في المهملات أو يتعذّر الوصول إليه. استعده أو اختر مجلدًا آخر.";
+"🔔 Hanno detto «%@»" = "🔔 قال أحدهم «%@»";
+"al minuto %@ · segnato nel transcript e nel riassunto" = "عند الدقيقة %@ · تم تحديده في النص والملخص";
+"Avvisami quando qualcuno dice…" = "نبّهني عندما يقول أحدهم…";
+"Durante la call ascolta gli altri sul Mac e, quando dicono una di queste parole, manda una notifica e segna il momento. Il testo ascoltato non viene salvato." = "أثناء المكالمة يستمع إلى الآخرين على جهاز Mac، وعندما يقولون إحدى هذه الكلمات يرسل إشعارًا ويحدد اللحظة. لا يتم حفظ ما يسمعه.";
+"il tuo nome, scadenza, budget" = "اسمك، موعد نهائي، ميزانية";
+"Separate da virgola. Vale dalla prossima registrazione." = "مفصولة بفواصل. يسري من التسجيل التالي.";
+"Accesso negato: Impostazioni di Sistema → Privacy e sicurezza → Riconoscimento vocale → Overheard" = "تم رفض الوصول: إعدادات النظام ← الخصوصية والأمن ← التعرّف على الكلام ← Overheard";
+"La lingua delle riunioni non si può ascoltare sul Mac: scegline un'altra in Trascrizione, o aggiungila in Impostazioni di Sistema → Tastiera → Dettatura." = "لا يمكن التعرّف على لغة الاجتماعات على هذا الـ Mac: اختر لغة أخرى في النسخ، أو أضفها في إعدادات النظام ← لوحة المفاتيح ← الإملاء.";

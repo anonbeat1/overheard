@@ -143,12 +143,20 @@ final class Recorder: ObservableObject {
     @Published var bookmarks = 0
 
     /// Segna il momento attuale della registrazione (⌃⌥M, pulsante nel pannello, overheard://bookmark)
-    func bookmark() {
-        guard let capture, let since else { return notify(String(localized: "Nessuna registrazione in corso"), String(localized: "⌃⌥M segna i momenti importanti mentre registri")) }
+    /// `keyword`: segnato da KeywordAlerts perché qualcuno ha detto quella parola
+    func bookmark(keyword: String? = nil) {
+        guard let capture, let since else {
+            if keyword != nil { return }
+            return notify(String(localized: "Nessuna registrazione in corso"), String(localized: "⌃⌥M segna i momenti importanti mentre registri"))
+        }
         let t = Date().timeIntervalSince(since)
         Bookmarks.add(capture.dir, seconds: t)
         bookmarks += 1
-        notify(String(localized: "⭐ Momento segnato"), String(localized: "al minuto \(Summarizer.stamp(t)) · lo trovi nel transcript e nel riassunto"))
+        if let keyword {
+            notify(String(localized: "🔔 Hanno detto «\(keyword)»"), String(localized: "al minuto \(Summarizer.stamp(t)) · segnato nel transcript e nel riassunto"))
+        } else {
+            notify(String(localized: "⭐ Momento segnato"), String(localized: "al minuto \(Summarizer.stamp(t)) · lo trovi nel transcript e nel riassunto"))
+        }
     }
 
     func toggle(reason: String? = nil, auto: String? = nil, discard: Bool = false) {

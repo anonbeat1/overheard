@@ -3,3 +3,4 @@
 "NSCalendarsFullAccessUsageDescription" = "يستخدم عنوان حدث التقويم والمدعوين إليه للاجتماعات المسجلة.";
 "NSCalendarsUsageDescription" = "يستخدم عنوان حدث التقويم والمدعوين إليه للاجتماعات المسجلة.";
 "NSMicrophoneUsageDescription" = "يسجل صوتك أثناء الاجتماعات.";
+"NSSpeechRecognitionUsageDescription" = "يستمع على جهاز Mac أثناء المكالمة إلى الكلمات التي اخترتها لتنبيهك. لا يتم حفظ ما يسمعه.";

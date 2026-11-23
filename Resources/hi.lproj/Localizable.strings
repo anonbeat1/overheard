@@ -737,3 +737,11 @@
 "Apri in Google Drive" = "Google Drive में खोलें";
 
 "Cartella Google Drive nel Cestino o non accessibile. Ripristinala o scegli un'altra cartella." = "Google Drive का फ़ोल्डर ट्रैश में है या उपलब्ध नहीं है। उसे वापस लाएँ या कोई दूसरा फ़ोल्डर चुनें।";
+"🔔 Hanno detto «%@»" = "🔔 किसी ने «%@» कहा";
+"al minuto %@ · segnato nel transcript e nel riassunto" = "मिनट %@ पर · ट्रांसक्रिप्ट और सारांश में चिह्नित";
+"Avvisami quando qualcuno dice…" = "जब कोई कहे तो मुझे बताएं…";
+"Durante la call ascolta gli altri sul Mac e, quando dicono una di queste parole, manda una notifica e segna il momento. Il testo ascoltato non viene salvato." = "कॉल के दौरान यह आपके Mac पर दूसरों को सुनता है और जब वे इनमें से कोई शब्द कहते हैं, तो सूचना भेजता है और उस पल को चिह्नित करता है। सुना गया टेक्स्ट सेव नहीं होता।";
+"il tuo nome, scadenza, budget" = "आपका नाम, डेडलाइन, बजट";
+"Separate da virgola. Vale dalla prossima registrazione." = "कॉमा से अलग करें। अगली रिकॉर्डिंग से लागू होगा।";
+"Accesso negato: Impostazioni di Sistema → Privacy e sicurezza → Riconoscimento vocale → Overheard" = "एक्सेस नहीं मिला: सिस्टम सेटिंग्स → गोपनीयता और सुरक्षा → वाक् पहचान → Overheard";
+"La lingua delle riunioni non si può ascoltare sul Mac: scegline un'altra in Trascrizione, o aggiungila in Impostazioni di Sistema → Tastiera → Dettatura." = "मीटिंग की भाषा इस Mac पर पहचानी नहीं जा सकती: ट्रांसक्रिप्शन में कोई दूसरी चुनें, या सिस्टम सेटिंग्स → कीबोर्ड → डिक्टेशन में इसे जोड़ें।";
