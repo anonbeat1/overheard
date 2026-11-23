@@ -737,3 +737,7 @@
 "Apri in Google Drive" = "Abrir no Google Drive";
 
 "Cartella Google Drive nel Cestino o non accessibile. Ripristinala o scegli un'altra cartella." = "A pasta do Google Drive está na lixeira ou indisponível. Restaure-a ou escolha outra pasta.";
+"Aggiungi ai Promemoria" = "Adicionar aos Lembretes";
+"%lld aggiunte a Promemoria" = "%lld adicionadas aos Lembretes";
+"Accesso negato: Impostazioni di Sistema → Privacy e sicurezza → Promemoria → Overheard" = "Acesso negado: Ajustes do Sistema → Privacidade e Segurança → Lembretes → Overheard";
+"Nessun account Promemoria su questo Mac" = "Nenhuma conta de Lembretes neste Mac";

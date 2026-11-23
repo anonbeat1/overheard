@@ -90,6 +90,7 @@ Deleting a meeting sends its cloud copies to the service's trash (Drive Trash, D
 
 **AI**
 - Automatic summary with decisions, action items (checkable) and bookmarked moments
+- Send action items to Apple Reminders with one click (an "Overheard" list; deadlines in the text become due dates)
 - Chat across all your meetings or a single one
 - MCP server with `list_meetings`, `search_meetings`, `get_meeting`, `list_action_items` and, if you allow it, actions like starting a recording or checking off a task
 

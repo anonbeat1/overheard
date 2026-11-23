@@ -145,6 +145,8 @@ struct TranscriptView: View {
     @State private var summary: [SummaryLine] = []
     @State private var generating = false
     @State private var summaryError: String?
+    @State private var addingReminders = false
+    @State private var remindersStatus: String?
     @State private var bookmarks: [Double] = []
     @State private var onlyMarked = false
     @State private var attendees: [String] = []
@@ -635,6 +637,7 @@ struct TranscriptView: View {
                             Text(section.title).font(.headline).foregroundStyle(.orange)
                         }
                         ForEach(section.lines) { summaryRow($0) }
+                        if section.lines.contains(where: { if case .todo = $0.kind { true } else { false } }) { remindersButton(section.lines) }
                     }
                     .padding(14)
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -678,6 +681,30 @@ struct TranscriptView: View {
         default:
             Text(md(l.text)).lineSpacing(3)
         }
+    }
+
+    /// Manda a Promemoria le cose da fare aperte della sezione (quelle già mandate no)
+    @ViewBuilder private func remindersButton(_ lines: [SummaryLine]) -> some View {
+        let todo = MeetingReminders.pending(lines, added: MeetingReminders.added(meeting.url))
+        HStack(spacing: 8) {
+            if addingReminders { ProgressView().controlSize(.small) }
+            else if !todo.isEmpty {
+                Button {
+                    addingReminders = true
+                    remindersStatus = nil
+                    Task {
+                        do {
+                            let n = try await MeetingReminders.add(todo, meeting: meeting)
+                            remindersStatus = String(localized: "\(n) aggiunte a Promemoria")
+                        } catch { remindersStatus = error.localizedDescription }
+                        addingReminders = false
+                    }
+                } label: { Label("Aggiungi ai Promemoria", systemImage: "checklist") }
+                .buttonStyle(.plain).font(.caption).foregroundStyle(.orange)
+            }
+            if let remindersStatus { Text(remindersStatus).font(.caption).foregroundStyle(.white.opacity(0.5)) }
+        }
+        .padding(.top, 4)
     }
 
     private func toggleTodo(_ l: SummaryLine) {

@@ -737,3 +737,7 @@
 "Apri in Google Drive" = "Google ドライブで開く";
 
 "Cartella Google Drive nel Cestino o non accessibile. Ripristinala o scegli un'altra cartella." = "Google ドライブのフォルダはゴミ箱にあるか、アクセスできません。復元するか、別のフォルダを選択してください。";
+"Aggiungi ai Promemoria" = "リマインダーに追加";
+"%lld aggiunte a Promemoria" = "%lld件をリマインダーに追加しました";
+"Accesso negato: Impostazioni di Sistema → Privacy e sicurezza → Promemoria → Overheard" = "アクセスが拒否されました：システム設定 → プライバシーとセキュリティ → リマインダー → Overheard";
+"Nessun account Promemoria su questo Mac" = "このMacにリマインダーのアカウントがありません";

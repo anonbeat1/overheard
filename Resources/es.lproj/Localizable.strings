@@ -737,3 +737,7 @@
 "Apri in Google Drive" = "Abrir en Google Drive";
 
 "Cartella Google Drive nel Cestino o non accessibile. Ripristinala o scegli un'altra cartella." = "La carpeta de Google Drive está en la papelera o no está disponible. Restáurala o elige otra.";
+"Aggiungi ai Promemoria" = "Añadir a Recordatorios";
+"%lld aggiunte a Promemoria" = "%lld añadidas a Recordatorios";
+"Accesso negato: Impostazioni di Sistema → Privacy e sicurezza → Promemoria → Overheard" = "Acceso denegado: Ajustes del Sistema → Privacidad y seguridad → Recordatorios → Overheard";
+"Nessun account Promemoria su questo Mac" = "No hay ninguna cuenta de Recordatorios en este Mac";

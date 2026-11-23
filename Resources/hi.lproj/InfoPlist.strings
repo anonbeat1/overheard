@@ -3,3 +3,4 @@
 "NSCalendarsFullAccessUsageDescription" = "रिकॉर्ड की गई बैठकों के लिए कैलेंडर इवेंट से शीर्षक और आमंत्रित लोगों के नाम लेता है।";
 "NSCalendarsUsageDescription" = "रिकॉर्ड की गई बैठकों के लिए कैलेंडर इवेंट से शीर्षक और आमंत्रित लोगों के नाम लेता है।";
 "NSMicrophoneUsageDescription" = "बैठकों के दौरान आपकी आवाज़ रिकॉर्ड करता है।";
+"NSRemindersFullAccessUsageDescription" = "आपके कहने पर मीटिंग सारांश के काम रिमाइंडर में जोड़ता है।";

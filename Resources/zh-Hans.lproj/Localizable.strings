@@ -737,3 +737,7 @@
 "Apri in Google Drive" = "在 Google 云端硬盘中打开";
 
 "Cartella Google Drive nel Cestino o non accessibile. Ripristinala o scegli un'altra cartella." = "Google 云端硬盘文件夹在回收站中或无法访问。请恢复该文件夹或选择其他文件夹。";
+"Aggiungi ai Promemoria" = "添加到提醒事项";
+"%lld aggiunte a Promemoria" = "已添加 %lld 项到提醒事项";
+"Accesso negato: Impostazioni di Sistema → Privacy e sicurezza → Promemoria → Overheard" = "访问被拒绝：系统设置 → 隐私与安全性 → 提醒事项 → Overheard";
+"Nessun account Promemoria su questo Mac" = "这台 Mac 上没有提醒事项账户";

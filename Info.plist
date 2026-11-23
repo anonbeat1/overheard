@@ -56,6 +56,8 @@
 	<string>Gives recorded meetings the title and attendees of the calendar event.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Records your voice during meetings.</string>
+	<key>NSRemindersFullAccessUsageDescription</key>
+	<string>Adds the action items of a meeting summary to Reminders, when you ask.</string>
 	<key>SUEnableAutomaticChecks</key>
 	<true/>
 	<key>SUFeedURL</key>
